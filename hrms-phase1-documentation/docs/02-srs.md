@@ -59,11 +59,21 @@ Define uniquely identified, testable functional and non-functional Phase 1 requi
 - **FR-DOC-001** Authorized upload/download through controlled flows.
 - **FR-DOC-002** Documents can associate with tenant, employee, New Hire, offer letter, HR records, departments and extensible future entities.
 - **FR-DOC-003** Store category, status, ownership, versions, timestamps and optional expiry.
-- **FR-DOC-004** Support categories Identity, Employment, Offer Letter, Education, Medical, Payroll, Tax, Policy, Acknowledgement, Other.
+- **FR-DOC-004** Support categories Identity, Employment, Offer Letter, Education, Medical, Payroll, Tax, Policy, Acknowledgement, Contract, Certificate, Other.
 - **FR-DOC-005** Enforce server-side type, size and content validation.
 - **FR-DOC-006** Preserve version history.
 - **FR-DOC-007** Sensitive document access uses additional permission restrictions and audit logging.
 - **FR-DOC-008** Public storage URLs cannot bypass authorization.
+- **FR-DOC-009** Document access requires HMAC-signed, time-limited access tokens. No permanent public URLs.
+- **FR-DOC-010** Every document access attempt (success and denial) is logged to an immutable access log with actor, tenant, outcome, and denial reason.
+- **FR-DOC-011** Documents are strictly isolated per tenant. Cross-tenant access is only possible via Super Admin-created platform-level share tokens.
+- **FR-DOC-012** Document sensitivity classification (NORMAL, CONFIDENTIAL, HIGHLY_CONFIDENTIAL) controls access requirements and audit granularity.
+
+### File Storage
+- **FR-STOR-001** All binary files are stored on external object storage (S3-compatible) with only metadata and storage references in the database.
+- **FR-STOR-002** Storage keys are server-generated using the pattern `{tenant_id}/{module}/{year}/{month}/{uuid}.{ext}`. Original filenames are display metadata only.
+- **FR-STOR-003** File content integrity is verified using SHA-256 hash on upload finalization.
+- **FR-STOR-004** Per-tenant storage quotas are enforced based on subscription plan limits.
 
 ### Regions/departments/designations
 - **FR-REG-001** Manage region, country, IANA timezone, locale and status.
@@ -110,11 +120,17 @@ Define uniquely identified, testable functional and non-functional Phase 1 requi
 - **FR-ANN-003** Support title, content, publish date, expiry, priority, status.
 - **FR-ANN-004** Track per-user read/unread state.
 
-### Tickets
+### Tickets (Intra-Company)
 - **FR-TKT-001** Create department-oriented tickets with server ticket number, subject, description, category, priority.
 - **FR-TKT-002** Statuses are `OPEN`, `IN_PROGRESS`, `WAITING`, `RESOLVED`, `CLOSED`.
 - **FR-TKT-003** Support assignee, comments, attachments, activity history.
 - **FR-TKT-004** Enforce tenant/department/permission visibility.
+
+### Platform Tickets (Company-to-Super-Admin)
+- **FR-TKT-005** Tenant Admin can create platform tickets to Super Admin for platform-level support, billing, feature requests, data issues, access issues, and security concerns.
+- **FR-TKT-006** Platform ticket statuses are `OPEN`, `IN_PROGRESS`, `WAITING_ON_TENANT`, `WAITING_ON_ADMIN`, `RESOLVED`, `CLOSED`.
+- **FR-TKT-007** Platform tickets support Super Admin assignment, comments (with internal-only flag), attachments, and immutable activity history.
+- **FR-TKT-008** Tenant Admin sees only their own tenant's platform tickets. Super Admin sees all platform tickets with filtering.
 
 ### Meeting rooms
 - **FR-ROOM-001** Manage buildings, floors, rooms, capacity, facilities and status.
@@ -122,11 +138,17 @@ Define uniquely identified, testable functional and non-functional Phase 1 requi
 - **FR-ROOM-003** Reserve/cancel rooms.
 - **FR-ROOM-004** Prevent overlapping active reservations with transactionally safe backend/database enforcement.
 
+### Tenant Settings
+- **FR-TEN-008** Each tenant has configurable settings: timezone, date/time format, currency, fiscal year, leave year, work schedule, file upload limits, and employee ID format.
+- **FR-TEN-009** Tenant settings are managed by Tenant Admin with `tenant_settings.manage` permission.
+- **FR-TEN-010** Tenant subscription plans define limits for employees, storage, departments, and feature access.
+
 ### Audit
 - **FR-AUD-001** Audit actor, tenant, action, resource, resource ID, timestamp, request ID.
 - **FR-AUD-002** Include IP and before/after state where appropriate and justified.
-- **FR-AUD-003** Sensitive document access is audited.
+- **FR-AUD-003** Sensitive document access is audited via immutable document_access_log.
 - **FR-AUD-004** Audit records cannot be normally edited/deleted by application users.
+- **FR-AUD-005** Audit database (DB-AUDIT) failure does not block business operations. Events are queued for replay.
 
 ## Non-functional requirements
 
@@ -153,10 +175,11 @@ Define uniquely identified, testable functional and non-functional Phase 1 requi
 - **NFR-PERF-006** Numeric SLOs are measured/approved rather than invented.
 
 ### Reliability/availability
-- **NFR-REL-001** Production exposes liveness/readiness checks.
-- **NFR-REL-002** Migrations are controlled and backups have tested recovery procedure.
-- **NFR-REL-003** Use transactions for invariants requiring atomicity.
+- **NFR-REL-001** Production exposes liveness/readiness checks per database.
+- **NFR-REL-002** Migrations are controlled per database and backups have tested recovery procedure.
+- **NFR-REL-003** Use transactions for invariants requiring atomicity within a single database. Cross-database atomicity is handled by service-layer compensation.
 - **NFR-REL-004** Bound retries and design idempotency for duplicate-prone operations.
+- **NFR-REL-005** Multi-database architecture ensures failure of one database (DB-CORE, DB-HR, DB-DOCS, DB-OPS, DB-AUDIT) does not cascade to unrelated modules.
 
 ### Privacy/EU readiness
 - **NFR-PRV-001** Model region, country, locale and timezone without one-country assumptions.

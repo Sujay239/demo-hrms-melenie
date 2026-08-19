@@ -52,18 +52,10 @@ export const PlatformShell: React.FC = () => {
   };
 
   const NavContent = () => (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-300">
+    <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200">
       {/* Brand Header */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
-        <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-          C
-        </div>
-        <div>
-          <h1 className="font-bold text-white tracking-tight text-base">Cyrcalur HRMS</h1>
-          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            Super Admin Portal
-          </span>
-        </div>
+      <div className="flex items-center px-6 py-5 border-b border-slate-100">
+        <img src="/logo.png" alt="Cyrcalur Logo" className="h-8 w-auto max-w-full object-contain" />
       </div>
 
       {/* Nav Menu */}
@@ -84,7 +76,7 @@ export const PlatformShell: React.FC = () => {
                 'flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all',
                 isActive
                   ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               )}
             >
               <Icon className="w-5 h-5 shrink-0" />
@@ -95,17 +87,17 @@ export const PlatformShell: React.FC = () => {
       </nav>
 
       {/* Demo Switcher footer */}
-      <div className="p-4 border-t border-slate-800 bg-slate-950/60">
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-          <span className="flex items-center gap-1">
-            <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
+      <div className="p-4 border-t border-slate-100 bg-slate-50/80">
+        <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-medium">
+          <span className="flex items-center gap-1.5">
+            <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
             Switch Active Demo User:
           </span>
         </div>
         <select
           value={currentUser.id}
           onChange={(e) => handleRoleSwitch(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-md p-2 focus:outline-none focus:border-indigo-500 cursor-pointer"
+          className="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-lg p-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer font-medium"
         >
           {allUsers.map((u) => (
             <option key={u.id} value={u.id}>
@@ -119,8 +111,8 @@ export const PlatformShell: React.FC = () => {
 
   return (
     <div className="min-h-screen flex bg-slate-50">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-64 shrink-0 border-r border-slate-800 z-20">
+      {/* Desktop Sidebar (Fixed in single screen) */}
+      <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-slate-200 z-20 sticky top-0 h-screen overflow-hidden">
         <NavContent />
       </aside>
 
@@ -132,11 +124,11 @@ export const PlatformShell: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 shadow-xs">
+        <header className="sticky top-0 z-10 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100"
+              className="md:hidden text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100"
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -181,7 +173,7 @@ export const PlatformShell: React.FC = () => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-full">
           <Outlet />
         </main>
       </div>

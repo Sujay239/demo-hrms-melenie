@@ -1,10 +1,11 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { mockStorage } from '@/services/mock-storage';
-import { Users, Clock, Calendar, CheckSquare, Megaphone, Ticket } from 'lucide-react';
+import { mockStorage, KEYS } from '@/services/mock-storage';
+import { Employee, LeaveRequest, Ticket as TicketType, Announcement, Holiday, AttendanceRecord } from '@/demo-data/seedData';
+import { Users, Clock, Calendar, CheckSquare, Megaphone, Ticket, ArrowRight } from 'lucide-react';
 
 export const TenantDashboardPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -14,6 +15,18 @@ export const TenantDashboardPage: React.FC = () => {
 
   const isTenantAdmin =
     currentUser.role === 'TENANT_ADMIN' || currentUser.role === 'SUPER_ADMIN';
+
+  const employees = mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, tenant.id);
+  const leaveRequests = mockStorage.getTenantItems<LeaveRequest>(KEYS.LEAVE_REQUESTS, tenant.id);
+  const tickets = mockStorage.getTenantItems<TicketType>(KEYS.TICKETS, tenant.id);
+  const announcements = mockStorage.getTenantItems<Announcement>(KEYS.ANNOUNCEMENTS, tenant.id);
+  const holidays = mockStorage.getTenantItems<Holiday>(KEYS.HOLIDAYS, tenant.id);
+  const attendance = mockStorage.getTenantItems<AttendanceRecord>(KEYS.ATTENDANCE, tenant.id);
+
+  const pendingLeaves = leaveRequests.filter((lr) => lr.status === 'PENDING').length;
+  const openTickets = tickets.filter((tk) => tk.status === 'OPEN' || tk.status === 'IN_PROGRESS' || tk.status === 'WAITING').length;
+  const presentCount = attendance.filter((a) => a.status === 'PRESENT').length;
+  const attendanceRate = attendance.length > 0 ? Math.round((presentCount / attendance.length) * 100) : 95;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -33,10 +46,10 @@ export const TenantDashboardPage: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-xs p-3 rounded-xl border border-white/20 flex items-center gap-3">
             <div>
               <p className="text-xs text-indigo-200">Today's Attendance Status</p>
-              <p className="text-sm font-bold text-white">CLOCKED OUT</p>
+              <p className="text-sm font-bold text-white">CLOCKED IN (09:00 AM)</p>
             </div>
             <Button variant="secondary" size="sm">
-              Clock In Now
+              Clock Out
             </Button>
           </div>
         )}
@@ -48,7 +61,7 @@ export const TenantDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Employees</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">{tenant.employeeCount || 42}</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{employees.length || tenant.employeeCount}</h3>
             </div>
             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
               <Users className="w-6 h-6" />
@@ -61,20 +74,20 @@ export const TenantDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Today's Attendance</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">94%</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{attendanceRate}%</h3>
             </div>
             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
               <Clock className="w-6 h-6" />
             </div>
           </div>
-          <p className="text-xs text-slate-500 mt-3">Clocked in on time</p>
+          <p className="text-xs text-slate-500 mt-3">{presentCount} present on record</p>
         </Card>
 
         <Card className="border-l-4 border-l-amber-600">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending Leave</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">3</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{pendingLeaves}</h3>
             </div>
             <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
               <Calendar className="w-6 h-6" />
@@ -87,13 +100,13 @@ export const TenantDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Open Tickets</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">2</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mt-1">{openTickets}</h3>
             </div>
             <div className="p-3 bg-sky-50 text-sky-600 rounded-xl">
               <Ticket className="w-6 h-6" />
             </div>
           </div>
-          <p className="text-xs text-slate-500 mt-3">Help desk queue</p>
+          <p className="text-xs text-slate-500 mt-3">Active help desk queue</p>
         </Card>
       </div>
 
@@ -104,17 +117,24 @@ export const TenantDashboardPage: React.FC = () => {
             <CardTitle className="flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-indigo-600" /> Recent Announcements
             </CardTitle>
+            <Link to={`/${tenant.slug}/announcements`} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+              View All <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-900">Office Closure Notice</span>
-                <Badge variant="rose" size="sm">HIGH PRIORITY</Badge>
+            {announcements.slice(0, 3).map((ann) => (
+              <div key={ann.id} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-900">{ann.title}</span>
+                  <Badge variant={ann.priority === 'HIGH' ? 'rose' : ann.priority === 'MEDIUM' ? 'amber' : 'neutral'} size="sm">
+                    {ann.priority} PRIORITY
+                  </Badge>
+                </div>
+                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                  {ann.content}
+                </p>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
-                The office will remain closed for maintenance on Friday, August 22nd.
-              </p>
-            </div>
+            ))}
           </CardContent>
         </Card>
 
@@ -123,15 +143,22 @@ export const TenantDashboardPage: React.FC = () => {
             <CardTitle className="flex items-center gap-2">
               <CheckSquare className="w-5 h-5 text-emerald-600" /> Upcoming Holidays
             </CardTitle>
+            <Link to={`/${tenant.slug}/holidays`} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+              View All <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
-              <div>
-                <h5 className="text-xs font-semibold text-slate-900">Regional Festival</h5>
-                <p className="text-xs text-slate-500">October 20, 2026</p>
+            {holidays.slice(0, 4).map((hol) => (
+              <div key={hol.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+                <div>
+                  <h5 className="text-xs font-semibold text-slate-900">{hol.name}</h5>
+                  <p className="text-xs text-slate-500">{hol.date}</p>
+                </div>
+                <Badge variant={hol.kind === 'FLEXIBLE' ? 'amber' : 'sky'} size="sm">
+                  {hol.kind}
+                </Badge>
               </div>
-              <Badge variant="amber" size="sm">FLEXIBLE</Badge>
-            </div>
+            ))}
           </CardContent>
         </Card>
       </div>

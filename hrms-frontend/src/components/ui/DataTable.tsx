@@ -111,17 +111,17 @@ export function DataTable<T>({
             </span>{' '}
             of <span className="font-semibold">{pagination.total}</span> entries
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <Button
               variant="outline"
               size="sm"
               disabled={pagination.page <= 1}
               onClick={() => onPageChange(pagination.page - 1)}
+              leftIcon={<ChevronLeft className="w-3.5 h-3.5" />}
             >
-              <ChevronLeft className="w-4 h-4" />
               Previous
             </Button>
-            <span className="px-2 py-1 font-medium">
+            <span className="px-2 py-1 font-medium whitespace-nowrap">
               Page {pagination.page} of {pagination.totalPages}
             </span>
             <Button
@@ -129,9 +129,9 @@ export function DataTable<T>({
               size="sm"
               disabled={pagination.page >= pagination.totalPages}
               onClick={() => onPageChange(pagination.page + 1)}
+              rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
             >
               Next
-              <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </div>

@@ -30,12 +30,15 @@ import { AnnouncementsPage } from '@/pages/tenant/AnnouncementsPage';
 import { TicketListPage } from '@/pages/tenant/TicketListPage';
 import { RoomReservationPage } from '@/pages/tenant/RoomReservationPage';
 import { AuditLogPage } from '@/pages/tenant/AuditLogPage';
+import { OnboardingCasesPage } from '@/pages/tenant/OnboardingCasesPage';
+import { ProfileSettingsPage } from '@/pages/tenant/ProfileSettingsPage';
 
 import { OnboardingDashboardPage } from '@/pages/onboarding/OnboardingDashboardPage';
 import { MyDetailsPage } from '@/pages/onboarding/MyDetailsPage';
 import { OfferReviewPage } from '@/pages/onboarding/OfferReviewPage';
 import { RequiredDocumentsPage } from '@/pages/onboarding/RequiredDocumentsPage';
 import { AcknowledgementPage } from '@/pages/onboarding/AcknowledgementPage';
+import { ToolsPreviewPage } from '@/pages/onboarding/ToolsPreviewPage';
 
 export const AppRouter: React.FC = () => {
   return (
@@ -66,6 +69,9 @@ export const AppRouter: React.FC = () => {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<TenantDashboardPage />} />
           <Route path="employees" element={<EmployeeListPage />} />
+          <Route path="profile" element={<ProfileSettingsPage />} />
+          <Route path="settings" element={<ProfileSettingsPage />} />
+          <Route path="onboarding-cases" element={<OnboardingCasesPage />} />
           <Route path="regions" element={<RegionListPage />} />
           <Route path="departments" element={<DepartmentListPage />} />
           <Route path="designations" element={<DesignationListPage />} />
@@ -88,6 +94,7 @@ export const AppRouter: React.FC = () => {
           <Route path="offer" element={<OfferReviewPage />} />
           <Route path="documents" element={<RequiredDocumentsPage />} />
           <Route path="acknowledgement" element={<AcknowledgementPage />} />
+          <Route path="preview" element={<ToolsPreviewPage />} />
         </Route>
 
         {/* Fallback Root Redirect */}
