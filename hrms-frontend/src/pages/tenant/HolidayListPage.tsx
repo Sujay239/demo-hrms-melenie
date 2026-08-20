@@ -24,7 +24,7 @@ export const HolidayListPage: React.FC = () => {
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
   const currentUser = mockStorage.getCurrentUser();
-  const isTenantAdmin = currentUser.role === 'TENANT_ADMIN' || currentUser.role === 'SUPER_ADMIN';
+  const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant.id);
 
   const holidays = mockStorage.getTenantItems<Holiday>(KEYS.HOLIDAYS, currentTenant.id);
 

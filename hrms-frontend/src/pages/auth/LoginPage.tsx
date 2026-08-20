@@ -31,7 +31,16 @@ export const LoginPage: React.FC = () => {
         if (matched.role === 'SUPER_ADMIN') {
           navigate('/admin');
         } else if (matched.role === 'NEW_HIRE') {
-          navigate('/acme-corp/onboarding/dashboard');
+          const tenant = matched.tenantId
+            ? mockStorage.getTenants().find((t) => t.id === matched.tenantId)
+            : mockStorage.getTenants()[0];
+          navigate(`/${tenant?.slug || 'acme-corp'}/onboarding/dashboard`);
+        } else if (matched.role === 'CONSULTANT') {
+          const tenant = mockStorage.getAccessibleTenant(matched);
+          navigate(tenant ? `/${tenant.slug}/dashboard` : '/admin/consultants');
+        } else if (matched.tenantId) {
+          const tenant = mockStorage.getTenants().find((t) => t.id === matched.tenantId);
+          navigate(`/${tenant?.slug || 'acme-corp'}/dashboard`);
         } else {
           navigate('/acme-corp/dashboard');
         }

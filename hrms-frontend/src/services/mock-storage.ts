@@ -117,9 +117,122 @@ class MockStorage {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  private tenantMetrics(tenantId: string, users: User[], employees: Employee[]) {
+    return {
+      consultantCount: users.filter((u) => u.role === 'CONSULTANT' && (u.assignedTenantIds || []).includes(tenantId)).length,
+      employeeCount: employees.filter((e) => e.tenantId === tenantId && e.employmentStatus === 'ACTIVE').length,
+    };
+  }
+
+  private syncTenantMetrics(): Tenant[] {
+    const tenants = this.getItem<Tenant>(KEYS.TENANTS);
+    const users = this.getItem<User>(KEYS.USERS);
+    const employees = this.getItem<Employee>(KEYS.EMPLOYEES);
+    let changed = false;
+
+    const synced = tenants.map((tenant) => {
+      const metrics = this.tenantMetrics(tenant.id, users, employees);
+      if (tenant.consultantCount !== metrics.consultantCount || tenant.employeeCount !== metrics.employeeCount) {
+        changed = true;
+        return { ...tenant, ...metrics };
+      }
+      return tenant;
+    });
+
+    if (changed) {
+      this.setItem(KEYS.TENANTS, synced);
+    }
+
+    return synced;
+  }
+
+  public getRoleLabel(role: User['role']): string {
+    const labels: Record<User['role'], string> = {
+      SUPER_ADMIN: 'Super Admin',
+      CONSULTANT: 'Consultant',
+      TENANT_ADMIN: 'Company Admin',
+      EMPLOYEE: 'Employee',
+      NEW_HIRE: 'New Hire',
+    };
+    return labels[role];
+  }
+
+  public getVisibleTenantsForUser(user: User = this.getCurrentUser()): Tenant[] {
+    const tenants = this.getTenants();
+    if (user.role === 'SUPER_ADMIN') return tenants;
+    if (user.role === 'CONSULTANT') {
+      const assignedTenantIds = new Set(user.assignedTenantIds || []);
+      return tenants.filter((tenant) => assignedTenantIds.has(tenant.id));
+    }
+    if (user.tenantId) {
+      return tenants.filter((tenant) => tenant.id === user.tenantId);
+    }
+    return [];
+  }
+
+  public getAccessibleTenant(user: User, requestedSlug?: string): Tenant | null {
+    const visibleTenants = this.getVisibleTenantsForUser(user);
+    return visibleTenants.find((tenant) => tenant.slug === requestedSlug) || visibleTenants[0] || null;
+  }
+
+  public isTenantAdminFor(user: User, tenantId?: string): boolean {
+    if (user.role === 'SUPER_ADMIN') return true;
+    if (user.role === 'TENANT_ADMIN') return Boolean(tenantId && user.tenantId === tenantId);
+    if (user.role === 'CONSULTANT') return Boolean(tenantId && (user.assignedTenantIds || []).includes(tenantId));
+    return false;
+  }
+
+  private syncUserFromEmployee(employee: Employee, previousEmployee?: Employee): void {
+    const users = this.getUsers();
+    const normalizedEmail = employee.email.toLowerCase();
+    const previousEmail = previousEmployee?.email.toLowerCase();
+    const userIdx = users.findIndex((u) => {
+      const sameTenant = u.tenantId === employee.tenantId;
+      const emailMatch = u.email.toLowerCase() === normalizedEmail || (!!previousEmail && u.email.toLowerCase() === previousEmail);
+      const legacyNameMatch = !!previousEmployee && sameTenant && u.name.toLowerCase() === previousEmployee.name.toLowerCase();
+      return sameTenant && (emailMatch || legacyNameMatch);
+    });
+
+    if (userIdx === -1) return;
+
+    users[userIdx] = {
+      ...users[userIdx],
+      name: employee.name,
+      email: employee.email,
+      avatarUrl: employee.avatarUrl || users[userIdx].avatarUrl,
+      status: employee.employmentStatus === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
+      tenantId: employee.tenantId,
+    };
+    this.setItem(KEYS.USERS, users);
+
+    const current = this.getCurrentUser();
+    if (current.id === users[userIdx].id) {
+      this.setCurrentUser(users[userIdx]);
+    }
+  }
+
+  private createUserForEmployee(employee: Employee): void {
+    const users = this.getUsers();
+    const exists = users.some((u) => u.email.toLowerCase() === employee.email.toLowerCase());
+    if (exists) return;
+
+    this.setItem<User>(KEYS.USERS, [
+      {
+        id: `user-${employee.id}`,
+        name: employee.name,
+        email: employee.email,
+        role: 'EMPLOYEE',
+        tenantId: employee.tenantId,
+        status: employee.employmentStatus === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
+        avatarUrl: employee.avatarUrl,
+      },
+      ...users,
+    ]);
+  }
+
   // Tenants
   public getTenants(): Tenant[] {
-    return this.getItem<Tenant>(KEYS.TENANTS);
+    return this.syncTenantMetrics();
   }
 
   public addTenant(tenant: Omit<Tenant, 'id' | 'createdAt' | 'consultantCount' | 'employeeCount'>): Tenant {
@@ -154,6 +267,9 @@ class MockStorage {
   public addUser(user: User): User {
     const users = this.getUsers();
     this.setItem(KEYS.USERS, [user, ...users]);
+    if (user.role === 'CONSULTANT') {
+      this.syncTenantMetrics();
+    }
     return user;
   }
 
@@ -163,6 +279,9 @@ class MockStorage {
     if (idx === -1) return null;
     users[idx] = { ...users[idx], ...updates };
     this.setItem(KEYS.USERS, users);
+    if (users[idx].role === 'CONSULTANT' || updates.role === 'CONSULTANT' || updates.assignedTenantIds) {
+      this.syncTenantMetrics();
+    }
     return users[idx];
   }
 
@@ -218,6 +337,10 @@ class MockStorage {
       id: item.id || `id-${Date.now()}`,
     };
     this.setItem(key, [newItem, ...items]);
+    if (key === KEYS.EMPLOYEES) {
+      this.createUserForEmployee(newItem as unknown as Employee);
+      this.syncTenantMetrics();
+    }
     return newItem;
   }
 
@@ -225,8 +348,13 @@ class MockStorage {
     const items = this.getItem<T>(key);
     const idx = items.findIndex((i) => i.id === id);
     if (idx === -1) return null;
+    const previous = items[idx];
     items[idx] = { ...items[idx], ...updates };
     this.setItem(key, items);
+    if (key === KEYS.EMPLOYEES) {
+      this.syncUserFromEmployee(items[idx] as unknown as Employee, previous as unknown as Employee);
+      this.syncTenantMetrics();
+    }
     return items[idx];
   }
 
@@ -236,6 +364,9 @@ class MockStorage {
       key,
       items.filter((i) => i.id !== id)
     );
+    if (key === KEYS.EMPLOYEES) {
+      this.syncTenantMetrics();
+    }
   }
 
   public deleteTenantItem<T extends { id: string }>(key: string, id: string): void {
@@ -303,7 +434,7 @@ class MockStorage {
         phone: targetCase.phone,
         departmentId: targetCase.departmentId,
         designationId: targetCase.designationId,
-        regionId: 'region-acme-us',
+        regionId: this.getTenants().find((tenant) => tenant.id === targetCase.tenantId)?.defaultRegionId || 'region-acme-us',
         managerId: targetCase.managerId || null,
         joiningDate: targetCase.joiningDate,
         employmentStatus: 'ACTIVE',

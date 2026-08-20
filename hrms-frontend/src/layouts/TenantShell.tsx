@@ -28,6 +28,7 @@ import { mockStorage } from '@/services/mock-storage';
 import { Drawer } from '@/components/ui/Drawer';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { ToastContainer } from '@/components/ui/Toast';
 
 export const TenantShell: React.FC = () => {
@@ -39,15 +40,42 @@ export const TenantShell: React.FC = () => {
 
   const currentUser = mockStorage.getCurrentUser();
   const allUsers = mockStorage.getUsers();
-  const allTenants = mockStorage.getTenants();
+  const visibleTenants = mockStorage.getVisibleTenantsForUser(currentUser);
 
-  // Find active tenant by slug
-  const activeTenant =
-    allTenants.find((t) => t.slug === slug) || allTenants[0];
+  // Find active tenant by slug and user authorization scope.
+  const activeTenant = mockStorage.getAccessibleTenant(currentUser, slug);
+
+  if (!activeTenant) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <Card className="max-w-md p-6 text-center space-y-3">
+          <Lock className="w-10 h-10 text-slate-400 mx-auto" />
+          <h2 className="text-lg font-bold text-slate-900">No Company Access</h2>
+          <p className="text-sm text-slate-500">
+            The selected account is not assigned to any company portal.
+          </p>
+          <Link to="/admin">
+            <Button variant="primary">Return to Platform Admin</Button>
+          </Link>
+        </Card>
+      </div>
+    );
+  }
 
   const currentSlug = activeTenant.slug;
 
-  const isTenantAdmin = currentUser.role === 'TENANT_ADMIN' || currentUser.role === 'SUPER_ADMIN';
+  const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, activeTenant.id);
+  const activeTenantUserIds = new Set(
+    allUsers
+      .filter(
+        (u) =>
+          u.role === 'SUPER_ADMIN' ||
+          u.tenantId === activeTenant.id ||
+          (u.role === 'CONSULTANT' && (u.assignedTenantIds || []).includes(activeTenant.id))
+      )
+      .map((u) => u.id)
+  );
+  const switchableUsers = allUsers.filter((u) => activeTenantUserIds.has(u.id));
 
   const feats = activeTenant.features || {
     onboarding: true,
@@ -124,8 +152,11 @@ export const TenantShell: React.FC = () => {
       } else if (targetUser.role === 'NEW_HIRE') {
         window.location.href = `/${currentSlug}/onboarding/dashboard`;
       } else if (targetUser.tenantId) {
-        const tenant = allTenants.find((t) => t.id === targetUser.tenantId);
+        const tenant = mockStorage.getTenants().find((t) => t.id === targetUser.tenantId);
         window.location.href = `/${tenant?.slug || currentSlug}/dashboard`;
+      } else if (targetUser.role === 'CONSULTANT') {
+        const tenant = mockStorage.getAccessibleTenant(targetUser, currentSlug);
+        window.location.href = tenant ? `/${tenant.slug}/dashboard` : '/admin/consultants';
       } else {
         window.location.reload();
       }
@@ -154,7 +185,7 @@ export const TenantShell: React.FC = () => {
       </div>
 
       {/* Tenant Context Selector */}
-      {allTenants.length > 1 && (
+      {visibleTenants.length > 1 && (
         <div className="px-3 pt-3 pb-2 border-b border-slate-100 bg-slate-50/50">
           <label className="text-[11px] font-medium text-slate-500 px-2 mb-1 block">
             Company Portal Context:
@@ -164,7 +195,7 @@ export const TenantShell: React.FC = () => {
             onChange={(e) => handleTenantSwitch(e.target.value)}
             className="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-lg p-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer font-medium"
           >
-            {allTenants.map((t) => (
+            {visibleTenants.map((t) => (
               <option key={t.id} value={t.slug}>
                 {t.name} ({t.status})
               </option>
@@ -211,9 +242,9 @@ export const TenantShell: React.FC = () => {
           onChange={(e) => handleRoleSwitch(e.target.value)}
           className="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-md p-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer font-medium"
         >
-          {allUsers.map((u) => (
+          {switchableUsers.map((u) => (
             <option key={u.id} value={u.id}>
-              {u.name} ({u.role})
+              {u.name} ({mockStorage.getRoleLabel(u.role)})
             </option>
           ))}
         </select>
@@ -266,7 +297,7 @@ export const TenantShell: React.FC = () => {
                 <span className="text-sm font-semibold text-slate-800 leading-tight">
                   {currentUser.name}
                 </span>
-                <span className="text-xs text-slate-500">{currentUser.role}</span>
+                <span className="text-xs text-slate-500">{mockStorage.getRoleLabel(currentUser.role)}</span>
               </div>
               <ChevronDown className="w-4 h-4 text-slate-400" />
             </button>
@@ -277,7 +308,7 @@ export const TenantShell: React.FC = () => {
                   <p className="text-sm font-semibold text-slate-900">{currentUser.name}</p>
                   <p className="text-xs text-slate-500">{currentUser.email}</p>
                   <span className="inline-block mt-1 text-[10px] font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100">
-                    {currentUser.role}
+                    {mockStorage.getRoleLabel(currentUser.role)}
                   </span>
                 </div>
                 <Link

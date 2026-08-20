@@ -13,8 +13,7 @@ export const TenantDashboardPage: React.FC = () => {
   const tenants = mockStorage.getTenants();
   const tenant = tenants.find((t) => t.slug === slug) || tenants[0];
 
-  const isTenantAdmin =
-    currentUser.role === 'TENANT_ADMIN' || currentUser.role === 'SUPER_ADMIN';
+  const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, tenant.id);
 
   const employees = mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, tenant.id);
   const leaveRequests = mockStorage.getTenantItems<LeaveRequest>(KEYS.LEAVE_REQUESTS, tenant.id);
@@ -38,7 +37,7 @@ export const TenantDashboardPage: React.FC = () => {
           </span>
           <h2 className="text-2xl font-bold mt-2">Welcome to {tenant.name}</h2>
           <p className="text-sm text-indigo-100 mt-1">
-            Logged in as <span className="font-semibold text-white">{currentUser.name}</span> ({currentUser.role})
+            Logged in as <span className="font-semibold text-white">{currentUser.name}</span> ({mockStorage.getRoleLabel(currentUser.role)})
           </p>
         </div>
 

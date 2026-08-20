@@ -50,7 +50,7 @@ export const ProfileSettingsPage: React.FC = () => {
         e.email.toLowerCase() === currentUser.email.toLowerCase() ||
         e.id === currentUser.id ||
         (currentUser.name && e.name.toLowerCase() === currentUser.name.toLowerCase())
-    ) || employees[0];
+    ) || null;
 
   const deptObj = departments.find((d) => d.id === myEmployee?.departmentId);
   const desigObj = designations.find((d) => d.id === myEmployee?.designationId);
@@ -140,6 +140,34 @@ export const ProfileSettingsPage: React.FC = () => {
     mockStorage.addAuditLog('EMPLOYEE_PROFILE_UPDATED', 'USER', currentUser.id);
     toast.success('🎉 Your profile information has been successfully updated!');
   };
+
+  if (!myEmployee) {
+    return (
+      <div className="space-y-6 w-full animate-in fade-in duration-200 pb-16">
+        <Card className="shadow-xs border border-slate-200 p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+            <div className="flex items-center gap-4">
+              <Avatar src={avatarUrl || currentUser.avatarUrl} name={currentUser.name} size="lg" />
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">{currentUser.name}</h2>
+                <p className="text-sm text-slate-500">{currentUser.email}</p>
+                <Badge variant="indigo" size="sm" className="mt-2">
+                  {mockStorage.getRoleLabel(currentUser.role)}
+                </Badge>
+              </div>
+            </div>
+            <Button variant="outline" onClick={() => window.location.assign(`/${currentTenant.slug}/employees`)}>
+              Open Employee Directory
+            </Button>
+          </div>
+          <div className="mt-5 p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-sm text-indigo-950">
+            This account has company access, but it is not linked to a personal employee HR record in {currentTenant.name}.
+            Employee-only personal, payroll, and reporting fields are hidden to prevent mixing this account with Sarah, Asha, or any other employee profile.
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 w-full animate-in fade-in duration-200 pb-16">

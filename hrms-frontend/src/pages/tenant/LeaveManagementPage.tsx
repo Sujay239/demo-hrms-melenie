@@ -38,7 +38,9 @@ import {
 export const LeaveManagementPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const currentUser = mockStorage.getCurrentUser();
-  const isTenantAdmin = currentUser.role === 'TENANT_ADMIN' || currentUser.role === 'SUPER_ADMIN';
+  const tenants = mockStorage.getTenants();
+  const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
+  const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant.id);
 
   // Active tab: for Admin ('all' | 'approvals' | 'policies'), for Employee ('my' | 'policies')
   const [activeTab, setActiveTab] = useState<'all' | 'approvals' | 'my' | 'policies'>(
@@ -71,9 +73,6 @@ export const LeaveManagementPage: React.FC = () => {
   const [carryForwardLimit, setCarryForwardLimit] = useState<number>(5);
   const [policyDescription, setPolicyDescription] = useState('');
   const [requiresDoc, setRequiresDoc] = useState(false);
-
-  const tenants = mockStorage.getTenants();
-  const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
 
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>(() =>
     mockStorage.getTenantItems<LeaveType>(KEYS.LEAVE_TYPES, currentTenant.id)

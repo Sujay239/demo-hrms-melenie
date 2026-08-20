@@ -66,10 +66,6 @@ export const EmployeeListPage: React.FC = () => {
   const [page, setPage] = useState(1);
 
   const currentUser = mockStorage.getCurrentUser();
-  const isAdmin =
-    currentUser.role === 'TENANT_ADMIN' ||
-    currentUser.role === 'SUPER_ADMIN' ||
-    currentUser.role === 'CONSULTANT';
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -122,6 +118,7 @@ export const EmployeeListPage: React.FC = () => {
 
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
+  const isAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant.id);
 
   const [employees, setEmployees] = useState<Employee[]>(() =>
     mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant?.id)

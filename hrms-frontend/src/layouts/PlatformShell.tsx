@@ -45,6 +45,9 @@ export const PlatformShell: React.FC = () => {
       } else if (targetUser.tenantId) {
         const tenant = mockStorage.getTenants().find((t) => t.id === targetUser.tenantId);
         window.location.href = `/${tenant?.slug || 'acme-corp'}/dashboard`;
+      } else if (targetUser.role === 'CONSULTANT') {
+        const tenant = mockStorage.getAccessibleTenant(targetUser);
+        window.location.href = tenant ? `/${tenant.slug}/dashboard` : '/admin/consultants';
       } else {
         window.location.href = '/acme-corp/dashboard';
       }
@@ -101,7 +104,7 @@ export const PlatformShell: React.FC = () => {
         >
           {allUsers.map((u) => (
             <option key={u.id} value={u.id}>
-              {u.name} ({u.role})
+              {u.name} ({mockStorage.getRoleLabel(u.role)})
             </option>
           ))}
         </select>
@@ -148,7 +151,7 @@ export const PlatformShell: React.FC = () => {
                 <span className="text-sm font-semibold text-slate-800 leading-tight">
                   {currentUser.name}
                 </span>
-                <span className="text-xs text-slate-500">Super Admin</span>
+                <span className="text-xs text-slate-500">{mockStorage.getRoleLabel(currentUser.role)}</span>
               </div>
               <ChevronDown className="w-4 h-4 text-slate-400" />
             </button>
