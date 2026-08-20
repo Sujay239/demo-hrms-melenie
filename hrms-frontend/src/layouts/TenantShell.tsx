@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
-import { Outlet, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { cn } from '@/utils/cn';
+import React, { useState } from "react";
+import {
+  Outlet,
+  Link,
+  useLocation,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+import { cn } from "@/utils/cn";
 import {
   LayoutDashboard,
   Users,
@@ -23,13 +29,13 @@ import {
   Building2,
   Lock,
   User,
-} from 'lucide-react';
-import { mockStorage } from '@/services/mock-storage';
-import { Drawer } from '@/components/ui/Drawer';
-import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { ToastContainer } from '@/components/ui/Toast';
+} from "lucide-react";
+import { mockStorage } from "@/services/mock-storage";
+import { Drawer } from "@/components/ui/Drawer";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { ToastContainer } from "@/components/ui/Toast";
 
 export const TenantShell: React.FC = () => {
   const location = useLocation();
@@ -50,7 +56,9 @@ export const TenantShell: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
         <Card className="max-w-md p-6 text-center space-y-3">
           <Lock className="w-10 h-10 text-slate-400 mx-auto" />
-          <h2 className="text-lg font-bold text-slate-900">No Company Access</h2>
+          <h2 className="text-lg font-bold text-slate-900">
+            No Company Access
+          </h2>
           <p className="text-sm text-slate-500">
             The selected account is not assigned to any company portal.
           </p>
@@ -64,16 +72,20 @@ export const TenantShell: React.FC = () => {
 
   const currentSlug = activeTenant.slug;
 
-  const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, activeTenant.id);
+  const isTenantAdmin = mockStorage.isTenantAdminFor(
+    currentUser,
+    activeTenant.id,
+  );
   const activeTenantUserIds = new Set(
     allUsers
       .filter(
         (u) =>
-          u.role === 'SUPER_ADMIN' ||
+          u.role === "SUPER_ADMIN" ||
           u.tenantId === activeTenant.id ||
-          (u.role === 'CONSULTANT' && (u.assignedTenantIds || []).includes(activeTenant.id))
+          (u.role === "CONSULTANT" &&
+            (u.assignedTenantIds || []).includes(activeTenant.id)),
       )
-      .map((u) => u.id)
+      .map((u) => u.id),
   );
   const switchableUsers = allUsers.filter((u) => activeTenantUserIds.has(u.id));
 
@@ -91,72 +103,233 @@ export const TenantShell: React.FC = () => {
 
   // Navigation Items per role with dynamic feature gating
   const adminNavItems = [
-    { label: 'Dashboard', path: `/${currentSlug}/dashboard`, icon: LayoutDashboard },
-    { label: 'Employees', path: `/${currentSlug}/employees`, icon: Users },
-    { label: 'My Profile & Settings', path: `/${currentSlug}/profile`, icon: User },
-    ...(feats.onboarding !== false ? [{ label: 'Onboarding Cases', path: `/${currentSlug}/onboarding-cases`, icon: UserPlus }] : []),
-    ...(feats.orgStructure !== false ? [
-      { label: 'Regions', path: `/${currentSlug}/regions`, icon: Building },
-      { label: 'Departments', path: `/${currentSlug}/departments`, icon: Building2 },
-      { label: 'Designations', path: `/${currentSlug}/designations`, icon: Briefcase },
-    ] : []),
-    ...(feats.documentVault !== false ? [{ label: 'Documents', path: `/${currentSlug}/documents`, icon: FileText }] : []),
-    ...(feats.leaveManagement !== false ? [
-      { label: 'Leave Management', path: `/${currentSlug}/leave/requests`, icon: Calendar },
-      { label: 'Holidays', path: `/${currentSlug}/holidays`, icon: CalendarDays },
-    ] : []),
-    ...(feats.attendance !== false ? [{ label: 'Attendance & OT', path: `/${currentSlug}/attendance/records`, icon: Clock }] : []),
-    ...(feats.knowledgeBase !== false ? [{ label: 'Knowledge Base', path: `/${currentSlug}/knowledge-base`, icon: BookOpen }] : []),
-    ...(feats.announcements !== false ? [{ label: 'Announcements', path: `/${currentSlug}/announcements`, icon: Megaphone }] : []),
-    ...(feats.helpDesk !== false ? [{ label: 'Help Desk Tickets', path: `/${currentSlug}/tickets`, icon: Ticket }] : []),
-    ...(feats.meetingRooms !== false ? [{ label: 'Meeting Rooms', path: `/${currentSlug}/rooms`, icon: DoorOpen }] : []),
-    { label: 'Audit Logs', path: `/${currentSlug}/audit-logs`, icon: ShieldCheck },
+    {
+      label: "Dashboard",
+      path: `/${currentSlug}/dashboard`,
+      icon: LayoutDashboard,
+    },
+    { label: "Employees", path: `/${currentSlug}/employees`, icon: Users },
+    {
+      label: "My Profile & Settings",
+      path: `/${currentSlug}/profile`,
+      icon: User,
+    },
+    ...(feats.onboarding !== false
+      ? [
+          {
+            label: "Onboarding Cases",
+            path: `/${currentSlug}/onboarding-cases`,
+            icon: UserPlus,
+          },
+        ]
+      : []),
+    ...(feats.orgStructure !== false
+      ? [
+          { label: "Regions", path: `/${currentSlug}/regions`, icon: Building },
+          {
+            label: "Departments",
+            path: `/${currentSlug}/departments`,
+            icon: Building2,
+          },
+          {
+            label: "Designations",
+            path: `/${currentSlug}/designations`,
+            icon: Briefcase,
+          },
+        ]
+      : []),
+    ...(feats.documentVault !== false
+      ? [
+          {
+            label: "Documents",
+            path: `/${currentSlug}/documents`,
+            icon: FileText,
+          },
+        ]
+      : []),
+    ...(feats.leaveManagement !== false
+      ? [
+          {
+            label: "Leave Management",
+            path: `/${currentSlug}/leave/requests`,
+            icon: Calendar,
+          },
+          {
+            label: "Holidays",
+            path: `/${currentSlug}/holidays`,
+            icon: CalendarDays,
+          },
+        ]
+      : []),
+    ...(feats.attendance !== false
+      ? [
+          {
+            label: "Attendance & OT",
+            path: `/${currentSlug}/attendance/records`,
+            icon: Clock,
+          },
+        ]
+      : []),
+    ...(feats.knowledgeBase !== false
+      ? [
+          {
+            label: "Knowledge Base",
+            path: `/${currentSlug}/knowledge-base`,
+            icon: BookOpen,
+          },
+        ]
+      : []),
+    ...(feats.announcements !== false
+      ? [
+          {
+            label: "Announcements",
+            path: `/${currentSlug}/announcements`,
+            icon: Megaphone,
+          },
+        ]
+      : []),
+    ...(feats.helpDesk !== false
+      ? [
+          {
+            label: "Help Desk Tickets",
+            path: `/${currentSlug}/tickets`,
+            icon: Ticket,
+          },
+        ]
+      : []),
+    ...(feats.meetingRooms !== false
+      ? [
+          {
+            label: "Meeting Rooms",
+            path: `/${currentSlug}/rooms`,
+            icon: DoorOpen,
+          },
+        ]
+      : []),
+    {
+      label: "Audit Logs",
+      path: `/${currentSlug}/audit-logs`,
+      icon: ShieldCheck,
+    },
   ];
 
   const employeeNavItems = [
-    { label: 'Dashboard', path: `/${currentSlug}/dashboard`, icon: LayoutDashboard },
-    { label: 'Directory', path: `/${currentSlug}/employees`, icon: Users },
-    { label: 'My Profile & Settings', path: `/${currentSlug}/profile`, icon: User },
-    ...(feats.attendance !== false ? [{ label: 'My Attendance', path: `/${currentSlug}/attendance`, icon: Clock }] : []),
-    ...(feats.leaveManagement !== false ? [
-      { label: 'My Leave', path: `/${currentSlug}/leave/balances`, icon: Calendar },
-      { label: 'Holidays', path: `/${currentSlug}/holidays`, icon: CalendarDays },
-    ] : []),
-    ...(feats.documentVault !== false ? [{ label: 'Documents', path: `/${currentSlug}/documents`, icon: FileText }] : []),
-    ...(feats.knowledgeBase !== false ? [{ label: 'Knowledge Base', path: `/${currentSlug}/knowledge-base`, icon: BookOpen }] : []),
-    ...(feats.announcements !== false ? [{ label: 'Announcements', path: `/${currentSlug}/announcements`, icon: Megaphone }] : []),
-    ...(feats.helpDesk !== false ? [{ label: 'Tickets', path: `/${currentSlug}/tickets`, icon: Ticket }] : []),
-    ...(feats.meetingRooms !== false ? [{ label: 'Meeting Rooms', path: `/${currentSlug}/rooms`, icon: DoorOpen }] : []),
+    {
+      label: "Dashboard",
+      path: `/${currentSlug}/dashboard`,
+      icon: LayoutDashboard,
+    },
+    { label: "Directory", path: `/${currentSlug}/employees`, icon: Users },
+    {
+      label: "My Profile & Settings",
+      path: `/${currentSlug}/profile`,
+      icon: User,
+    },
+    ...(feats.attendance !== false
+      ? [
+          {
+            label: "My Attendance",
+            path: `/${currentSlug}/attendance`,
+            icon: Clock,
+          },
+        ]
+      : []),
+    ...(feats.leaveManagement !== false
+      ? [
+          {
+            label: "My Leave",
+            path: `/${currentSlug}/leave/balances`,
+            icon: Calendar,
+          },
+          {
+            label: "Holidays",
+            path: `/${currentSlug}/holidays`,
+            icon: CalendarDays,
+          },
+        ]
+      : []),
+    ...(feats.documentVault !== false
+      ? [
+          {
+            label: "Documents",
+            path: `/${currentSlug}/documents`,
+            icon: FileText,
+          },
+        ]
+      : []),
+    ...(feats.knowledgeBase !== false
+      ? [
+          {
+            label: "Knowledge Base",
+            path: `/${currentSlug}/knowledge-base`,
+            icon: BookOpen,
+          },
+        ]
+      : []),
+    ...(feats.announcements !== false
+      ? [
+          {
+            label: "Announcements",
+            path: `/${currentSlug}/announcements`,
+            icon: Megaphone,
+          },
+        ]
+      : []),
+    ...(feats.helpDesk !== false
+      ? [{ label: "Tickets", path: `/${currentSlug}/tickets`, icon: Ticket }]
+      : []),
+    ...(feats.meetingRooms !== false
+      ? [
+          {
+            label: "Meeting Rooms",
+            path: `/${currentSlug}/rooms`,
+            icon: DoorOpen,
+          },
+        ]
+      : []),
   ];
 
   const navItems = isTenantAdmin ? adminNavItems : employeeNavItems;
 
   // Check if current route is disabled
   const isCurrentFeatureDisabled =
-    (location.pathname.includes('/onboarding-cases') && feats.onboarding === false) ||
-    ((location.pathname.includes('/leave') || location.pathname.includes('/holidays')) && feats.leaveManagement === false) ||
-    (location.pathname.includes('/attendance') && feats.attendance === false) ||
-    (location.pathname.includes('/knowledge-base') && feats.knowledgeBase === false) ||
-    (location.pathname.includes('/announcements') && feats.announcements === false) ||
-    (location.pathname.includes('/tickets') && feats.helpDesk === false) ||
-    (location.pathname.includes('/rooms') && feats.meetingRooms === false) ||
-    (location.pathname.includes('/documents') && feats.documentVault === false) ||
-    ((location.pathname.includes('/regions') || location.pathname.includes('/departments') || location.pathname.includes('/designations')) && feats.orgStructure === false);
+    (location.pathname.includes("/onboarding-cases") &&
+      feats.onboarding === false) ||
+    ((location.pathname.includes("/leave") ||
+      location.pathname.includes("/holidays")) &&
+      feats.leaveManagement === false) ||
+    (location.pathname.includes("/attendance") && feats.attendance === false) ||
+    (location.pathname.includes("/knowledge-base") &&
+      feats.knowledgeBase === false) ||
+    (location.pathname.includes("/announcements") &&
+      feats.announcements === false) ||
+    (location.pathname.includes("/tickets") && feats.helpDesk === false) ||
+    (location.pathname.includes("/rooms") && feats.meetingRooms === false) ||
+    (location.pathname.includes("/documents") &&
+      feats.documentVault === false) ||
+    ((location.pathname.includes("/regions") ||
+      location.pathname.includes("/departments") ||
+      location.pathname.includes("/designations")) &&
+      feats.orgStructure === false);
 
   const handleRoleSwitch = (userId: string) => {
     const targetUser = allUsers.find((u) => u.id === userId);
     if (targetUser) {
       mockStorage.setCurrentUser(targetUser);
-      if (targetUser.role === 'SUPER_ADMIN') {
-        window.location.href = '/admin';
-      } else if (targetUser.role === 'NEW_HIRE') {
+      if (targetUser.role === "SUPER_ADMIN") {
+        window.location.href = "/admin";
+      } else if (targetUser.role === "NEW_HIRE") {
         window.location.href = `/${currentSlug}/onboarding/dashboard`;
       } else if (targetUser.tenantId) {
-        const tenant = mockStorage.getTenants().find((t) => t.id === targetUser.tenantId);
+        const tenant = mockStorage
+          .getTenants()
+          .find((t) => t.id === targetUser.tenantId);
         window.location.href = `/${tenant?.slug || currentSlug}/dashboard`;
-      } else if (targetUser.role === 'CONSULTANT') {
+      } else if (targetUser.role === "CONSULTANT") {
         const tenant = mockStorage.getAccessibleTenant(targetUser, currentSlug);
-        window.location.href = tenant ? `/${tenant.slug}/dashboard` : '/admin/consultants';
+        window.location.href = tenant
+          ? `/${tenant.slug}/dashboard`
+          : "/admin/consultants";
       } else {
         window.location.reload();
       }
@@ -216,10 +389,10 @@ export const TenantShell: React.FC = () => {
               to={item.path}
               onClick={() => setIsMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  ? "bg-indigo-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -292,12 +465,18 @@ export const TenantShell: React.FC = () => {
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              <Avatar src={currentUser.avatarUrl} name={currentUser.name} size="sm" />
+              <Avatar
+                src={currentUser.avatarUrl}
+                name={currentUser.name}
+                size="sm"
+              />
               <div className="hidden md:flex flex-col text-left">
                 <span className="text-sm font-semibold text-slate-800 leading-tight">
                   {currentUser.name}
                 </span>
-                <span className="text-xs text-slate-500">{mockStorage.getRoleLabel(currentUser.role)}</span>
+                <span className="text-xs text-slate-500">
+                  {mockStorage.getRoleLabel(currentUser.role)}
+                </span>
               </div>
               <ChevronDown className="w-4 h-4 text-slate-400" />
             </button>
@@ -305,7 +484,9 @@ export const TenantShell: React.FC = () => {
             {isProfileMenuOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-1 z-30 animate-in fade-in zoom-in-95">
                 <div className="px-4 py-2.5 border-b border-slate-100">
-                  <p className="text-sm font-semibold text-slate-900">{currentUser.name}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {currentUser.name}
+                  </p>
                   <p className="text-xs text-slate-500">{currentUser.email}</p>
                   <span className="inline-block mt-1 text-[10px] font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100">
                     {mockStorage.getRoleLabel(currentUser.role)}
@@ -334,21 +515,27 @@ export const TenantShell: React.FC = () => {
 
         {/* Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-full">
-          {currentUser.role === 'NEW_HIRE' && (
+          {currentUser.role === "NEW_HIRE" && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
               <div className="flex items-center gap-3">
                 <span className="p-2 bg-amber-100 text-amber-800 rounded-lg shrink-0">
                   <UserPlus className="w-5 h-5" />
                 </span>
                 <div>
-                  <h4 className="text-sm font-bold text-amber-900">Pre-Employment Onboarding in Progress</h4>
+                  <h4 className="text-sm font-bold text-amber-900">
+                    Pre-Employment Onboarding in Progress
+                  </h4>
                   <p className="text-xs text-amber-700">
-                    Complete your remaining checklist requirements. Full operational features unlock upon HR approval.
+                    Complete your remaining checklist requirements. Full
+                    operational features unlock upon HR approval.
                   </p>
                 </div>
               </div>
               <Link to={`/${currentSlug}/onboarding/dashboard`}>
-                <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shrink-0">
+                <Button
+                  size="sm"
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shrink-0"
+                >
                   Go to Onboarding Checklist →
                 </Button>
               </Link>
@@ -360,12 +547,17 @@ export const TenantShell: React.FC = () => {
               <div className="w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
                 <Lock className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Module Disabled for {activeTenant.name}</h3>
+              <h3 className="text-xl font-bold text-slate-900">
+                Module Disabled for {activeTenant.name}
+              </h3>
               <p className="text-sm text-slate-500 max-w-md mx-auto">
-                This feature has been deactivated by the Platform Super Admin in company configuration settings.
+                This feature has been deactivated by the Platform Super Admin in
+                company configuration settings.
               </p>
               <Link to={`/${currentSlug}/dashboard`}>
-                <Button variant="primary" className="mt-2">Return to Company Dashboard</Button>
+                <Button variant="primary" className="mt-2">
+                  Return to Company Dashboard
+                </Button>
               </Link>
             </div>
           ) : (

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { cn } from '@/utils/cn';
+import React, { useState } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { cn } from "@/utils/cn";
 import {
   LayoutDashboard,
   Building2,
@@ -11,11 +11,11 @@ import {
   Menu,
   ChevronDown,
   UserCheck,
-} from 'lucide-react';
-import { mockStorage } from '@/services/mock-storage';
-import { Drawer } from '@/components/ui/Drawer';
-import { Avatar } from '@/components/ui/Avatar';
-import { ToastContainer } from '@/components/ui/Toast';
+} from "lucide-react";
+import { mockStorage } from "@/services/mock-storage";
+import { Drawer } from "@/components/ui/Drawer";
+import { Avatar } from "@/components/ui/Avatar";
+import { ToastContainer } from "@/components/ui/Toast";
 
 export const PlatformShell: React.FC = () => {
   const location = useLocation();
@@ -26,11 +26,15 @@ export const PlatformShell: React.FC = () => {
   const allUsers = mockStorage.getUsers();
 
   const navItems = [
-    { label: 'Platform Dashboard', path: '/admin', icon: LayoutDashboard },
-    { label: 'Tenants & Companies', path: '/admin/tenants', icon: Building2 },
-    { label: 'Consultants', path: '/admin/consultants', icon: Users2 },
-    { label: 'Platform Settings', path: '/admin/settings', icon: Settings },
-    { label: 'Platform Audit Logs', path: '/admin/audit-logs', icon: ShieldAlert },
+    { label: "Platform Dashboard", path: "/admin", icon: LayoutDashboard },
+    { label: "Tenants & Companies", path: "/admin/tenants", icon: Building2 },
+    { label: "Consultants", path: "/admin/consultants", icon: Users2 },
+    { label: "Platform Settings", path: "/admin/settings", icon: Settings },
+    {
+      label: "Platform Audit Logs",
+      path: "/admin/audit-logs",
+      icon: ShieldAlert,
+    },
   ];
 
   const handleRoleSwitch = (userId: string) => {
@@ -38,18 +42,22 @@ export const PlatformShell: React.FC = () => {
     if (targetUser) {
       mockStorage.setCurrentUser(targetUser);
       // Redirect according to role
-      if (targetUser.role === 'SUPER_ADMIN') {
-        window.location.href = '/admin';
-      } else if (targetUser.role === 'NEW_HIRE') {
-        window.location.href = '/acme-corp/onboarding/dashboard';
+      if (targetUser.role === "SUPER_ADMIN") {
+        window.location.href = "/admin";
+      } else if (targetUser.role === "NEW_HIRE") {
+        window.location.href = "/acme-corp/onboarding/dashboard";
       } else if (targetUser.tenantId) {
-        const tenant = mockStorage.getTenants().find((t) => t.id === targetUser.tenantId);
-        window.location.href = `/${tenant?.slug || 'acme-corp'}/dashboard`;
-      } else if (targetUser.role === 'CONSULTANT') {
+        const tenant = mockStorage
+          .getTenants()
+          .find((t) => t.id === targetUser.tenantId);
+        window.location.href = `/${tenant?.slug || "acme-corp"}/dashboard`;
+      } else if (targetUser.role === "CONSULTANT") {
         const tenant = mockStorage.getAccessibleTenant(targetUser);
-        window.location.href = tenant ? `/${tenant.slug}/dashboard` : '/admin/consultants';
+        window.location.href = tenant
+          ? `/${tenant.slug}/dashboard`
+          : "/admin/consultants";
       } else {
-        window.location.href = '/acme-corp/dashboard';
+        window.location.href = "/acme-corp/dashboard";
       }
     }
   };
@@ -57,8 +65,12 @@ export const PlatformShell: React.FC = () => {
   const NavContent = () => (
     <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200">
       {/* Brand Header */}
-      <div className="flex items-center px-6 py-5 border-b border-slate-100">
-        <img src="/logo.png" alt="Cyrcalur Logo" className="h-8 w-auto max-w-full object-contain" />
+      <div className="flex items-center px-6 py-4 border-b border-slate-100">
+        <img
+          src="/logo.png"
+          alt="Cyrcalur Logo"
+          className="h-10 w-auto max-w-full object-contain"
+        />
       </div>
 
       {/* Nav Menu */}
@@ -66,8 +78,8 @@ export const PlatformShell: React.FC = () => {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            item.path === '/admin'
-              ? location.pathname === '/admin' || location.pathname === '/'
+            item.path === "/admin"
+              ? location.pathname === "/admin" || location.pathname === "/"
               : location.pathname.startsWith(item.path);
 
           return (
@@ -76,10 +88,10 @@ export const PlatformShell: React.FC = () => {
               to={item.path}
               onClick={() => setIsMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all',
+                "flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all",
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  ? "bg-indigo-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
               )}
             >
               <Icon className="w-5 h-5 shrink-0" />
@@ -146,12 +158,18 @@ export const PlatformShell: React.FC = () => {
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              <Avatar src={currentUser.avatarUrl} name={currentUser.name} size="sm" />
+              <Avatar
+                src={currentUser.avatarUrl}
+                name={currentUser.name}
+                size="sm"
+              />
               <div className="hidden md:flex flex-col text-left">
                 <span className="text-sm font-semibold text-slate-800 leading-tight">
                   {currentUser.name}
                 </span>
-                <span className="text-xs text-slate-500">{mockStorage.getRoleLabel(currentUser.role)}</span>
+                <span className="text-xs text-slate-500">
+                  {mockStorage.getRoleLabel(currentUser.role)}
+                </span>
               </div>
               <ChevronDown className="w-4 h-4 text-slate-400" />
             </button>
@@ -159,7 +177,9 @@ export const PlatformShell: React.FC = () => {
             {isProfileMenuOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-1 z-30 animate-in fade-in zoom-in-95">
                 <div className="px-4 py-2.5 border-b border-slate-100">
-                  <p className="text-sm font-semibold text-slate-900">{currentUser.name}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {currentUser.name}
+                  </p>
                   <p className="text-xs text-slate-500">{currentUser.email}</p>
                 </div>
                 <Link
