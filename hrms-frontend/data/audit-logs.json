@@ -1,0 +1,222 @@
+[
+  {
+    "id": "aud-1787314174986",
+    "tenantId": "platform",
+    "actorId": "user-superadmin",
+    "actorName": "Melenie",
+    "action": "SUPER_ADMIN_PROFILE_UPDATED",
+    "resourceType": "USER",
+    "resourceId": "user-superadmin",
+    "timestamp": "2026-08-21T12:09:34.986Z",
+    "requestId": "req-h4ol70x"
+  },
+  {
+    "id": "aud-1787312345262",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-emp-1787312095175",
+    "actorName": "Noah Oliver",
+    "action": "EMPLOYEE_CLOCK_IN",
+    "resourceType": "ATTENDANCE",
+    "resourceId": "att-1787312345262",
+    "timestamp": "2026-08-21T11:39:05.262Z",
+    "requestId": "req-o7m1w92"
+  },
+  {
+    "id": "aud-1787312315425",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "ONBOARDING_APPROVED_PERMANENT",
+    "resourceType": "ONBOARDING_CASE",
+    "resourceId": "onb-1787312095183",
+    "timestamp": "2026-08-21T11:38:35.425Z",
+    "requestId": "req-1ygjk9i"
+  },
+  {
+    "id": "aud-1787312292131",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-emp-1787312095175",
+    "actorName": "Noah Oliver",
+    "action": "ONBOARDING_ACKNOWLEDGEMENT_SIGNED",
+    "resourceType": "ONBOARDING_CASE",
+    "resourceId": "onb-1787312095183",
+    "timestamp": "2026-08-21T11:38:12.131Z",
+    "requestId": "req-u5mpm9g"
+  },
+  {
+    "id": "aud-1787312252570",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-emp-1787312095175",
+    "actorName": "Noah Oliver",
+    "action": "ONBOARDING_ACKNOWLEDGEMENT_SIGNED",
+    "resourceType": "ONBOARDING_CASE",
+    "resourceId": "onb-1787312095183",
+    "timestamp": "2026-08-21T11:37:32.570Z",
+    "requestId": "req-lz56494"
+  },
+  {
+    "id": "aud-1787312095185",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "EMPLOYEE_CREATED",
+    "resourceType": "EMPLOYEE",
+    "resourceId": "emp-1787312095175",
+    "timestamp": "2026-08-21T11:34:55.185Z",
+    "requestId": "req-8eqwbkb"
+  },
+  {
+    "id": "aud-1787310105524",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "EMPLOYEE_CREATED",
+    "resourceType": "EMPLOYEE",
+    "resourceId": "emp-1787310105519",
+    "timestamp": "2026-08-21T11:01:45.524Z",
+    "requestId": "req-hjy5oqg"
+  },
+  {
+    "id": "aud-1787302995452",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "USER_PROFILE_UPDATED",
+    "resourceType": "USER",
+    "resourceId": "user-admin-tenant-1787291784650",
+    "timestamp": "2026-08-21T09:03:15.452Z",
+    "requestId": "req-izie5wp"
+  },
+  {
+    "id": "aud-1787301633625",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "LEAVE_DECISION_UPDATED_APPROVED",
+    "resourceType": "LEAVE",
+    "resourceId": "lr-1787301626544",
+    "timestamp": "2026-08-21T08:40:33.625Z",
+    "requestId": "req-v5srab2"
+  },
+  {
+    "id": "aud-1787301626545",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-emp-ac-1",
+    "actorName": "David Miller",
+    "action": "LEAVE_APPLIED",
+    "resourceType": "LEAVE",
+    "resourceId": "lr-1787301626544",
+    "timestamp": "2026-08-21T08:40:26.545Z",
+    "requestId": "req-xz3x1ik"
+  },
+  {
+    "id": "aud-1787301043754",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "KB_ARTICLE_CREATED",
+    "resourceType": "KB_ARTICLE",
+    "resourceId": "kb-1787301043753",
+    "timestamp": "2026-08-21T08:30:43.754Z",
+    "requestId": "req-028x9ao"
+  },
+  {
+    "id": "aud-1787300803346",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "KB_ARTICLE_CREATED",
+    "resourceType": "KB_ARTICLE",
+    "resourceId": "kb-1787300803328",
+    "timestamp": "2026-08-21T08:26:43.346Z",
+    "requestId": "req-4zfv5yl"
+  },
+  {
+    "id": "aud-1787300209009",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "KB_ARTICLE_CREATED",
+    "resourceType": "KB_ARTICLE",
+    "resourceId": "kb-1787300208976",
+    "timestamp": "2026-08-21T08:16:49.009Z",
+    "requestId": "req-anpdb3w"
+  },
+  {
+    "id": "aud-1787299543249",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-emp-ac-1",
+    "actorName": "David Miller",
+    "action": "TICKET_CREATED",
+    "resourceType": "TICKET",
+    "resourceId": "tkt-1787299543248",
+    "timestamp": "2026-08-21T08:05:43.249Z",
+    "requestId": "req-a8plc8h"
+  },
+  {
+    "id": "aud-1787298944930",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-emp-ac-1",
+    "actorName": "David Miller",
+    "action": "EMPLOYEE_CLOCK_IN",
+    "resourceType": "ATTENDANCE",
+    "resourceId": "att-1787298944929",
+    "timestamp": "2026-08-21T07:55:44.930Z",
+    "requestId": "req-4st5hb4"
+  },
+  {
+    "id": "aud-1787297235308",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "EMPLOYEE_UPDATED",
+    "resourceType": "EMPLOYEE",
+    "resourceId": "emp-ac-1",
+    "timestamp": "2026-08-21T07:27:15.308Z",
+    "requestId": "req-3eznwh9"
+  },
+  {
+    "id": "aud-1787297194188",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "USER_PROFILE_UPDATED",
+    "resourceType": "USER",
+    "resourceId": "user-admin-tenant-1787291784650",
+    "timestamp": "2026-08-21T07:26:34.188Z",
+    "requestId": "req-48bp43l"
+  },
+  {
+    "id": "aud-1787296224002",
+    "tenantId": "platform",
+    "actorId": "user-superadmin",
+    "actorName": "Melenie",
+    "action": "TENANT_UPDATED",
+    "resourceType": "TENANT",
+    "resourceId": "tenant-1787291784650",
+    "timestamp": "2026-08-21T07:10:24.002Z",
+    "requestId": "req-w7vf151"
+  },
+  {
+    "id": "aud-001",
+    "tenantId": "platform",
+    "actorId": "user-superadmin",
+    "actorName": "Melenie (Super Admin)",
+    "action": "SYSTEM_INITIALIZED_AMERICAN_DATA",
+    "resourceType": "PLATFORM",
+    "resourceId": "platform-master",
+    "timestamp": "2026-08-21T07:00:00.000Z",
+    "requestId": "req-init-2026"
+  },
+  {
+    "id": "aud-002",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "TENANT_SECURITY_POLICY_CONFIGURED",
+    "resourceType": "TENANT",
+    "resourceId": "tenant-1787291784650",
+    "timestamp": "2026-08-21T07:15:00.000Z",
+    "requestId": "req-sec-101"
+  }
+]

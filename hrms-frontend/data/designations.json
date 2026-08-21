@@ -1,0 +1,514 @@
+[
+  {
+    "id": "desig-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "name": "Chief Executive Officer (CEO)",
+    "description": "Core Chief Executive Officer (CEO) role within Auto Computation",
+    "departmentId": "dept-auto-computation-1",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "name": "Chief Technology Officer (CTO)",
+    "description": "Core Chief Technology Officer (CTO) role within Auto Computation",
+    "departmentId": "dept-auto-computation-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "name": "VP of Engineering",
+    "description": "Core VP of Engineering role within Auto Computation",
+    "departmentId": "dept-auto-computation-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-4",
+    "tenantId": "tenant-1787291784650",
+    "name": "Principal Cloud Architect",
+    "description": "Core Principal Cloud Architect role within Auto Computation",
+    "departmentId": "dept-auto-computation-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-5",
+    "tenantId": "tenant-1787291784650",
+    "name": "Senior Staff Software Engineer",
+    "description": "Core Senior Staff Software Engineer role within Auto Computation",
+    "departmentId": "dept-auto-computation-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-6",
+    "tenantId": "tenant-1787291784650",
+    "name": "Lead AI/ML Research Scientist",
+    "description": "Core Lead AI/ML Research Scientist role within Auto Computation",
+    "departmentId": "dept-auto-computation-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-7",
+    "tenantId": "tenant-1787291784650",
+    "name": "Staff Machine Learning Engineer",
+    "description": "Core Staff Machine Learning Engineer role within Auto Computation",
+    "departmentId": "dept-auto-computation-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-8",
+    "tenantId": "tenant-1787291784650",
+    "name": "Principal Product Designer",
+    "description": "Core Principal Product Designer role within Auto Computation",
+    "departmentId": "dept-auto-computation-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-9",
+    "tenantId": "tenant-1787291784650",
+    "name": "Senior UX Researcher",
+    "description": "Core Senior UX Researcher role within Auto Computation",
+    "departmentId": "dept-auto-computation-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-10",
+    "tenantId": "tenant-1787291784650",
+    "name": "VP of Growth & Marketing",
+    "description": "Core VP of Growth & Marketing role within Auto Computation",
+    "departmentId": "dept-auto-computation-5",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-11",
+    "tenantId": "tenant-1787291784650",
+    "name": "Enterprise Sales Director",
+    "description": "Core Enterprise Sales Director role within Auto Computation",
+    "departmentId": "dept-auto-computation-6",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-12",
+    "tenantId": "tenant-1787291784650",
+    "name": "Director of People & Culture",
+    "description": "Core Director of People & Culture role within Auto Computation",
+    "departmentId": "dept-auto-computation-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-13",
+    "tenantId": "tenant-1787291784650",
+    "name": "Senior HR Business Partner",
+    "description": "Core Senior HR Business Partner role within Auto Computation",
+    "departmentId": "dept-auto-computation-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-14",
+    "tenantId": "tenant-1787291784650",
+    "name": "Chief Financial Officer (CFO)",
+    "description": "Core Chief Financial Officer (CFO) role within Auto Computation",
+    "departmentId": "dept-auto-computation-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-15",
+    "tenantId": "tenant-1787291784650",
+    "name": "Senior Financial Analyst & Controller",
+    "description": "Core Senior Financial Analyst & Controller role within Auto Computation",
+    "departmentId": "dept-auto-computation-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-auto-computation-16",
+    "tenantId": "tenant-1787291784650",
+    "name": "Lead Cloud Security & DevOps Architect",
+    "description": "Core Lead Cloud Security & DevOps Architect role within Auto Computation",
+    "departmentId": "dept-auto-computation-9",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "name": "Chief Executive Officer (CEO)",
+    "description": "Core Chief Executive Officer (CEO) role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-1",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "name": "Chief Technology Officer (CTO)",
+    "description": "Core Chief Technology Officer (CTO) role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "name": "VP of Engineering",
+    "description": "Core VP of Engineering role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-4",
+    "tenantId": "tenant-apex-101",
+    "name": "Principal Cloud Architect",
+    "description": "Core Principal Cloud Architect role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-5",
+    "tenantId": "tenant-apex-101",
+    "name": "Senior Staff Software Engineer",
+    "description": "Core Senior Staff Software Engineer role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-6",
+    "tenantId": "tenant-apex-101",
+    "name": "Lead AI/ML Research Scientist",
+    "description": "Core Lead AI/ML Research Scientist role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-7",
+    "tenantId": "tenant-apex-101",
+    "name": "Staff Machine Learning Engineer",
+    "description": "Core Staff Machine Learning Engineer role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-8",
+    "tenantId": "tenant-apex-101",
+    "name": "Principal Product Designer",
+    "description": "Core Principal Product Designer role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-9",
+    "tenantId": "tenant-apex-101",
+    "name": "Senior UX Researcher",
+    "description": "Core Senior UX Researcher role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-10",
+    "tenantId": "tenant-apex-101",
+    "name": "VP of Growth & Marketing",
+    "description": "Core VP of Growth & Marketing role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-5",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-11",
+    "tenantId": "tenant-apex-101",
+    "name": "Enterprise Sales Director",
+    "description": "Core Enterprise Sales Director role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-6",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-12",
+    "tenantId": "tenant-apex-101",
+    "name": "Director of People & Culture",
+    "description": "Core Director of People & Culture role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-13",
+    "tenantId": "tenant-apex-101",
+    "name": "Senior HR Business Partner",
+    "description": "Core Senior HR Business Partner role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-14",
+    "tenantId": "tenant-apex-101",
+    "name": "Chief Financial Officer (CFO)",
+    "description": "Core Chief Financial Officer (CFO) role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-15",
+    "tenantId": "tenant-apex-101",
+    "name": "Senior Financial Analyst & Controller",
+    "description": "Core Senior Financial Analyst & Controller role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-apex-cloud-16",
+    "tenantId": "tenant-apex-101",
+    "name": "Lead Cloud Security & DevOps Architect",
+    "description": "Core Lead Cloud Security & DevOps Architect role within Apex Cloud Dynamics",
+    "departmentId": "dept-apex-cloud-9",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "name": "Chief Executive Officer (CEO)",
+    "description": "Core Chief Executive Officer (CEO) role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-1",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "name": "Chief Technology Officer (CTO)",
+    "description": "Core Chief Technology Officer (CTO) role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "name": "VP of Engineering",
+    "description": "Core VP of Engineering role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-4",
+    "tenantId": "tenant-horizon-102",
+    "name": "Principal Cloud Architect",
+    "description": "Core Principal Cloud Architect role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-5",
+    "tenantId": "tenant-horizon-102",
+    "name": "Senior Staff Software Engineer",
+    "description": "Core Senior Staff Software Engineer role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-6",
+    "tenantId": "tenant-horizon-102",
+    "name": "Lead AI/ML Research Scientist",
+    "description": "Core Lead AI/ML Research Scientist role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-7",
+    "tenantId": "tenant-horizon-102",
+    "name": "Staff Machine Learning Engineer",
+    "description": "Core Staff Machine Learning Engineer role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-8",
+    "tenantId": "tenant-horizon-102",
+    "name": "Principal Product Designer",
+    "description": "Core Principal Product Designer role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-9",
+    "tenantId": "tenant-horizon-102",
+    "name": "Senior UX Researcher",
+    "description": "Core Senior UX Researcher role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-10",
+    "tenantId": "tenant-horizon-102",
+    "name": "VP of Growth & Marketing",
+    "description": "Core VP of Growth & Marketing role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-5",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-11",
+    "tenantId": "tenant-horizon-102",
+    "name": "Enterprise Sales Director",
+    "description": "Core Enterprise Sales Director role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-6",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-12",
+    "tenantId": "tenant-horizon-102",
+    "name": "Director of People & Culture",
+    "description": "Core Director of People & Culture role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-13",
+    "tenantId": "tenant-horizon-102",
+    "name": "Senior HR Business Partner",
+    "description": "Core Senior HR Business Partner role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-14",
+    "tenantId": "tenant-horizon-102",
+    "name": "Chief Financial Officer (CFO)",
+    "description": "Core Chief Financial Officer (CFO) role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-15",
+    "tenantId": "tenant-horizon-102",
+    "name": "Senior Financial Analyst & Controller",
+    "description": "Core Senior Financial Analyst & Controller role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-horizon-health-16",
+    "tenantId": "tenant-horizon-102",
+    "name": "Lead Cloud Security & DevOps Architect",
+    "description": "Core Lead Cloud Security & DevOps Architect role within Horizon BioHealth",
+    "departmentId": "dept-horizon-health-9",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Chief Executive Officer (CEO)",
+    "description": "Core Chief Executive Officer (CEO) role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-1",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Chief Technology Officer (CTO)",
+    "description": "Core Chief Technology Officer (CTO) role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "name": "VP of Engineering",
+    "description": "Core VP of Engineering role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-4",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Principal Cloud Architect",
+    "description": "Core Principal Cloud Architect role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-5",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Senior Staff Software Engineer",
+    "description": "Core Senior Staff Software Engineer role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-2",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-6",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Lead AI/ML Research Scientist",
+    "description": "Core Lead AI/ML Research Scientist role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-7",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Staff Machine Learning Engineer",
+    "description": "Core Staff Machine Learning Engineer role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-3",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-8",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Principal Product Designer",
+    "description": "Core Principal Product Designer role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-9",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Senior UX Researcher",
+    "description": "Core Senior UX Researcher role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-4",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-10",
+    "tenantId": "tenant-vanguard-103",
+    "name": "VP of Growth & Marketing",
+    "description": "Core VP of Growth & Marketing role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-5",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-11",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Enterprise Sales Director",
+    "description": "Core Enterprise Sales Director role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-6",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-12",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Director of People & Culture",
+    "description": "Core Director of People & Culture role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-13",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Senior HR Business Partner",
+    "description": "Core Senior HR Business Partner role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-7",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-14",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Chief Financial Officer (CFO)",
+    "description": "Core Chief Financial Officer (CFO) role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-15",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Senior Financial Analyst & Controller",
+    "description": "Core Senior Financial Analyst & Controller role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-8",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "desig-vanguard-fintech-16",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Lead Cloud Security & DevOps Architect",
+    "description": "Core Lead Cloud Security & DevOps Architect role within Vanguard Financial Labs",
+    "departmentId": "dept-vanguard-fintech-9",
+    "status": "ACTIVE"
+  }
+]

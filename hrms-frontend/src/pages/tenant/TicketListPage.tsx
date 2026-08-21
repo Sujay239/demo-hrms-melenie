@@ -9,8 +9,8 @@ import { FormField } from '@/components/ui/FormField';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import { toast } from '@/components/ui/Toast';
 import { mockStorage, KEYS } from '@/services/mock-storage';
-import { Ticket, Department } from '@/demo-data/seedData';
-import { Plus, Search, Ticket as TicketIcon, Send, MessageSquare } from 'lucide-react';
+import { Ticket, Department, Employee } from '@/demo-data/seedData';
+import { Plus, Search, Ticket as TicketIcon, Send, MessageSquare, ShieldCheck, User } from 'lucide-react';
 
 export const TicketListPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -22,7 +22,7 @@ export const TicketListPage: React.FC = () => {
   // Form states
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
-  const [departmentId, setDepartmentId] = useState('dept-acme-eng');
+  const [departmentId, setDepartmentId] = useState('');
   const [priority, setPriority] = useState<'HIGH' | 'MEDIUM' | 'LOW'>('MEDIUM');
   const [newComment, setNewComment] = useState('');
 
@@ -31,10 +31,29 @@ export const TicketListPage: React.FC = () => {
   const currentUser = mockStorage.getCurrentUser();
   const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant.id);
 
-  const tickets = mockStorage.getTenantItems<Ticket>(KEYS.TICKETS, currentTenant.id);
+  const employees = mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant.id);
+  const myEmployee = employees.find(
+    (e) =>
+      e.email.toLowerCase() === currentUser.email.toLowerCase() ||
+      e.id === currentUser.id ||
+      (currentUser.name && e.name.toLowerCase() === currentUser.name.toLowerCase())
+  );
+
+  const allTickets = mockStorage.getTenantItems<Ticket>(KEYS.TICKETS, currentTenant.id);
   const departments = mockStorage.getTenantItems<Department>(KEYS.DEPARTMENTS, currentTenant.id);
 
-  const filtered = tickets.filter((t) => {
+  // Role-based tickets access: If regular employee, only show tickets raised by themselves
+  const accessibleTickets = isTenantAdmin
+    ? allTickets
+    : allTickets.filter(
+        (t) =>
+          t.createdById === currentUser.id ||
+          t.createdById === myEmployee?.id ||
+          (currentUser.name && t.createdByName?.toLowerCase() === currentUser.name.toLowerCase()) ||
+          (myEmployee?.name && t.createdByName?.toLowerCase() === myEmployee.name.toLowerCase())
+      );
+
+  const filtered = accessibleTickets.filter((t) => {
     const matchesSearch =
       t.subject.toLowerCase().includes(search.toLowerCase()) ||
       t.ticketNumber.toLowerCase().includes(search.toLowerCase());
@@ -44,33 +63,33 @@ export const TicketListPage: React.FC = () => {
 
   const handleCreateTicket = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!subject || !description) {
+    if (!subject.trim() || !description.trim()) {
       toast.error('Subject and description are required');
       return;
     }
 
-    const dept = departments.find((d) => d.id === departmentId);
+    const dept = departments.find((d) => d.id === departmentId) || departments[0];
 
     const newTicket: Ticket = {
       id: `tkt-${Date.now()}`,
       tenantId: currentTenant.id,
       ticketNumber: `TKT-${Math.floor(100000 + Math.random() * 900000)}`,
-      subject,
-      description,
+      subject: subject.trim(),
+      description: description.trim(),
       category: 'General',
-      departmentId,
-      departmentName: dept?.name || 'Department',
+      departmentId: dept?.id || 'dept-1',
+      departmentName: dept?.name || 'Operations',
       priority,
       status: 'OPEN',
-      createdById: currentUser.id,
-      createdByName: currentUser.name,
+      createdById: myEmployee?.id || currentUser.id,
+      createdByName: myEmployee?.name || currentUser.name,
       createdAt: new Date().toISOString(),
       comments: [
         {
           id: `c-${Date.now()}`,
           authorName: 'System',
           authorRole: 'SYSTEM',
-          content: 'Ticket created and queued.',
+          content: 'Ticket created and assigned to support desk.',
           createdAt: new Date().toISOString(),
         },
       ],
@@ -79,7 +98,7 @@ export const TicketListPage: React.FC = () => {
     mockStorage.addTenantItem<Ticket>(KEYS.TICKETS, newTicket);
     mockStorage.addAuditLog('TICKET_CREATED', 'TICKET', newTicket.id);
 
-    toast.success(`Ticket ${newTicket.ticketNumber} created!`);
+    toast.success(`Ticket ${newTicket.ticketNumber} created successfully!`);
     setIsCreateModalOpen(false);
     setSubject('');
     setDescription('');
@@ -101,11 +120,11 @@ export const TicketListPage: React.FC = () => {
       id: `c-${Date.now()}`,
       authorName: currentUser.name,
       authorRole: currentUser.role,
-      content: newComment,
+      content: newComment.trim(),
       createdAt: new Date().toISOString(),
     };
 
-    const updatedComments = [...selectedTicket.comments, commentObj];
+    const updatedComments = [...(selectedTicket.comments || []), commentObj];
     mockStorage.updateTenantItem<Ticket>(KEYS.TICKETS, selectedTicket.id, {
       comments: updatedComments,
     });
@@ -120,7 +139,7 @@ export const TicketListPage: React.FC = () => {
       key: 'ticketNumber',
       header: 'Ticket #',
       render: (t) => (
-        <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded border border-indigo-100">
+        <span className="font-mono text-xs font-bold text-orange-700 bg-orange-50 px-2 py-1 rounded border border-orange-200">
           {t.ticketNumber}
         </span>
       ),
@@ -160,12 +179,23 @@ export const TicketListPage: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-200">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Help Desk & Tickets</h2>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+            {isTenantAdmin ? 'Help Desk & Ticket Management' : 'My Support Tickets'}
+          </h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            Department-routed support tickets and resolution tracking.
+            {isTenantAdmin
+              ? `Company-wide support tickets, employee inquiries, and resolution tracking for ${currentTenant.name}.`
+              : 'Submit and track support requests raised by you.'}
           </p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+        <Button
+          onClick={() => {
+            setDepartmentId(departments[0]?.id || '');
+            setIsCreateModalOpen(true);
+          }}
+          leftIcon={<Plus className="w-4 h-4" />}
+          className="bg-[#FF6900] hover:bg-[#E05D00] font-bold"
+        >
           Create Ticket
         </Button>
       </div>
@@ -177,7 +207,7 @@ export const TicketListPage: React.FC = () => {
             placeholder="Search by ticket number or subject..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            leftIcon={<Search className="w-4 h-4" />}
+            leftIcon={<Search className="w-4 h-4 text-slate-400" />}
           />
         </div>
         <div className="w-full sm:w-48">
@@ -196,72 +226,114 @@ export const TicketListPage: React.FC = () => {
         </div>
       </div>
 
-      <DataTable
+      <DataTable<Ticket>
         columns={columns}
         data={filtered}
         keyExtractor={(t) => t.id}
-        onRowClick={(t) => setSelectedTicket(t)}
-        emptyTitle="No tickets found"
-        emptyDescription="Create a ticket to request assistance from company departments."
+        onRowClick={(ticket) => setSelectedTicket(ticket)}
+        emptyTitle={isTenantAdmin ? 'No tickets found' : 'No support tickets raised'}
+        emptyDescription={
+          isTenantAdmin
+            ? 'No tickets found for this tenant.'
+            : 'You have not raised any support tickets yet. Click "Create Ticket" to open a request.'
+        }
       />
 
-      {/* Ticket Detail Modal */}
+      {/* Ticket Details Modal */}
       {selectedTicket && (
         <Modal
           isOpen={!!selectedTicket}
           onClose={() => setSelectedTicket(null)}
-          title={`${selectedTicket.ticketNumber}: ${selectedTicket.subject}`}
-          description={`Created by ${selectedTicket.createdByName} • Department: ${selectedTicket.departmentName}`}
+          title={`Ticket ${selectedTicket.ticketNumber}`}
+          description={`Created by ${selectedTicket.createdByName} on ${new Date(
+            selectedTicket.createdAt
+          ).toLocaleString()}`}
           maxWidth="2xl"
-        >
-          <div className="space-y-6">
-            {/* Status Transition Control (SRS canonical state machine) */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-500">Current Status:</span>
-                <Badge status={selectedTicket.status} />
-              </div>
-
-              {isTenantAdmin && (
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="text-slate-400 mr-1">Move to:</span>
-                  {(['OPEN', 'IN_PROGRESS', 'WAITING', 'RESOLVED', 'CLOSED'] as Ticket['status'][]).map(
-                    (st) => (
-                      <button
-                        key={st}
-                        onClick={() => handleStatusTransition(selectedTicket.id, st)}
-                        disabled={selectedTicket.status === st}
-                        className={`px-2 py-1 rounded text-[11px] font-semibold border transition-all cursor-pointer ${
-                          selectedTicket.status === st
-                            ? 'bg-slate-800 text-white border-slate-800'
-                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                        }`}
-                      >
-                        {st}
-                      </button>
-                    )
+          footer={
+            <div className="flex flex-wrap items-center justify-between w-full gap-2">
+              {/* Admin status transition controls */}
+              {isTenantAdmin ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-500">Update Status:</span>
+                  <div className="flex gap-1">
+                    {(['OPEN', 'IN_PROGRESS', 'WAITING', 'RESOLVED', 'CLOSED'] as const).map(
+                      (status) => (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => handleStatusTransition(selectedTicket.id, status)}
+                          disabled={selectedTicket.status === status}
+                          className={`px-2 py-1 text-xs font-semibold rounded cursor-pointer transition-colors ${
+                            selectedTicket.status === status
+                              ? 'bg-slate-800 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {status}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Non-admin creator can close/resolve their own ticket */
+                <div className="flex items-center gap-2">
+                  {selectedTicket.status !== 'CLOSED' && selectedTicket.status !== 'RESOLVED' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStatusTransition(selectedTicket.id, 'RESOLVED')}
+                    >
+                      Mark as Resolved
+                    </Button>
                   )}
                 </div>
               )}
+
+              <Button variant="outline" size="sm" onClick={() => setSelectedTicket(null)} className="ml-auto">
+                Close
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-4 text-xs">
+            {/* Meta header */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div>
+                <span className="text-slate-400 text-[10px] uppercase font-bold block">Status</span>
+                <Badge status={selectedTicket.status} size="sm" className="mt-1" />
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] uppercase font-bold block">Priority</span>
+                <span className="font-semibold text-slate-800 block mt-1">{selectedTicket.priority}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] uppercase font-bold block">Department</span>
+                <span className="font-semibold text-slate-800 block mt-1">{selectedTicket.departmentName}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] uppercase font-bold block">Creator</span>
+                <span className="font-semibold text-slate-800 block mt-1">{selectedTicket.createdByName}</span>
+              </div>
             </div>
 
-            {/* Description */}
-            <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200 text-sm text-slate-800">
-              <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Description</h5>
-              <p className="whitespace-pre-wrap">{selectedTicket.description}</p>
+            {/* Subject and Description */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+              <h4 className="text-sm font-bold text-slate-900">{selectedTicket.subject}</h4>
+              <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{selectedTicket.description}</p>
             </div>
 
             {/* Comments Thread */}
             <div className="space-y-3">
               <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-indigo-600" /> Activity & Comments Thread
+                <MessageSquare className="w-4 h-4 text-[#FF6900]" /> Activity & Comments Thread
               </h4>
 
               <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                {selectedTicket.comments.map((c) => (
-                  <div key={c.id} className="p-3 bg-white rounded-lg border border-slate-200 text-xs space-y-1">
+                {(selectedTicket.comments || []).map((c) => (
+                  <div key={c.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200/70 text-xs space-y-1">
                     <div className="flex items-center justify-between font-medium text-slate-700">
-                      <span className="font-semibold text-slate-900">
+                      <span className="font-bold text-slate-900">
                         {c.authorName} ({c.authorRole})
                       </span>
                       <span className="text-slate-400 text-[10px]">{new Date(c.createdAt).toLocaleString()}</span>
@@ -278,7 +350,7 @@ export const TicketListPage: React.FC = () => {
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Type a comment or update note..."
                 />
-                <Button type="submit" leftIcon={<Send className="w-4 h-4" />}>
+                <Button type="submit" leftIcon={<Send className="w-4 h-4" />} className="bg-[#FF6900] hover:bg-[#E05D00]">
                   Post
                 </Button>
               </form>
@@ -298,7 +370,9 @@ export const TicketListPage: React.FC = () => {
             <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateTicket}>Submit Ticket</Button>
+            <Button onClick={handleCreateTicket} className="bg-[#FF6900] hover:bg-[#E05D00]">
+              Submit Ticket
+            </Button>
           </>
         }
       >
@@ -340,7 +414,7 @@ export const TicketListPage: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-xl border border-slate-300 p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6900]"
               placeholder="Explain the issue or request in detail..."
               required
             />

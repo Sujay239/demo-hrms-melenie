@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { Modal } from '@/components/ui/Modal';
@@ -10,7 +11,18 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import { mockStorage, KEYS } from '@/services/mock-storage';
-import { Employee, Department, Designation, Region, Tenant } from '@/demo-data/seedData';
+import {
+  Employee,
+  Department,
+  Designation,
+  Region,
+  Tenant,
+  User as UserType,
+  OnboardingCase,
+  OnboardingDocRequirement,
+  AllowedDocumentType,
+  DEFAULT_ONBOARDING_DOCUMENTS,
+} from '@/demo-data/seedData';
 import {
   Search,
   Plus,
@@ -41,25 +53,30 @@ import {
   Home,
   CheckCircle2,
   Upload,
+  Download,
   ArrowRight,
   ShieldCheck,
   Lock,
+  GitGraph,
+  ListFilter,
 } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
+import { OrgChartView } from '@/components/tenant/OrgChartView';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
-  INR: '₹',
   USD: '$',
   EUR: '€',
   GBP: '£',
+  CAD: 'C$',
+  AUD: 'A$',
   SGD: 'S$',
   AED: 'AED',
-  AUD: 'A$',
-  CAD: 'C$',
+  INR: '₹',
 };
 
 export const EmployeeListPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [activeDirectoryTab, setActiveDirectoryTab] = useState<'LIST' | 'ORG_CHART'>('LIST');
   const [search, setSearch] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -71,9 +88,7 @@ export const EmployeeListPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [profileActiveTab, setProfileActiveTab] = useState<
-    'Overview' | 'PersonalInfo' | 'JobDetails' | 'Compensation' | 'Documents' | 'Attendance' | 'Leave'
-  >('Overview');
+  const [profileActiveTab, setProfileActiveTab] = useState<'Overview' | 'Documents'>('Overview');
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
@@ -103,22 +118,65 @@ export const EmployeeListPage: React.FC = () => {
   const [workLocation, setWorkLocation] = useState('');
   const [teamName, setTeamName] = useState('');
   const [employmentStatus, setEmploymentStatus] = useState<'ACTIVE' | 'INACTIVE' | 'ON_LEAVE'>('ACTIVE');
+  const [isPermanent, setIsPermanent] = useState<boolean>(false);
   const [skillsInput, setSkillsInput] = useState('');
 
+  const tenants = mockStorage.getTenants();
+  const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
+  const isAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant?.id);
+
+  // Dynamic Onboarding Document Requirements state
+  const [docRequirements, setDocRequirements] = useState<OnboardingDocRequirement[]>(() =>
+    mockStorage.getOnboardingDocRequirements(currentTenant?.id)
+  );
+
+  const handleAddDocRequirement = () => {
+    const newReq: OnboardingDocRequirement = {
+      id: `doc-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      title: '',
+      description: '',
+      allowedType: 'PDF',
+      isRequired: true,
+    };
+    setDocRequirements((prev) => [...prev, newReq]);
+  };
+
+  const handleRemoveDocRequirement = (id: string) => {
+    setDocRequirements((prev) => prev.filter((d) => d.id !== id));
+  };
+
+  const handleUpdateDocRequirement = (id: string, updates: Partial<OnboardingDocRequirement>) => {
+    setDocRequirements((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, ...updates } : d))
+    );
+  };
+
+  const handleSaveAsDefaultTemplate = () => {
+    const validDocs = docRequirements.filter((d) => d.title.trim().length > 0);
+    if (validDocs.length === 0) {
+      toast.error('Please add at least one document requirement with a title.');
+      return;
+    }
+    mockStorage.saveOnboardingDocRequirements(currentTenant.id, validDocs);
+    toast.success('💾 Saved as company onboarding document template! Future new hires will automatically use this checklist.');
+  };
+
+  const handleResetToDefaultTemplate = () => {
+    const defaults = mockStorage.getOnboardingDocRequirements(currentTenant.id);
+    setDocRequirements(defaults);
+    toast.success('Loaded saved company document requirements template.');
+  };
+
   // Form State - Compensation & Auto Currency
-  const [currency, setCurrency] = useState('INR');
+  const [currency, setCurrency] = useState(currentTenant?.currency || 'USD');
   const [ctcAnnual, setCtcAnnual] = useState('');
   const [basicSalary, setBasicSalary] = useState('');
   const [variablePay, setVariablePay] = useState('');
   const [allowances, setAllowances] = useState('');
-  const [paymentMode, setPaymentMode] = useState<'Bank Transfer' | 'Direct Deposit' | 'Check' | 'Cash'>('Bank Transfer');
+  const [paymentMode, setPaymentMode] = useState<'Bank Transfer' | 'Direct Deposit' | 'Check' | 'Cash'>('Direct Deposit');
   const [bankName, setBankName] = useState('');
   const [bankAccountNumber, setBankAccountNumber] = useState('');
   const [ifscRoutingCode, setIfscRoutingCode] = useState('');
-
-  const tenants = mockStorage.getTenants();
-  const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
-  const isAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant.id);
 
   const [employees, setEmployees] = useState<Employee[]>(() =>
     mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant?.id)
@@ -138,7 +196,16 @@ export const EmployeeListPage: React.FC = () => {
     setEmployees(mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant?.id));
   };
 
-  const currencySymbol = CURRENCY_SYMBOLS[currency] || '₹';
+  const tenantCurrency = currentTenant?.currency || 'USD';
+  const currencySymbol = CURRENCY_SYMBOLS[currency || tenantCurrency] || CURRENCY_SYMBOLS[tenantCurrency] || '$';
+
+  const formatSalary = (val?: number | string | null) => {
+    if (val === undefined || val === null || val === '') return '--';
+    const cleanStr = String(val).replace(/[^0-9.]/g, '');
+    const num = parseFloat(cleanStr);
+    if (isNaN(num)) return String(val);
+    return `${currencySymbol}${num.toLocaleString('en-US')}`;
+  };
 
   const handleOpenAddModal = () => {
     setEditingEmployee(null);
@@ -164,18 +231,19 @@ export const EmployeeListPage: React.FC = () => {
 
     setDepartmentId(departments[0]?.id || '');
     setDesignationId(designations[0]?.id || '');
-    setRegionId(regions[0]?.id || currentTenant.defaultRegionId || '');
+    setRegionId(regions[0]?.id || currentTenant?.defaultRegionId || '');
     setManagerId('');
     setEmploymentType('Full Time');
     setJoiningDate(new Date().toISOString().split('T')[0]);
     setConfirmationDate('');
     setWorkLocation('');
     setTeamName('');
-    setEmploymentStatus('ACTIVE');
+    setEmploymentStatus('INACTIVE');
+    setIsPermanent(false);
     setSkillsInput('');
 
     // Auto default to tenant currency
-    setCurrency(currentTenant.currency || 'INR');
+    setCurrency(currentTenant?.currency || 'INR');
     setCtcAnnual('');
     setBasicSalary('');
     setVariablePay('');
@@ -184,6 +252,9 @@ export const EmployeeListPage: React.FC = () => {
     setBankName('');
     setBankAccountNumber('');
     setIfscRoutingCode('');
+
+    // Reset doc requirements template from storage
+    setDocRequirements(mockStorage.getOnboardingDocRequirements(currentTenant?.id));
 
     setIsAddModalOpen(true);
   };
@@ -215,6 +286,7 @@ export const EmployeeListPage: React.FC = () => {
     setWorkLocation(emp.workLocation || '');
     setTeamName(emp.teamName || '');
     setEmploymentStatus(emp.employmentStatus);
+    setIsPermanent(emp.isPermanent ?? (emp.employmentStatus === 'ACTIVE'));
     setSkillsInput(emp.skills ? emp.skills.join(', ') : '');
 
     // Extract numeric values from compensation strings if formatted
@@ -223,7 +295,7 @@ export const EmployeeListPage: React.FC = () => {
       return String(val).replace(/[^0-9.]/g, '');
     };
 
-    setCurrency(currentTenant.currency || 'INR');
+    setCurrency(currentTenant?.currency || 'INR');
     setCtcAnnual(cleanNumber(emp.ctcAnnual));
     setBasicSalary(cleanNumber(emp.basicSalary));
     setVariablePay(cleanNumber(emp.variablePay));
@@ -319,7 +391,7 @@ export const EmployeeListPage: React.FC = () => {
       return false;
     }
     if (!workLocation.trim()) {
-      toast.error('Please enter the work location (e.g. Bangalore, India).');
+      toast.error('Please enter the work location (e.g. New York, NY, USA).');
       return false;
     }
     if (editingEmployee && managerId === editingEmployee.id) {
@@ -415,7 +487,8 @@ export const EmployeeListPage: React.FC = () => {
       regionId,
       managerId: managerId || null,
       joiningDate,
-      employmentStatus,
+      employmentStatus: isPermanent ? (employmentStatus || 'ACTIVE') : 'INACTIVE',
+      isPermanent: isPermanent,
       avatarUrl: avatarUrl.trim() || undefined,
 
       dateOfBirth,
@@ -445,6 +518,27 @@ export const EmployeeListPage: React.FC = () => {
 
     if (editingEmployee) {
       mockStorage.updateTenantItem<Employee>(KEYS.EMPLOYEES, editingEmployee.id, payload);
+      
+      // Also sync matching user account
+      const users = mockStorage.getItem<UserType>(KEYS.USERS);
+      const userIdx = users.findIndex(
+        (u) =>
+          u.email.toLowerCase() === editingEmployee.email.toLowerCase() ||
+          u.id === editingEmployee.id ||
+          u.id === `user-${editingEmployee.id}`
+      );
+      if (userIdx !== -1) {
+        users[userIdx] = {
+          ...users[userIdx],
+          name: payload.name || users[userIdx].name,
+          role: isPermanent ? 'EMPLOYEE' : 'NEW_HIRE',
+          status: isPermanent ? 'ACTIVE' : 'PENDING_ACTIVATION',
+          isPermanent: isPermanent,
+          phone: payload.phone || users[userIdx].phone,
+        };
+        mockStorage.setItem(KEYS.USERS, users);
+      }
+
       mockStorage.addAuditLog('EMPLOYEE_UPDATED', 'EMPLOYEE', editingEmployee.id);
       toast.success(`Employee profile for ${name} updated successfully!`);
     } else {
@@ -455,8 +549,9 @@ export const EmployeeListPage: React.FC = () => {
         return;
       }
 
+      const newEmpId = `emp-${Date.now()}`;
       const newEmp: Employee = {
-        id: `emp-${Date.now()}`,
+        id: newEmpId,
         tenantId: currentTenant.id,
         employeeId: payload.employeeId || `TN-${Date.now()}`,
         name: payload.name || '',
@@ -467,7 +562,8 @@ export const EmployeeListPage: React.FC = () => {
         regionId: payload.regionId || '',
         managerId: payload.managerId,
         joiningDate: payload.joiningDate || new Date().toISOString().split('T')[0],
-        employmentStatus: payload.employmentStatus || 'ACTIVE',
+        employmentStatus: isPermanent ? (payload.employmentStatus || 'ACTIVE') : 'INACTIVE',
+        isPermanent: isPermanent,
         avatarUrl: payload.avatarUrl,
 
         dateOfBirth: payload.dateOfBirth,
@@ -496,8 +592,83 @@ export const EmployeeListPage: React.FC = () => {
       };
 
       mockStorage.addTenantItem<Employee>(KEYS.EMPLOYEES, newEmp);
+
+      // Create or synchronize corresponding user login account
+      const users = mockStorage.getItem<UserType>(KEYS.USERS);
+      const existingUserIdx = users.findIndex((u) => u.email.toLowerCase() === newEmp.email.toLowerCase());
+      const userId = `user-${newEmp.id}`;
+
+      if (existingUserIdx !== -1) {
+        users[existingUserIdx] = {
+          ...users[existingUserIdx],
+          name: newEmp.name,
+          role: isPermanent ? 'EMPLOYEE' : 'NEW_HIRE',
+          status: isPermanent ? 'ACTIVE' : 'PENDING_ACTIVATION',
+          isPermanent: isPermanent,
+          tenantId: currentTenant.id,
+          phone: newEmp.phone,
+          avatarUrl: newEmp.avatarUrl,
+        };
+        mockStorage.setItem(KEYS.USERS, users);
+      } else {
+        const newUser: UserType = {
+          id: userId,
+          name: newEmp.name,
+          email: newEmp.email,
+          password: 'password123',
+          role: isPermanent ? 'EMPLOYEE' : 'NEW_HIRE',
+          tenantId: currentTenant.id,
+          status: isPermanent ? 'ACTIVE' : 'PENDING_ACTIVATION',
+          isPermanent: isPermanent,
+          phone: newEmp.phone,
+          avatarUrl: newEmp.avatarUrl,
+        };
+        mockStorage.setItem(KEYS.USERS, [newUser, ...users]);
+      }
+
+      // If not permanent, automatically register into Onboarding Cases workflow
+      if (!isPermanent) {
+        const cases = mockStorage.getItem<OnboardingCase>(KEYS.ONBOARDING_CASES);
+        const deptName = departments.find((d) => d.id === newEmp.departmentId)?.name || 'General';
+        const desigName = designations.find((d) => d.id === newEmp.designationId)?.name || 'Staff Member';
+        const mgrName = employees.find((e) => e.id === newEmp.managerId)?.name || 'Department Manager';
+        const regName = regions.find((r) => r.id === newEmp.regionId)?.name || 'Headquarters';
+        const validDocRequirements = docRequirements.filter((d) => d.title.trim().length > 0);
+
+        const newCase: OnboardingCase = {
+          id: `onb-${Date.now()}`,
+          tenantId: currentTenant.id,
+          userId: userId,
+          employeeId: newEmp.employeeId,
+          candidateName: newEmp.name,
+          email: newEmp.email,
+          phone: newEmp.phone,
+          address: newEmp.currentAddress,
+          emergencyContact: newEmp.emergencyContactName ? `${newEmp.emergencyContactName} (${newEmp.emergencyContactPhone || ''})` : undefined,
+          departmentId: newEmp.departmentId,
+          departmentName: deptName,
+          designationId: newEmp.designationId,
+          designationName: desigName,
+          managerId: newEmp.managerId,
+          managerName: mgrName,
+          joiningDate: newEmp.joiningDate,
+          regionName: regName,
+          personalDetailsCompleted: false,
+          offerSignedUploaded: false,
+          requiredDocsUploaded: false,
+          requiredDocsChecklist: validDocRequirements.length > 0 ? validDocRequirements : undefined,
+          acknowledgementSigned: false,
+          status: 'IN_PROGRESS',
+          submittedAt: new Date().toISOString(),
+          avatarUrl: newEmp.avatarUrl,
+        };
+        mockStorage.setItem(KEYS.ONBOARDING_CASES, [newCase, ...cases]);
+        toast.success(`🎉 ${name} added! Onboarding case initiated (isPermanent: false).`);
+      } else {
+        toast.success(`🎉 Permanent employee "${name}" successfully registered!`);
+      }
+
       mockStorage.addAuditLog('EMPLOYEE_CREATED', 'EMPLOYEE', newEmp.id);
-      toast.success(`🎉 New employee "${name}" successfully registered!`);
     }
 
     setIsAddModalOpen(false);
@@ -525,7 +696,17 @@ export const EmployeeListPage: React.FC = () => {
       e.email.toLowerCase().includes(search.toLowerCase());
 
     const matchesDept = departmentFilter === 'ALL' || e.departmentId === departmentFilter;
-    const matchesStatus = statusFilter === 'ALL' || e.employmentStatus === statusFilter;
+    
+    let matchesStatus = true;
+    if (statusFilter === 'ALL') {
+      matchesStatus = true;
+    } else if (statusFilter === 'PERMANENT') {
+      matchesStatus = e.isPermanent !== false;
+    } else if (statusFilter === 'ONBOARDING') {
+      matchesStatus = e.isPermanent === false;
+    } else {
+      matchesStatus = e.employmentStatus === statusFilter;
+    }
 
     return matchesSearch && matchesDept && matchesStatus;
   });
@@ -541,7 +722,14 @@ export const EmployeeListPage: React.FC = () => {
   const regionObj = regions.find((r) => r.id === selectedEmployee?.regionId);
 
   // Is viewing self or admin
-  const isViewingSelfOrAdmin = isAdmin || selectedEmployee?.id === myEmployee?.id;
+  const isViewingSelfOrAdmin = Boolean(
+    isAdmin ||
+    (selectedEmployee && (
+      selectedEmployee.id === myEmployee?.id ||
+      (currentUser?.email && selectedEmployee.email?.toLowerCase() === currentUser.email?.toLowerCase()) ||
+      (currentUser?.id && selectedEmployee.id === currentUser.id)
+    ))
+  );
 
   const columns: Column<Employee>[] = [
     {
@@ -595,56 +783,68 @@ export const EmployeeListPage: React.FC = () => {
     {
       key: 'phone',
       header: 'Phone',
-      render: (e) => <span className="text-xs text-slate-600">{e.phone || '+91 98765 43210'}</span>,
+      render: (e) => <span className="text-xs text-slate-600">{e.phone || '+1 (555) 234-5678'}</span>,
     },
     {
       key: 'workLocation',
       header: 'Location / Address',
       render: (e) => {
         const reg = regions.find((r) => r.id === e.regionId);
-        return <span className="text-xs text-slate-500">{e.workLocation || e.currentAddress || reg?.name || 'Bangalore, India'}</span>;
+        return <span className="text-xs text-slate-500">{e.workLocation || e.currentAddress || reg?.name || 'New York, NY, USA'}</span>;
       },
     },
     {
       key: 'employmentStatus',
-      header: 'Status',
+      header: 'Status & Classification',
       render: (e) => (
-        <Badge
-          variant={
-            e.employmentStatus === 'ACTIVE'
-              ? 'emerald'
-              : e.employmentStatus === 'ON_LEAVE'
-              ? 'amber'
-              : 'neutral'
-          }
-          size="sm"
-        >
-          {e.employmentStatus}
-        </Badge>
+        <div className="flex flex-col gap-1 items-start">
+          <Badge
+            variant={
+              e.employmentStatus === 'ACTIVE'
+                ? 'emerald'
+                : e.employmentStatus === 'ON_LEAVE'
+                ? 'amber'
+                : 'neutral'
+            }
+            size="sm"
+          >
+            {e.employmentStatus}
+          </Badge>
+          {e.isPermanent === false ? (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+              <Clock className="w-3 h-3 text-amber-600" />
+              Onboarding
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+              Permanent
+            </span>
+          )}
+        </div>
       ),
     },
     {
       key: 'id',
       header: 'Actions',
       render: (e) => {
-        const canEdit = isAdmin || e.id === myEmployee?.id;
         return (
           <div className="flex items-center gap-1.5 justify-end">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleOpenProfile(e)}
-              className="p-1.5 text-slate-500 hover:text-indigo-600"
+              className="p-1.5 text-slate-500 hover:text-indigo-600 cursor-pointer"
               title="View Profile"
             >
               <Eye className="w-4 h-4" />
             </Button>
-            {canEdit && (
+            {isAdmin && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleOpenEditModal(e)}
-                className="p-1.5 text-slate-500 hover:text-indigo-600"
+                className="p-1.5 text-slate-500 hover:text-indigo-600 cursor-pointer"
                 title="Edit Employee"
               >
                 <Edit2 className="w-4 h-4" />
@@ -665,11 +865,9 @@ export const EmployeeListPage: React.FC = () => {
             <Users className="w-4 h-4" />
             <span>Human Resource Information System</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Employee Directory</h2>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">People</h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            {isAdmin
-              ? `Maintain organizational members, detailed profile cards, compensation records, and reporting lines for ${currentTenant.name}.`
-              : `Company colleague directory. View team member contacts, office locations, and technical skills.`}
+            Find a colleague or see how the company is organised.
           </p>
         </div>
 
@@ -679,7 +877,7 @@ export const EmployeeListPage: React.FC = () => {
             size="md"
             leftIcon={<Plus className="w-4 h-4" />}
             onClick={handleOpenAddModal}
-            className="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-xs"
+            className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold shadow-xs cursor-pointer"
           >
             Add Employee
           </Button>
@@ -688,7 +886,7 @@ export const EmployeeListPage: React.FC = () => {
 
       {/* KPI Counters */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="p-4 border-l-4 border-l-indigo-600">
+        <Card className="p-4 border-l-4 border-l-orange-500">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Staff</p>
           <h3 className="text-2xl font-bold text-slate-900 mt-1">{employees.length}</h3>
           <p className="text-xs text-slate-400 mt-1">Active enterprise directory</p>
@@ -717,57 +915,103 @@ export const EmployeeListPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-        <div className="flex-1 max-w-md">
-          <Input
-            placeholder="Search by name, employee ID (e.g. TN-1001), or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            leftIcon={<Search className="w-4 h-4 text-slate-400" />}
-          />
-        </div>
-
-        <div className="flex items-center gap-2 overflow-x-auto">
-          <select
-            value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      {/* Navigation View Switcher Tabs */}
+      <div className="flex items-center justify-between border-b border-slate-200">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setActiveDirectoryTab('LIST')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
+              activeDirectoryTab === 'LIST'
+                ? 'border-[#FF6900] text-[#FF6900]'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
           >
-            <option value="ALL">All Departments ({departments.length})</option>
-            {departments.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
-          </select>
+            <span>Directory</span>
+          </button>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          <button
+            type="button"
+            onClick={() => setActiveDirectoryTab('ORG_CHART')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
+              activeDirectoryTab === 'ORG_CHART'
+                ? 'border-[#FF6900] text-[#FF6900]'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
           >
-            <option value="ALL">All Statuses</option>
-            <option value="ACTIVE">Active</option>
-            <option value="ON_LEAVE">On Leave</option>
-            <option value="INACTIVE">Inactive</option>
-          </select>
+            <span>Org chart</span>
+          </button>
         </div>
       </div>
 
-      {/* Employee Data Table */}
-      <DataTable
-        columns={columns}
-        data={paginated}
-        keyExtractor={(e) => e.id}
-        pagination={{
-          page,
-          pageSize,
-          total: filtered.length,
-          totalPages,
-        }}
-        onPageChange={setPage}
-      />
+      {activeDirectoryTab === 'LIST' ? (
+        <>
+          {/* Filters Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+            <div className="flex-1 max-w-md">
+              <Input
+                placeholder="Search by name, employee ID (e.g. TN-1001), or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                leftIcon={<Search className="w-4 h-4 text-slate-400" />}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto">
+              <select
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+              >
+                <option value="ALL">All Departments ({departments.length})</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 text-xs rounded-lg px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+              >
+                <option value="ALL">All Statuses & Classifications</option>
+                <option value="PERMANENT">🛡️ Permanent Confirmed</option>
+                <option value="ONBOARDING">⏳ Onboarding / New Hires</option>
+                <option value="ACTIVE">Active on Duty</option>
+                <option value="ON_LEAVE">On Leave</option>
+                <option value="INACTIVE">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Employee Data Table */}
+          <DataTable
+            columns={columns}
+            data={paginated}
+            keyExtractor={(e) => e.id}
+            pagination={{
+              page,
+              pageSize,
+              total: filtered.length,
+              totalPages,
+            }}
+            onPageChange={setPage}
+          />
+        </>
+      ) : (
+        <OrgChartView
+          employees={employees}
+          departments={departments}
+          designations={designations}
+          regions={regions}
+          currentUser={currentUser}
+          isTenantAdmin={isAdmin}
+          myEmployee={myEmployee}
+          onSelectEmployee={(emp) => handleOpenProfile(emp)}
+        />
+      )}
 
       {/* ============================================================ */}
       {/* ADD / EDIT EMPLOYEE STEP-BY-STEP GUIDED WIZARD MODAL         */}
@@ -775,6 +1019,7 @@ export const EmployeeListPage: React.FC = () => {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        closeOnOverlayClick={false}
         maxWidth="3xl"
         title={editingEmployee ? `Edit Employee (${editingEmployee.name})` : 'New Employee Onboarding'}
         description="Step-by-step registration. Fill out each required step before saving."
@@ -898,10 +1143,10 @@ export const EmployeeListPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <FormField label="Date of Birth" required>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={dateOfBirth}
-                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      onChange={setDateOfBirth}
+                      placeholder="Select birth date"
                       required
                     />
                   </FormField>
@@ -938,7 +1183,7 @@ export const EmployeeListPage: React.FC = () => {
                     <Input
                       value={nationality}
                       onChange={(e) => setNationality(e.target.value)}
-                      placeholder="e.g. Indian"
+                      placeholder="e.g. American"
                       required
                     />
                   </FormField>
@@ -948,7 +1193,7 @@ export const EmployeeListPage: React.FC = () => {
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+91 91234 56789"
+                      placeholder="+1 (555) 234-5678"
                       required
                     />
                   </FormField>
@@ -969,7 +1214,7 @@ export const EmployeeListPage: React.FC = () => {
                       type="tel"
                       value={emergencyContactPhone}
                       onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                      placeholder="+91 91234 56789"
+                      placeholder="+1 (555) 019-2834"
                       required
                     />
                   </FormField>
@@ -979,7 +1224,7 @@ export const EmployeeListPage: React.FC = () => {
                   <Input
                     value={currentAddress}
                     onChange={(e) => setCurrentAddress(e.target.value)}
-                    placeholder="21, 5th Cross, Koramangala, Bangalore - 560034, India"
+                    placeholder="350 5th Avenue, New York, NY 10118, USA"
                     required
                   />
                 </FormField>
@@ -1090,19 +1335,21 @@ export const EmployeeListPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <FormField label="Date of Joining" required>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={joiningDate}
-                      onChange={(e) => setJoiningDate(e.target.value)}
+                      onChange={setJoiningDate}
+                      placeholder="Select joining date"
+                      placement="top"
                       required
                     />
                   </FormField>
 
                   <FormField label="Confirmation Date">
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={confirmationDate}
-                      onChange={(e) => setConfirmationDate(e.target.value)}
+                      onChange={setConfirmationDate}
+                      placeholder="Select confirmation date"
+                      placement="top"
                     />
                   </FormField>
 
@@ -1110,7 +1357,7 @@ export const EmployeeListPage: React.FC = () => {
                     <Input
                       value={workLocation}
                       onChange={(e) => setWorkLocation(e.target.value)}
-                      placeholder="e.g. Bangalore, India"
+                      placeholder="e.g. New York, NY, USA"
                       required
                     />
                   </FormField>
@@ -1163,14 +1410,14 @@ export const EmployeeListPage: React.FC = () => {
                       onChange={(e) => setCurrency(e.target.value)}
                       className="bg-white border border-indigo-200 text-xs rounded-lg px-2 py-1 font-bold text-indigo-700 shadow-2xs focus:ring-1 focus:ring-indigo-500"
                     >
-                      <option value="INR">INR (₹) — Rupee</option>
-                      <option value="USD">USD ($) — Dollar</option>
+                      <option value="USD">USD ($) — US Dollar</option>
                       <option value="EUR">EUR (€) — Euro</option>
-                      <option value="GBP">GBP (£) — Pound</option>
-                      <option value="SGD">SGD (S$) — Singapore Dollar</option>
-                      <option value="AED">AED (د.إ) — Dirham</option>
-                      <option value="AUD">AUD (A$) — Australian Dollar</option>
+                      <option value="GBP">GBP (£) — British Pound</option>
                       <option value="CAD">CAD (C$) — Canadian Dollar</option>
+                      <option value="AUD">AUD (A$) — Australian Dollar</option>
+                      <option value="SGD">SGD (S$) — Singapore Dollar</option>
+                      <option value="AED">AED (AED) — Dirham</option>
+                      <option value="INR">INR (₹) — Indian Rupee</option>
                     </select>
                   </div>
                 </div>
@@ -1185,7 +1432,7 @@ export const EmployeeListPage: React.FC = () => {
                         type="number"
                         value={ctcAnnual}
                         onChange={(e) => setCtcAnnual(e.target.value)}
-                        placeholder="1800000"
+                        placeholder="125000"
                         className="pl-8"
                         required
                       />
@@ -1201,7 +1448,7 @@ export const EmployeeListPage: React.FC = () => {
                         type="number"
                         value={basicSalary}
                         onChange={(e) => setBasicSalary(e.target.value)}
-                        placeholder="900000"
+                        placeholder="95000"
                         className="pl-8"
                         required
                       />
@@ -1219,13 +1466,13 @@ export const EmployeeListPage: React.FC = () => {
                         type="number"
                         value={variablePay}
                         onChange={(e) => setVariablePay(e.target.value)}
-                        placeholder="200000"
+                        placeholder="15000"
                         className="pl-8"
                       />
                     </div>
                   </FormField>
 
-                  <FormField label="Special Allowances" helperText={`HRA, Travel, Medical allowances (Currency: ${currencySymbol})`}>
+                  <FormField label="Special Allowances" helperText={`Housing, Travel, Health allowances (Currency: ${currencySymbol})`}>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-sm font-bold text-indigo-600 pointer-events-none">
                         {currencySymbol}
@@ -1234,7 +1481,7 @@ export const EmployeeListPage: React.FC = () => {
                         type="number"
                         value={allowances}
                         onChange={(e) => setAllowances(e.target.value)}
-                        placeholder="700000"
+                        placeholder="15000"
                         className="pl-8"
                       />
                     </div>
@@ -1247,9 +1494,9 @@ export const EmployeeListPage: React.FC = () => {
                       value={paymentMode}
                       onChange={(e) => setPaymentMode(e.target.value as any)}
                       options={[
-                        { value: 'Bank Transfer', label: 'Bank Transfer' },
                         { value: 'Direct Deposit', label: 'Direct Deposit' },
-                        { value: 'Check', label: 'Check' },
+                        { value: 'Bank Transfer', label: 'Bank Transfer / Wire' },
+                        { value: 'Check', label: 'Paper Check' },
                         { value: 'Cash', label: 'Cash' },
                       ]}
                     />
@@ -1259,16 +1506,16 @@ export const EmployeeListPage: React.FC = () => {
                     <Input
                       value={bankAccountNumber}
                       onChange={(e) => setBankAccountNumber(e.target.value)}
-                      placeholder="e.g. 50100234567890"
+                      placeholder="e.g. 987654321098"
                       required
                     />
                   </FormField>
 
-                  <FormField label="Bank Name & IFSC / Routing" required>
+                  <FormField label="Bank Name & Routing (ABA / ACH)" required>
                     <Input
                       value={bankName}
                       onChange={(e) => setBankName(e.target.value)}
-                      placeholder="e.g. HDFC Bank (HDFC0001234)"
+                      placeholder="e.g. JPMorgan Chase (Routing: 021000021)"
                       required
                     />
                   </FormField>
@@ -1306,10 +1553,181 @@ export const EmployeeListPage: React.FC = () => {
                   />
                 </FormField>
 
+                {/* Permanent Confirmation vs Onboarding Workflow Selector */}
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 mt-3">
+                  <div>
+                    <h5 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                      <span>Employment Classification & Access Mode</span>
+                    </h5>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Set whether this employee is confirmed as permanent or must complete new hire onboarding before accessing resources.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div
+                      onClick={() => setIsPermanent(false)}
+                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
+                        !isPermanent
+                          ? 'border-amber-500 bg-amber-50/60 shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+                            !isPermanent
+                              ? 'border-amber-600 bg-amber-600'
+                              : 'border-slate-300 bg-white'
+                          }`}
+                        />
+                        <span className="text-xs font-bold text-slate-900">
+                          ⏳ New Hire (Onboarding Required)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      onClick={() => setIsPermanent(true)}
+                      className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
+                        isPermanent
+                          ? 'border-emerald-500 bg-emerald-50/60 shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+                            isPermanent
+                              ? 'border-emerald-600 bg-emerald-600'
+                              : 'border-slate-300 bg-white'
+                          }`}
+                        />
+                        <span className="text-xs font-bold text-slate-900">
+                          🛡️ Direct Permanent Active
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Onboarding Documents Requirement Checklist (Dynamic & Configurable) */}
+                {!isPermanent && (
+                  <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 space-y-3 mt-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div>
+                        <h5 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                          <FileText className="w-4 h-4 text-indigo-600" />
+                          <span>Required Onboarding Documents & Expected Formats</span>
+                          <span className="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">
+                            {docRequirements.length} Docs
+                          </span>
+                        </h5>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Specify custom documents this new hire must upload with expected file types (PDF, Image, etc.).
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleSaveAsDefaultTemplate}
+                          className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 bg-white border border-indigo-200 hover:bg-indigo-50 px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+                          title="Save this list as the company's reusable document template for future employees"
+                        >
+                          💾 Save as Default
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleResetToDefaultTemplate}
+                          className="text-[11px] font-semibold text-slate-600 hover:text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+                          title="Reset/Load the saved default company document checklist"
+                        >
+                          🔄 Load Default
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5 pt-1">
+                      {docRequirements.map((doc, idx) => (
+                        <div
+                          key={doc.id}
+                          className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs space-y-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold flex items-center justify-center shrink-0">
+                              {idx + 1}
+                            </span>
+                            <input
+                              type="text"
+                              value={doc.title}
+                              onChange={(e) =>
+                                handleUpdateDocRequirement(doc.id, { title: e.target.value })
+                              }
+                              placeholder="e.g. Government Photo ID, Degree Certificate, Voided Check..."
+                              className="flex-1 text-xs font-semibold text-slate-900 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                              required
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDocRequirement(doc.id)}
+                              className="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                              title="Delete requirement"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-7">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[11px] text-slate-500 font-medium shrink-0">Format:</span>
+                              <select
+                                value={doc.allowedType}
+                                onChange={(e) =>
+                                  handleUpdateDocRequirement(doc.id, {
+                                    allowedType: e.target.value as AllowedDocumentType,
+                                  })
+                                }
+                                className="w-full text-[11px] font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                              >
+                                <option value="PDF">📄 PDF Document (.pdf)</option>
+                                <option value="IMAGE">🖼️ Photo / Image (.jpg, .png, .webp)</option>
+                                <option value="PDF_OR_IMAGE">📄🖼️ PDF or Image</option>
+                                <option value="ANY">📁 Any File Format</option>
+                              </select>
+                            </div>
+
+                            <label className="flex items-center gap-2 cursor-pointer text-[11px] text-slate-700 font-medium">
+                              <input
+                                type="checkbox"
+                                checked={doc.isRequired}
+                                onChange={(e) =>
+                                  handleUpdateDocRequirement(doc.id, { isRequired: e.target.checked })
+                                }
+                                className="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                              />
+                              <span>Mandatory for onboarding approval</span>
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={handleAddDocRequirement}
+                        className="w-full py-2 border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-white hover:bg-indigo-50/50 text-indigo-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Document Requirement</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Registration Review Summary */}
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 mt-4">
+                <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2 mt-4 shadow-xs">
                   <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Registration Summary</h5>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-600">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-[11px] text-slate-600">
                     <div>
                       <span className="text-slate-400 block">Name</span>
                       <strong className="text-slate-900">{name || '--'}</strong>
@@ -1317,6 +1735,12 @@ export const EmployeeListPage: React.FC = () => {
                     <div>
                       <span className="text-slate-400 block">Employee ID</span>
                       <strong className="text-indigo-600">{employeeId || '--'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block">Classification</span>
+                      <strong className={isPermanent ? 'text-emerald-700' : 'text-amber-700'}>
+                        {isPermanent ? 'Permanent' : 'Onboarding'}
+                      </strong>
                     </div>
                     <div>
                       <span className="text-slate-400 block">Annual CTC</span>
@@ -1343,7 +1767,7 @@ export const EmployeeListPage: React.FC = () => {
           onClose={() => setIsProfileModalOpen(false)}
           maxWidth={isViewingSelfOrAdmin ? '4xl' : '2xl'}
           title={`${selectedEmployee.name} (${selectedEmployee.employeeId})`}
-          description={`${desigObj?.name || 'Senior Software Engineer'} • ${deptObj?.name || 'Engineering'} • ${selectedEmployee.workLocation || selectedEmployee.currentAddress || 'Bangalore, India'}`}
+          description={`${desigObj?.name || 'Senior Software Engineer'} • ${deptObj?.name || 'Engineering'} • ${selectedEmployee.workLocation || selectedEmployee.currentAddress || 'New York, NY, USA'}`}
           footer={
             <div className="flex items-center justify-between w-full">
               {isAdmin && (
@@ -1358,7 +1782,7 @@ export const EmployeeListPage: React.FC = () => {
               )}
 
               <div className="flex items-center gap-2 ml-auto">
-                {(isAdmin || selectedEmployee.id === myEmployee?.id) && (
+                {isAdmin && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -1392,7 +1816,7 @@ export const EmployeeListPage: React.FC = () => {
                   <div>
                     <p className="font-semibold text-indigo-950">Employee Privacy Protected</p>
                     <p className="text-slate-600 text-[11px] mt-0.5 leading-relaxed">
-                      Personal emergency contacts, compensation packages, and banking records are restricted to HR Administrators and the employee account owner.
+                      Confidential compensation, banking accounts, and private HR documentation are restricted to HR Administrators and the employee account owner.
                     </p>
                   </div>
                 </div>
@@ -1417,7 +1841,7 @@ export const EmployeeListPage: React.FC = () => {
                       </div>
                       <div className="flex justify-between border-b border-slate-100 pb-1">
                         <span className="text-slate-400">Direct Phone</span>
-                        <span className="text-slate-800 font-medium">{selectedEmployee.phone || '+91 98765 43210'}</span>
+                        <span className="text-slate-800 font-medium">{selectedEmployee.phone || '+1 (212) 555-0100'}</span>
                       </div>
                       <div className="flex justify-between border-b border-slate-100 pb-1">
                         <span className="text-slate-400">Department</span>
@@ -1427,10 +1851,16 @@ export const EmployeeListPage: React.FC = () => {
                         <span className="text-slate-400">Designation</span>
                         <span className="text-slate-800">{desigObj?.name || 'Senior Software Engineer'}</span>
                       </div>
+                      <div className="flex justify-between border-b border-slate-100 pb-1">
+                        <span className="text-slate-400">Emergency Contact</span>
+                        <span className="text-slate-800 font-medium">
+                          {selectedEmployee.emergencyContactName ? `${selectedEmployee.emergencyContactName} (${selectedEmployee.emergencyContactPhone || selectedEmployee.emergencyContactRelation || ''})` : 'Available via HR Desk'}
+                        </span>
+                      </div>
                       <div className="pt-1">
-                        <span className="text-slate-400 block text-[10px]">Workplace Address</span>
+                        <span className="text-slate-400 block text-[10px]">Work Location / Office</span>
                         <span className="text-slate-700 leading-tight block">
-                          {selectedEmployee.workLocation || selectedEmployee.currentAddress || regionObj?.name || 'Bangalore, India'}
+                          {selectedEmployee.workLocation || regionObj?.name || 'New York HQ'}
                         </span>
                       </div>
                     </div>
@@ -1477,16 +1907,11 @@ export const EmployeeListPage: React.FC = () => {
             ) : (
               /* FULL ADMIN / SELF PROFILE VIEW WITH ALL 4 CARDS */
               <>
-                {/* Top Navigation Tabs */}
+                {/* Top Navigation Tabs - Strictly Overview and Documents */}
                 <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto text-xs font-semibold">
                   {[
                     { key: 'Overview', label: 'Overview', icon: User },
-                    { key: 'PersonalInfo', label: 'Personal Info', icon: Heart },
-                    { key: 'JobDetails', label: 'Job Details', icon: Briefcase },
-                    { key: 'Compensation', label: 'Compensation', icon: DollarSign },
                     { key: 'Documents', label: 'Documents', icon: FileText },
-                    { key: 'Attendance', label: 'Attendance', icon: Clock },
-                    { key: 'Leave', label: 'Leave', icon: Calendar },
                   ].map((tab) => {
                     const IconComponent = tab.icon;
                     const isActive = profileActiveTab === tab.key;
@@ -1495,13 +1920,13 @@ export const EmployeeListPage: React.FC = () => {
                         key={tab.key}
                         type="button"
                         onClick={() => setProfileActiveTab(tab.key as any)}
-                        className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap cursor-pointer ${
+                        className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer text-xs font-bold ${
                           isActive
-                            ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 shadow-2xs'
+                            ? 'bg-[#FF6900]/10 text-[#FF6900] border border-[#FF6900]/20 shadow-2xs'
                             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                         }`}
                       >
-                        <IconComponent className="w-3.5 h-3.5" />
+                        <IconComponent className="w-4 h-4" />
                         <span>{tab.label}</span>
                       </button>
                     );
@@ -1521,7 +1946,7 @@ export const EmployeeListPage: React.FC = () => {
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Date of Birth</span>
-                          <span className="text-slate-800">{selectedEmployee.dateOfBirth || '12 Feb 1994'}</span>
+                          <span className="text-slate-800">{selectedEmployee.dateOfBirth || '1990-05-14'}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Gender</span>
@@ -1533,21 +1958,21 @@ export const EmployeeListPage: React.FC = () => {
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Nationality</span>
-                          <span className="text-slate-800">{selectedEmployee.nationality || 'Indian'}</span>
+                          <span className="text-slate-800">{selectedEmployee.nationality || 'American'}</span>
                         </div>
                         <div className="border-b border-slate-100 pb-1">
                           <span className="text-slate-400 block text-[10px]">Emergency Contact</span>
                           <span className="text-slate-800 font-medium block">
-                            {selectedEmployee.emergencyContactName || 'John Mitchell (Father)'}
+                            {selectedEmployee.emergencyContactName || 'Sarah Miller (Spouse)'}
                           </span>
                           <span className="text-slate-500 font-mono text-[10px]">
-                            {selectedEmployee.emergencyContactPhone || '+91 91234 56789'}
+                            {selectedEmployee.emergencyContactPhone || '+1 (212) 555-0199'}
                           </span>
                         </div>
                         <div className="pt-1">
                           <span className="text-slate-400 block text-[10px]">Current Address</span>
                           <span className="text-slate-700 leading-tight block">
-                            {selectedEmployee.currentAddress || '21, 5th Cross, Koramangala, Bangalore - 560034, India'}
+                            {selectedEmployee.currentAddress || '120 Broadway, Suite 1400, New York, NY 10005'}
                           </span>
                         </div>
                       </div>
@@ -1567,7 +1992,7 @@ export const EmployeeListPage: React.FC = () => {
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Employee ID</span>
-                          <span className="font-mono font-bold text-indigo-600">{selectedEmployee.employeeId}</span>
+                          <span className="font-mono font-bold text-[#FF6900]">{selectedEmployee.employeeId}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Employment Type</span>
@@ -1576,18 +2001,18 @@ export const EmployeeListPage: React.FC = () => {
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Date of Joining</span>
                           <span className="text-slate-800">
-                            {selectedEmployee.joiningDate ? new Date(selectedEmployee.joiningDate).toLocaleDateString() : '15 Jan 2023'}
+                            {selectedEmployee.joiningDate ? new Date(selectedEmployee.joiningDate).toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' }) : '3/15/2024'}
                           </span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Confirmation Date</span>
                           <span className="text-slate-800">
-                            {selectedEmployee.confirmationDate ? new Date(selectedEmployee.confirmationDate).toLocaleDateString() : '15 Jul 2023'}
+                            {selectedEmployee.confirmationDate ? new Date(selectedEmployee.confirmationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' }) : '6/15/2024'}
                           </span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Work Location</span>
-                          <span className="text-slate-800">{selectedEmployee.workLocation || regionObj?.name || 'Bangalore, India'}</span>
+                          <span className="text-slate-800">{selectedEmployee.workLocation || regionObj?.name || 'New York HQ'}</span>
                         </div>
                         <div className="pt-1 flex justify-between">
                           <span className="text-slate-400">Reporting Manager</span>
@@ -1602,28 +2027,28 @@ export const EmployeeListPage: React.FC = () => {
                       <div className="space-y-2 text-[11px] text-slate-600">
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">CTC (Annual)</span>
-                          <strong className="text-slate-900 font-bold">{selectedEmployee.ctcAnnual || '₹18,00,000'}</strong>
+                          <strong className="text-slate-900 font-bold">{formatSalary(selectedEmployee.ctcAnnual)}</strong>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Basic Salary</span>
-                          <span className="text-slate-800">{selectedEmployee.basicSalary || '₹9,00,000'}</span>
+                          <span className="text-slate-800">{formatSalary(selectedEmployee.basicSalary)}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Variable Pay</span>
-                          <span className="text-slate-800">{selectedEmployee.variablePay || '₹2,00,000'}</span>
+                          <span className="text-slate-800">{formatSalary(selectedEmployee.variablePay)}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Allowances</span>
-                          <span className="text-slate-800">{selectedEmployee.allowances || '₹7,00,000'}</span>
+                          <span className="text-slate-800">{formatSalary(selectedEmployee.allowances)}</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 pb-1">
                           <span className="text-slate-400">Payment Mode</span>
-                          <span className="text-slate-800">{selectedEmployee.paymentMode || 'Bank Transfer'}</span>
+                          <span className="text-slate-800">{selectedEmployee.paymentMode || 'Direct Deposit'}</span>
                         </div>
                         <div className="pt-1">
                           <span className="text-slate-400 block text-[10px]">Bank Account</span>
-                          <span className="font-mono text-slate-800 block">{selectedEmployee.bankAccountNumber || 'XXXX XXXX 1234'}</span>
-                          <span className="text-[10px] text-slate-400">{selectedEmployee.bankName || 'HDFC Bank'}</span>
+                          <span className="font-mono text-slate-800 block">{selectedEmployee.bankAccountNumber || '•••• •••• 9283'}</span>
+                          <span className="text-[10px] text-slate-400">{selectedEmployee.bankName || 'JPMorgan Chase Bank, N.A.'}</span>
                         </div>
                       </div>
                     </Card>
@@ -1636,7 +2061,7 @@ export const EmployeeListPage: React.FC = () => {
                         <div className="space-y-2 text-[11px]">
                           <div className="flex justify-between items-center border-b border-slate-100 pb-1.5">
                             <span className="text-slate-400">Team</span>
-                            <strong className="text-indigo-600 font-bold">{selectedEmployee.teamName || 'Backend Team'}</strong>
+                            <strong className="text-[#FF6900] font-bold">{selectedEmployee.teamName || 'Core Platform Architecture'}</strong>
                           </div>
                           <div>
                             <span className="text-slate-400 block text-[10px] mb-1.5">Team Members</span>
@@ -1658,10 +2083,10 @@ export const EmployeeListPage: React.FC = () => {
                       <Card className="p-4 space-y-2.5 bg-white border border-slate-200 rounded-2xl shadow-xs">
                         <h4 className="font-bold text-slate-900 text-sm">Skills</h4>
                         <div className="flex flex-wrap gap-1.5">
-                          {(selectedEmployee.skills || ['JavaScript', 'React', 'Node.js', 'TypeScript', 'PostgreSQL', 'AWS']).map((sk) => (
+                          {(selectedEmployee.skills || ['Go', 'Kubernetes', 'AWS', 'Distributed Systems', 'PostgreSQL', 'Kafka']).map((sk) => (
                             <span
                               key={sk}
-                              className="bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-1 rounded-full text-[10px] border border-indigo-100"
+                              className="bg-orange-50 text-orange-800 font-semibold px-2.5 py-1 rounded-full text-[10px] border border-orange-200"
                             >
                               {sk}
                             </span>
@@ -1672,48 +2097,65 @@ export const EmployeeListPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* TAB CONTENT: PERSONAL INFO */}
-                {profileActiveTab === 'PersonalInfo' && (
+                {/* TAB CONTENT: DOCUMENTS */}
+                {profileActiveTab === 'Documents' && (
                   <Card className="p-5 space-y-4 animate-in fade-in">
-                    <h4 className="text-base font-bold text-slate-900">Personal & Emergency Contact Details</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                      <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                        <span className="text-slate-400 text-[10px] font-semibold uppercase">Date of Birth</span>
-                        <p className="font-bold text-slate-900">{selectedEmployee.dateOfBirth || '12 Feb 1994'}</p>
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">Official Employment Documents</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Verified HR, legal, and compliance documents for {selectedEmployee.name}</p>
                       </div>
-                      <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                        <span className="text-slate-400 text-[10px] font-semibold uppercase">Gender & Marital Status</span>
-                        <p className="font-bold text-slate-900">{selectedEmployee.gender || 'Female'} • {selectedEmployee.maritalStatus || 'Single'}</p>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                        <span className="text-slate-400 text-[10px] font-semibold uppercase">Nationality</span>
-                        <p className="font-bold text-slate-900">{selectedEmployee.nationality || 'Indian'}</p>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                        <span className="text-slate-400 text-[10px] font-semibold uppercase">Emergency Contact</span>
-                        <p className="font-bold text-slate-900">{selectedEmployee.emergencyContactName || 'John Mitchell (Father)'} ({selectedEmployee.emergencyContactPhone || '+91 91234 56789'})</p>
-                      </div>
+                      <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-100">
+                        6 Documents On File
+                      </span>
                     </div>
-                  </Card>
-                )}
 
-                {/* TAB CONTENT: COMPENSATION */}
-                {profileActiveTab === 'Compensation' && (
-                  <Card className="p-5 space-y-4 animate-in fade-in">
-                    <h4 className="text-base font-bold text-slate-900">Annual Compensation & Payroll Details</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                      <div className="p-4 bg-indigo-50/50 border border-indigo-100 rounded-xl">
-                        <span className="text-indigo-600 text-[10px] font-bold uppercase">Total Annual CTC</span>
-                        <p className="text-xl font-extrabold text-indigo-950 mt-1">{selectedEmployee.ctcAnnual || '₹18,00,000'}</p>
-                      </div>
-                      <div className="p-4 bg-slate-50 rounded-xl">
-                        <span className="text-slate-400 text-[10px] font-semibold uppercase">Basic Salary</span>
-                        <p className="text-base font-bold text-slate-900 mt-1">{selectedEmployee.basicSalary || '₹9,00,000'}</p>
-                      </div>
-                      <div className="p-4 bg-slate-50 rounded-xl">
-                        <span className="text-slate-400 text-[10px] font-semibold uppercase">Variable Pay</span>
-                        <p className="text-base font-bold text-slate-900 mt-1">{selectedEmployee.variablePay || '₹2,00,000'}</p>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                      {[
+                        { title: 'Employment Agreement & Offer Letter', size: '2.4 MB', type: 'PDF', date: selectedEmployee.joiningDate || '2024-03-15', status: 'Signed & Executed' },
+                        { title: 'Federal W-4 Tax Withholding Certificate', size: '850 KB', type: 'PDF', date: selectedEmployee.joiningDate || '2024-03-15', status: 'Verified' },
+                        { title: 'Form I-9 Identity & Work Eligibility Verification', size: '1.8 MB', type: 'PDF', date: selectedEmployee.joiningDate || '2024-03-15', status: 'Verified' },
+                        { title: 'Direct Deposit Authorization & Bank Mandate', size: '420 KB', type: 'PDF', date: selectedEmployee.joiningDate || '2024-03-15', status: 'Active' },
+                        { title: 'Intellectual Property & Security Compliance NDA', size: '1.2 MB', type: 'PDF', date: selectedEmployee.joiningDate || '2024-03-15', status: 'Signed' },
+                        { title: 'Educational Credentials & Background Screening', size: '3.5 MB', type: 'PDF', date: selectedEmployee.joiningDate || '2024-03-15', status: 'Verified' },
+                      ].map((doc, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl transition-all group"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-lg bg-orange-100/60 text-[#FF6900] flex items-center justify-center font-bold text-xs shrink-0">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-800 text-xs truncate group-hover:text-[#FF6900] transition-colors">
+                                {doc.title}
+                              </p>
+                              <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400">
+                                <span>{doc.type} • {doc.size}</span>
+                                <span>•</span>
+                                <span>{doc.date}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0 ml-2">
+                            <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 hidden sm:inline-block">
+                              {doc.status}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                toast.success(`Downloading ${doc.title}...`);
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-white rounded-lg transition-colors cursor-pointer"
+                              title="Download Document"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </Card>
                 )}

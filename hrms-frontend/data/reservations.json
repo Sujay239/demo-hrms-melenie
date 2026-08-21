@@ -1,0 +1,38 @@
+[
+  {
+    "id": "res-ac-1",
+    "tenantId": "tenant-1787291784650",
+    "roomId": "room-auto-computation-1-1",
+    "roomName": "Apollo Executive Boardroom (One)",
+    "reservedById": "emp-ac-1",
+    "reservedByName": "David Miller",
+    "title": "Q3 Enterprise Architecture & Cloud Scale Review",
+    "startAt": "2026-08-25T14:00:00.000Z",
+    "endAt": "2026-08-25T16:00:00.000Z",
+    "status": "CONFIRMED"
+  },
+  {
+    "id": "res-ac-2",
+    "tenantId": "tenant-1787291784650",
+    "roomId": "room-auto-computation-1-2",
+    "roomName": "Discovery Strategic Room (One)",
+    "reservedById": "emp-ac-2",
+    "reservedByName": "Sarah Jenkins",
+    "title": "All-Hands Culture & Q3 Benefits Townhall Prep",
+    "startAt": "2026-08-26T10:00:00.000Z",
+    "endAt": "2026-08-26T11:30:00.000Z",
+    "status": "CONFIRMED"
+  },
+  {
+    "id": "res-apex-1",
+    "tenantId": "tenant-apex-101",
+    "roomId": "room-apex-cloud-2-1",
+    "roomName": "Apollo Executive Boardroom (Salesforce)",
+    "reservedById": "emp-apex-1",
+    "reservedByName": "Marcus Vance",
+    "title": "Silicon Valley AI LLM Strategy & Investor Sync",
+    "startAt": "2026-08-28T15:00:00.000Z",
+    "endAt": "2026-08-28T17:00:00.000Z",
+    "status": "CONFIRMED"
+  }
+]

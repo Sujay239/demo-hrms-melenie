@@ -1,0 +1,326 @@
+[
+  {
+    "id": "dept-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "name": "Executive & Leadership",
+    "description": "C-Suite, Strategy and Corporate Governance",
+    "parentDepartmentId": null,
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "name": "Cloud Engineering & Architecture",
+    "description": "Core Platform, Backend Services & Scalability",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "name": "Artificial Intelligence & Data Science",
+    "description": "Machine Learning Models, NLP & Data Analytics",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-4",
+    "tenantId": "tenant-1787291784650",
+    "name": "Product Design & UX Research",
+    "description": "User Experience, UI Systems & Customer Journey",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-5",
+    "tenantId": "tenant-1787291784650",
+    "name": "Growth, Marketing & Brand",
+    "description": "Digital Acquisition, Content Marketing & PR",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-6",
+    "tenantId": "tenant-1787291784650",
+    "name": "Enterprise Sales & Partnerships",
+    "description": "B2B Accounts, Solution Architecture & Sales",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-7",
+    "tenantId": "tenant-1787291784650",
+    "name": "People Operations & HR",
+    "description": "Talent Acquisition, Total Rewards & Employee Relations",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-8",
+    "tenantId": "tenant-1787291784650",
+    "name": "Finance, Tax & Legal Compliance",
+    "description": "Financial Planning, Accounting, Payroll & Legal",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-auto-computation-9",
+    "tenantId": "tenant-1787291784650",
+    "name": "DevOps & Information Security",
+    "description": "Cloud Infrastructure, SOC2 Compliance & Cyber Defense",
+    "parentDepartmentId": "dept-auto-computation-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "name": "Executive & Leadership",
+    "description": "C-Suite, Strategy and Corporate Governance",
+    "parentDepartmentId": null,
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "name": "Cloud Engineering & Architecture",
+    "description": "Core Platform, Backend Services & Scalability",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "name": "Artificial Intelligence & Data Science",
+    "description": "Machine Learning Models, NLP & Data Analytics",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-4",
+    "tenantId": "tenant-apex-101",
+    "name": "Product Design & UX Research",
+    "description": "User Experience, UI Systems & Customer Journey",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-5",
+    "tenantId": "tenant-apex-101",
+    "name": "Growth, Marketing & Brand",
+    "description": "Digital Acquisition, Content Marketing & PR",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-6",
+    "tenantId": "tenant-apex-101",
+    "name": "Enterprise Sales & Partnerships",
+    "description": "B2B Accounts, Solution Architecture & Sales",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-7",
+    "tenantId": "tenant-apex-101",
+    "name": "People Operations & HR",
+    "description": "Talent Acquisition, Total Rewards & Employee Relations",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-8",
+    "tenantId": "tenant-apex-101",
+    "name": "Finance, Tax & Legal Compliance",
+    "description": "Financial Planning, Accounting, Payroll & Legal",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-apex-cloud-9",
+    "tenantId": "tenant-apex-101",
+    "name": "DevOps & Information Security",
+    "description": "Cloud Infrastructure, SOC2 Compliance & Cyber Defense",
+    "parentDepartmentId": "dept-apex-cloud-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "name": "Executive & Leadership",
+    "description": "C-Suite, Strategy and Corporate Governance",
+    "parentDepartmentId": null,
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "name": "Cloud Engineering & Architecture",
+    "description": "Core Platform, Backend Services & Scalability",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "name": "Artificial Intelligence & Data Science",
+    "description": "Machine Learning Models, NLP & Data Analytics",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-4",
+    "tenantId": "tenant-horizon-102",
+    "name": "Product Design & UX Research",
+    "description": "User Experience, UI Systems & Customer Journey",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-5",
+    "tenantId": "tenant-horizon-102",
+    "name": "Growth, Marketing & Brand",
+    "description": "Digital Acquisition, Content Marketing & PR",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-6",
+    "tenantId": "tenant-horizon-102",
+    "name": "Enterprise Sales & Partnerships",
+    "description": "B2B Accounts, Solution Architecture & Sales",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-7",
+    "tenantId": "tenant-horizon-102",
+    "name": "People Operations & HR",
+    "description": "Talent Acquisition, Total Rewards & Employee Relations",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-8",
+    "tenantId": "tenant-horizon-102",
+    "name": "Finance, Tax & Legal Compliance",
+    "description": "Financial Planning, Accounting, Payroll & Legal",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-horizon-health-9",
+    "tenantId": "tenant-horizon-102",
+    "name": "DevOps & Information Security",
+    "description": "Cloud Infrastructure, SOC2 Compliance & Cyber Defense",
+    "parentDepartmentId": "dept-horizon-health-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Executive & Leadership",
+    "description": "C-Suite, Strategy and Corporate Governance",
+    "parentDepartmentId": null,
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Cloud Engineering & Architecture",
+    "description": "Core Platform, Backend Services & Scalability",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Artificial Intelligence & Data Science",
+    "description": "Machine Learning Models, NLP & Data Analytics",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-4",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Product Design & UX Research",
+    "description": "User Experience, UI Systems & Customer Journey",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-5",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Growth, Marketing & Brand",
+    "description": "Digital Acquisition, Content Marketing & PR",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-6",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Enterprise Sales & Partnerships",
+    "description": "B2B Accounts, Solution Architecture & Sales",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-7",
+    "tenantId": "tenant-vanguard-103",
+    "name": "People Operations & HR",
+    "description": "Talent Acquisition, Total Rewards & Employee Relations",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-8",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Finance, Tax & Legal Compliance",
+    "description": "Financial Planning, Accounting, Payroll & Legal",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "dept-vanguard-fintech-9",
+    "tenantId": "tenant-vanguard-103",
+    "name": "DevOps & Information Security",
+    "description": "Cloud Infrastructure, SOC2 Compliance & Cyber Defense",
+    "parentDepartmentId": "dept-vanguard-fintech-1",
+    "headEmployeeId": null,
+    "status": "ACTIVE"
+  }
+]

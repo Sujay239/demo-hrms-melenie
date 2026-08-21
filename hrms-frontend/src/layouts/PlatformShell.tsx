@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/utils/cn";
 import {
   LayoutDashboard,
@@ -10,20 +10,49 @@ import {
   LogOut,
   Menu,
   ChevronDown,
-  UserCheck,
+  Lock,
 } from "lucide-react";
 import { mockStorage } from "@/services/mock-storage";
 import { Drawer } from "@/components/ui/Drawer";
 import { Avatar } from "@/components/ui/Avatar";
 import { ToastContainer } from "@/components/ui/Toast";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 
 export const PlatformShell: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const currentUser = mockStorage.getCurrentUser();
-  const allUsers = mockStorage.getUsers();
+
+  const handleSignOut = () => {
+    mockStorage.logout();
+    navigate("/auth/login");
+  };
+
+  // Authorization check: only SUPER_ADMIN can access PlatformShell
+  if (!currentUser || currentUser.role !== "SUPER_ADMIN") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <Card className="max-w-md p-6 text-center space-y-4">
+          <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+            <Lock className="w-6 h-6" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900">
+            Super Admin Access Required
+          </h2>
+          <p className="text-sm text-slate-500">
+            You must be logged in as a Platform Super Admin to view this scope.
+          </p>
+          <Button variant="primary" onClick={handleSignOut} className="w-full">
+            Go to Login
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   const navItems = [
     { label: "Platform Dashboard", path: "/admin", icon: LayoutDashboard },
@@ -37,39 +66,14 @@ export const PlatformShell: React.FC = () => {
     },
   ];
 
-  const handleRoleSwitch = (userId: string) => {
-    const targetUser = allUsers.find((u) => u.id === userId);
-    if (targetUser) {
-      mockStorage.setCurrentUser(targetUser);
-      // Redirect according to role
-      if (targetUser.role === "SUPER_ADMIN") {
-        window.location.href = "/admin";
-      } else if (targetUser.role === "NEW_HIRE") {
-        window.location.href = "/acme-corp/onboarding/dashboard";
-      } else if (targetUser.tenantId) {
-        const tenant = mockStorage
-          .getTenants()
-          .find((t) => t.id === targetUser.tenantId);
-        window.location.href = `/${tenant?.slug || "acme-corp"}/dashboard`;
-      } else if (targetUser.role === "CONSULTANT") {
-        const tenant = mockStorage.getAccessibleTenant(targetUser);
-        window.location.href = tenant
-          ? `/${tenant.slug}/dashboard`
-          : "/admin/consultants";
-      } else {
-        window.location.href = "/acme-corp/dashboard";
-      }
-    }
-  };
-
   const NavContent = () => (
     <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200">
       {/* Brand Header */}
-      <div className="flex items-center px-6 py-4 border-b border-slate-100">
+      <div className="flex items-center px-4 py-4 border-b border-slate-100 min-h-[72px]">
         <img
           src="/logo.png"
-          alt="Cyrcalur Logo"
-          className="h-10 w-auto max-w-full object-contain"
+          alt="Peopleworkplaces Logo"
+          className="h-12 w-auto max-w-[210px] object-contain object-left"
         />
       </div>
 
@@ -101,33 +105,38 @@ export const PlatformShell: React.FC = () => {
         })}
       </nav>
 
-      {/* Demo Switcher footer */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/80">
-        <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-medium">
-          <span className="flex items-center gap-1.5">
-            <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
-            Switch Active Demo User:
-          </span>
+      {/* Clean User Footer (Role-switching dropdown removed) */}
+      <div className="p-4 border-t border-slate-100 bg-slate-50/80 flex items-center justify-between">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Avatar
+            src={currentUser.avatarUrl}
+            name={currentUser.name}
+            size="sm"
+          />
+          <div className="flex flex-col truncate">
+            <span className="text-xs font-semibold text-slate-800 truncate">
+              {currentUser.name}
+            </span>
+            <span className="text-[10px] text-slate-500 font-medium">
+              Platform Super Admin
+            </span>
+          </div>
         </div>
-        <select
-          value={currentUser.id}
-          onChange={(e) => handleRoleSwitch(e.target.value)}
-          className="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-lg p-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer font-medium"
+        <button
+          onClick={handleSignOut}
+          title="Sign Out"
+          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
         >
-          {allUsers.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name} ({mockStorage.getRoleLabel(u.role)})
-            </option>
-          ))}
-        </select>
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
 
   return (
     <div className="min-h-screen flex bg-slate-50">
-      {/* Desktop Sidebar (Fixed in single screen) */}
-      <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-slate-200 z-20 sticky top-0 h-screen overflow-hidden">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-slate-200 z-30 sticky top-0 h-screen overflow-hidden">
         <NavContent />
       </aside>
 
@@ -139,7 +148,7 @@ export const PlatformShell: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileOpen(true)}
@@ -148,11 +157,11 @@ export const PlatformShell: React.FC = () => {
               <Menu className="w-6 h-6" />
             </button>
             <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
-              Platform Admin Scope (admin.cyrcalur.hr)
+              Platform Admin Scope (admin.Peopleworkplaces.hr)
             </span>
           </div>
 
-          {/* User Profile */}
+          {/* Super Admin Profile Actions */}
           <div className="relative">
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -167,29 +176,26 @@ export const PlatformShell: React.FC = () => {
                 <span className="text-sm font-semibold text-slate-800 leading-tight">
                   {currentUser.name}
                 </span>
-                <span className="text-xs text-slate-500">
-                  {mockStorage.getRoleLabel(currentUser.role)}
-                </span>
+                <span className="text-xs text-slate-500">Super Admin</span>
               </div>
               <ChevronDown className="w-4 h-4 text-slate-400" />
             </button>
 
             {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-1 z-30 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-40 animate-in fade-in zoom-in-95">
                 <div className="px-4 py-2.5 border-b border-slate-100">
                   <p className="text-sm font-semibold text-slate-900">
                     {currentUser.name}
                   </p>
                   <p className="text-xs text-slate-500">{currentUser.email}</p>
                 </div>
-                <Link
-                  to="/auth/login"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
-                  onClick={() => setIsProfileMenuOpen(false)}
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
-                </Link>
+                </button>
               </div>
             )}
           </div>

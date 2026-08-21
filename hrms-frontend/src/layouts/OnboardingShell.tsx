@@ -1,10 +1,26 @@
-import React from 'react';
-import { Outlet, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { cn } from '@/utils/cn';
-import { LayoutDashboard, UserCheck, FileText, CheckSquare, LogOut, Lock, Sparkles, Building2, CheckCircle2 } from 'lucide-react';
-import { mockStorage } from '@/services/mock-storage';
-import { ToastContainer, toast } from '@/components/ui/Toast';
-import { Button } from '@/components/ui/Button';
+import React from "react";
+import {
+  Outlet,
+  Link,
+  useLocation,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+import { cn } from "@/utils/cn";
+import {
+  LayoutDashboard,
+  UserCheck,
+  FileText,
+  CheckSquare,
+  LogOut,
+  Lock,
+  Sparkles,
+  Building2,
+  CheckCircle2,
+} from "lucide-react";
+import { mockStorage } from "@/services/mock-storage";
+import { ToastContainer, toast } from "@/components/ui/Toast";
+import { Button } from "@/components/ui/Button";
 
 export const OnboardingShell: React.FC = () => {
   const location = useLocation();
@@ -16,12 +32,15 @@ export const OnboardingShell: React.FC = () => {
   const activeTenant = allTenants.find((t) => t.slug === slug) || allTenants[0];
 
   const currentSlug = activeTenant.slug;
-  const isApproved = currentUser.role === 'EMPLOYEE';
+  const isApproved = currentUser.role === "EMPLOYEE";
 
   const cases = mockStorage.getOnboardingCases(activeTenant.id);
-  const myCase = cases.find(
-    (c) => c.userId === currentUser.id || c.email.toLowerCase() === currentUser.email.toLowerCase()
-  ) || cases[0];
+  const myCase =
+    cases.find(
+      (c) =>
+        c.userId === currentUser.id ||
+        c.email.toLowerCase() === currentUser.email.toLowerCase(),
+    ) || cases[0];
 
   const phase1Done = myCase?.personalDetailsCompleted || false;
   const phase2Done = myCase?.offerSignedUploaded || false;
@@ -30,51 +49,54 @@ export const OnboardingShell: React.FC = () => {
 
   const navItems = [
     {
-      id: 'dashboard',
-      label: 'Onboarding Checklist',
+      id: "dashboard",
+      label: "Onboarding Checklist",
       path: `/${currentSlug}/onboarding/dashboard`,
       icon: LayoutDashboard,
       isLocked: false,
       isDone: phase1Done && phase2Done && phase3Done && phase4Done,
     },
     {
-      id: 'details',
-      label: '1. Personal Details',
+      id: "details",
+      label: "1. Personal Details",
       path: `/${currentSlug}/onboarding/details`,
       icon: UserCheck,
       isLocked: false,
       isDone: phase1Done,
     },
     {
-      id: 'offer',
-      label: '2. Offer Letter & Sign',
+      id: "offer",
+      label: "2. Offer Letter & Sign",
       path: `/${currentSlug}/onboarding/offer`,
       icon: FileText,
       isLocked: !phase1Done,
-      lockMessage: 'Complete Phase 1 (Personal Details) to unlock Offer Letter signing.',
+      lockMessage:
+        "Complete Phase 1 (Personal Details) to unlock Offer Letter signing.",
       isDone: phase2Done,
     },
     {
-      id: 'documents',
-      label: '3. Required Documents',
+      id: "documents",
+      label: "3. Required Documents",
       path: `/${currentSlug}/onboarding/documents`,
       icon: CheckSquare,
       isLocked: !phase1Done || !phase2Done,
-      lockMessage: 'Complete Phase 2 (Offer Letter Signing) to unlock Document Submission.',
+      lockMessage:
+        "Complete Phase 2 (Offer Letter Signing) to unlock Document Submission.",
       isDone: phase3Done,
     },
     {
-      id: 'acknowledgement',
-      label: '4. Policy Sign-Off',
+      id: "acknowledgement",
+      label: "4. Policy Sign-Off",
       path: `/${currentSlug}/onboarding/acknowledgement`,
       icon: CheckSquare,
       isLocked: !phase1Done || !phase2Done || !phase3Done,
-      lockMessage: 'Complete Phase 3 (Required Documents) to unlock Policy Sign-Off.',
+      lockMessage:
+        "Complete Phase 3 (Required Documents) to unlock Policy Sign-Off.",
       isDone: phase4Done,
     },
     {
-      id: 'preview',
-      label: 'Company Tools (Preview)',
+      id: "preview",
+      label: "Company Tools (Preview)",
       path: `/${currentSlug}/onboarding/preview`,
       icon: Lock,
       isLocked: false,
@@ -82,10 +104,13 @@ export const OnboardingShell: React.FC = () => {
     },
   ];
 
-  const handleNavClick = (e: React.MouseEvent, item: typeof navItems[0]) => {
+  const handleNavClick = (e: React.MouseEvent, item: (typeof navItems)[0]) => {
     if (item.isLocked) {
       e.preventDefault();
-      toast.error(item.lockMessage || 'This phase is locked until you complete previous steps.');
+      toast.error(
+        item.lockMessage ||
+          "This phase is locked until you complete previous steps.",
+      );
     }
   };
 
@@ -96,9 +121,13 @@ export const OnboardingShell: React.FC = () => {
         <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {activeTenant.logoUrl ? (
-              <img src={activeTenant.logoUrl} alt={activeTenant.name} className="h-9 max-w-[140px] object-contain" />
+              <img
+                src={activeTenant.logoUrl}
+                alt={activeTenant.name}
+                className="h-11 max-w-[180px] object-contain object-left"
+              />
             ) : (
-              <div className="h-9 px-3 bg-indigo-600 text-white font-bold rounded-lg flex items-center justify-center">
+              <div className="h-11 px-3.5 bg-indigo-600 text-white font-bold rounded-lg flex items-center justify-center text-base shadow-xs">
                 {activeTenant.name.slice(0, 2).toUpperCase()}
               </div>
             )}
@@ -106,14 +135,20 @@ export const OnboardingShell: React.FC = () => {
               <span className="text-sm font-bold text-slate-800">
                 New Hire Onboarding Portal
               </span>
-              <span className="text-xs text-slate-400 font-mono">cyrcalur.hr/{currentSlug}</span>
+              <span className="text-xs text-slate-400 font-mono">
+                Peopleworkplaces.hr/{currentSlug}
+              </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {isApproved ? (
               <Link to={`/${currentSlug}/dashboard`}>
-                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs" leftIcon={<Sparkles className="w-3.5 h-3.5" />}>
+                <Button
+                  size="sm"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs"
+                  leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+                >
                   Enter Company Portal →
                 </Button>
               </Link>
@@ -123,7 +158,11 @@ export const OnboardingShell: React.FC = () => {
                 Onboarding: {currentUser.name}
               </span>
             )}
-            <Link to="/auth/login" className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100" title="Sign out">
+            <Link
+              to="/auth/login"
+              className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100"
+              title="Sign out"
+            >
               <LogOut className="w-5 h-5" />
             </Link>
           </div>
@@ -143,12 +182,12 @@ export const OnboardingShell: React.FC = () => {
                 to={item.path}
                 onClick={(e) => handleNavClick(e, item)}
                 className={cn(
-                  'flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all shrink-0 select-none',
+                  "flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all shrink-0 select-none",
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-xs'
+                    ? "bg-indigo-600 text-white shadow-xs"
                     : item.isLocked
-                    ? 'text-slate-400 bg-slate-50 cursor-not-allowed opacity-75 border border-slate-200/50'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      ? "text-slate-400 bg-slate-50 cursor-not-allowed opacity-75 border border-slate-200/50"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                 )}
               >
                 {item.isDone ? (

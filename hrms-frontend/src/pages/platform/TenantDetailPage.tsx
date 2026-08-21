@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Input } from '@/components/ui/Input';
-import { FormField } from '@/components/ui/FormField';
-import { Select } from '@/components/ui/Select';
-import { toast } from '@/components/ui/Toast';
-import { mockStorage } from '@/services/mock-storage';
-import { Tenant, TenantFeatures } from '@/demo-data/seedData';
-import { Switch } from '@/components/ui/Switch';
+import React, { useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Input } from "@/components/ui/Input";
+import { FormField } from "@/components/ui/FormField";
+import { Select } from "@/components/ui/Select";
+import { toast } from "@/components/ui/Toast";
+import { mockStorage } from "@/services/mock-storage";
+import { Tenant, TenantFeatures } from "@/demo-data/seedData";
+import { Switch } from "@/components/ui/Switch";
 import {
   ArrowLeft,
   ExternalLink,
@@ -40,35 +40,74 @@ import {
   X,
   Upload,
   RotateCcw,
-} from 'lucide-react';
+  Plus,
+} from "lucide-react";
 
 export const TenantDetailPage: React.FC = () => {
   const { tenantId } = useParams<{ tenantId: string }>();
   const navigate = useNavigate();
 
-  const [tenants, setTenants] = useState<Tenant[]>(() => mockStorage.getTenants());
+  const [tenants, setTenants] = useState<Tenant[]>(() =>
+    mockStorage.getTenants(),
+  );
   const tenant = tenants.find((t) => t.id === tenantId) || null;
 
-  const [status, setStatus] = useState<'ACTIVE' | 'INACTIVE' | 'DEACTIVATED'>(
-    tenant?.status || 'ACTIVE'
+  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "DEACTIVATED">(
+    tenant?.status || "ACTIVE",
   );
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editName, setEditName] = useState(tenant?.name || '');
-  const [editSlug, setEditSlug] = useState(tenant?.slug || '');
-  const [editLogoUrl, setEditLogoUrl] = useState(tenant?.logoUrl || '');
-  const [editIndustry, setEditIndustry] = useState(tenant?.industry || 'Software & Cloud Technology');
-  const [editAdminEmail, setEditAdminEmail] = useState(tenant?.adminEmail || '');
-  const [editWebsiteUrl, setEditWebsiteUrl] = useState(tenant?.websiteUrl || '');
-  const [editOfferExpiry, setEditOfferExpiry] = useState<number>(tenant?.offerLetterExpiryDays || 14);
-  const [editLeaveAllowance, setEditLeaveAllowance] = useState<number>(tenant?.annualLeaveAllowance || 24);
-  const [editProbationDays, setEditProbationDays] = useState<number>(tenant?.probationPeriodDays || 90);
-  const [editNoticeDays, setEditNoticeDays] = useState<number>(tenant?.noticePeriodDays || 30);
-  const [editWorkWeek, setEditWorkWeek] = useState<number>(tenant?.workWeekDays || 5);
-  const [editDailyHours, setEditDailyHours] = useState<number>(tenant?.dailyWorkingHours || 8);
-  const [editCurrency, setEditCurrency] = useState(tenant?.currency || 'USD');
-  const [editTimezone, setEditTimezone] = useState(tenant?.timezone || 'America/New_York (EST)');
+  const [editName, setEditName] = useState(tenant?.name || "");
+  const [editSlug, setEditSlug] = useState(tenant?.slug || "");
+  const [editLogoUrl, setEditLogoUrl] = useState(tenant?.logoUrl || "");
+  const [editIndustry, setEditIndustry] = useState(
+    tenant?.industry || "Software & Cloud Technology",
+  );
+  const [isEditCustomIndustry, setIsEditCustomIndustry] = useState(false);
+  const [customEditIndustryText, setCustomEditIndustryText] = useState("");
+  const [editIndustryOptions, setEditIndustryOptions] = useState<string[]>([
+    "Software & Cloud Technology",
+    "Financial Services & Fintech",
+    "Healthcare & Biotechnology",
+    "Manufacturing & Heavy Industry",
+    "Supply Chain & Global Logistics",
+    "Consulting & Professional Services",
+    "E-Commerce & Retail",
+    "Education & EdTech",
+    "Real Estate & Construction",
+    "Hospitality & Tourism",
+    "Media & Entertainment",
+    "Energy & Utilities",
+  ]);
+  const [editAdminEmail, setEditAdminEmail] = useState(
+    tenant?.adminEmail || "",
+  );
+  const [editWebsiteUrl, setEditWebsiteUrl] = useState(
+    tenant?.websiteUrl || "",
+  );
+  const [editOfferExpiry, setEditOfferExpiry] = useState<number>(
+    tenant?.offerLetterExpiryDays || 14,
+  );
+  const [editLeaveAllowance, setEditLeaveAllowance] = useState<number>(
+    tenant?.annualLeaveAllowance || 24,
+  );
+  const [editProbationDays, setEditProbationDays] = useState<number>(
+    tenant?.probationPeriodDays || 90,
+  );
+  const [editNoticeDays, setEditNoticeDays] = useState<number>(
+    tenant?.noticePeriodDays || 30,
+  );
+  const [editWorkWeek, setEditWorkWeek] = useState<number>(
+    tenant?.workWeekDays || 5,
+  );
+  const [editDailyHours, setEditDailyHours] = useState<number>(
+    tenant?.dailyWorkingHours || 8,
+  );
+  const [editCurrency, setEditCurrency] = useState(tenant?.currency || "USD");
+  const [editTimezone, setEditTimezone] = useState(
+    tenant?.timezone || "America/New_York (EST)",
+  );
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Feature Flags State
@@ -89,9 +128,15 @@ export const TenantDetailPage: React.FC = () => {
   if (!tenant) {
     return (
       <div className="p-8 text-center space-y-4">
-        <h3 className="text-xl font-bold text-slate-800">Tenant / Company Not Found</h3>
-        <p className="text-sm text-slate-500">The requested company ID does not exist in directory.</p>
-        <Button onClick={() => navigate('/admin/tenants')}>Back to Company Directory</Button>
+        <h3 className="text-xl font-bold text-slate-800">
+          Tenant / Company Not Found
+        </h3>
+        <p className="text-sm text-slate-500">
+          The requested company ID does not exist in directory.
+        </p>
+        <Button onClick={() => navigate("/admin/tenants")}>
+          Back to Company Directory
+        </Button>
       </div>
     );
   }
@@ -101,14 +146,17 @@ export const TenantDetailPage: React.FC = () => {
     setTenants(updated);
   };
 
-  const handleStatusChange = (newStatus: 'ACTIVE' | 'DEACTIVATED') => {
+  const handleStatusChange = (newStatus: "ACTIVE" | "DEACTIVATED") => {
     mockStorage.updateTenant(tenant.id, { status: newStatus });
     setStatus(newStatus);
     reloadTenant();
     toast.success(`Company portal status updated to ${newStatus}`);
   };
 
-  const handleToggleFeature = (featureKey: keyof TenantFeatures, currentVal: boolean = true) => {
+  const handleToggleFeature = (
+    featureKey: keyof TenantFeatures,
+    currentVal: boolean = true,
+  ) => {
     const newVal = !currentVal;
     const updatedFeats = {
       ...features,
@@ -130,13 +178,13 @@ export const TenantDetailPage: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 3 * 1024 * 1024) {
-        toast.error('File size exceeds 3MB limit');
+        toast.error("File size exceeds 3MB limit");
         return;
       }
       const reader = new FileReader();
       reader.onloadend = () => {
         setEditLogoUrl(reader.result as string);
-        toast.success('New company logo loaded!');
+        toast.success("New company logo loaded!");
       };
       reader.readAsDataURL(file);
     }
@@ -145,17 +193,21 @@ export const TenantDetailPage: React.FC = () => {
   const handleSaveCompanyEdit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editName || !editSlug) {
-      toast.error('Company Name and Slug are required');
+      toast.error("Company Name and Slug are required");
       return;
     }
 
     setIsSavingEdit(true);
+    const finalIndustry =
+      isEditCustomIndustry && customEditIndustryText.trim()
+        ? customEditIndustryText.trim()
+        : editIndustry;
     setTimeout(() => {
       mockStorage.updateTenant(tenant.id, {
         name: editName,
         slug: editSlug,
         logoUrl: editLogoUrl || undefined,
-        industry: editIndustry,
+        industry: finalIndustry,
         adminEmail: editAdminEmail,
         websiteUrl: editWebsiteUrl,
         offerLetterExpiryDays: Number(editOfferExpiry) || 14,
@@ -177,67 +229,67 @@ export const TenantDetailPage: React.FC = () => {
 
   const featureConfigs = [
     {
-      key: 'onboarding' as keyof TenantFeatures,
-      title: 'New Hire Onboarding & Checklist',
-      desc: 'Allows new hires to fill details, e-sign offer letter on digital pad, upload docs, and sign policies.',
+      key: "onboarding" as keyof TenantFeatures,
+      title: "New Hire Onboarding & Checklist",
+      desc: "Allows new hires to fill details, e-sign offer letter on digital pad, upload docs, and sign policies.",
       icon: UserPlus,
-      color: 'indigo',
+      color: "indigo",
     },
     {
-      key: 'leaveManagement' as keyof TenantFeatures,
-      title: 'Leave & PTO Management',
-      desc: 'Leave balance accounts, PTO applications, approvals workflow, and official holiday calendars.',
+      key: "leaveManagement" as keyof TenantFeatures,
+      title: "Leave & PTO Management",
+      desc: "Leave balance accounts, PTO applications, approvals workflow, and official holiday calendars.",
       icon: Calendar,
-      color: 'amber',
+      color: "amber",
     },
     {
-      key: 'attendance' as keyof TenantFeatures,
-      title: 'Time & Attendance Tracking',
-      desc: 'Real-time clock-in / clock-out tracking, timesheets, and overtime approval workflows.',
+      key: "attendance" as keyof TenantFeatures,
+      title: "Time & Attendance Tracking",
+      desc: "Real-time clock-in / clock-out tracking, timesheets, and overtime approval workflows.",
       icon: Clock,
-      color: 'emerald',
+      color: "emerald",
     },
     {
-      key: 'knowledgeBase' as keyof TenantFeatures,
-      title: 'Company Knowledge Base',
-      desc: 'Internal documentation, handbook policies, and department standard operating procedures.',
+      key: "knowledgeBase" as keyof TenantFeatures,
+      title: "Company Knowledge Base",
+      desc: "Internal documentation, handbook policies, and department standard operating procedures.",
       icon: BookOpen,
-      color: 'sky',
+      color: "sky",
     },
     {
-      key: 'announcements' as keyof TenantFeatures,
-      title: 'Announcements & Broadcasts',
-      desc: 'Company-wide bulletin boards, town hall notices, and urgent workplace alerts.',
+      key: "announcements" as keyof TenantFeatures,
+      title: "Announcements & Broadcasts",
+      desc: "Company-wide bulletin boards, town hall notices, and urgent workplace alerts.",
       icon: Megaphone,
-      color: 'rose',
+      color: "rose",
     },
     {
-      key: 'helpDesk' as keyof TenantFeatures,
-      title: 'Help Desk & IT Support Tickets',
-      desc: 'Internal service desk for IT equipment requests, HR questions, and facility issues.',
+      key: "helpDesk" as keyof TenantFeatures,
+      title: "Help Desk & IT Support Tickets",
+      desc: "Internal service desk for IT equipment requests, HR questions, and facility issues.",
       icon: Ticket,
-      color: 'violet',
+      color: "violet",
     },
     {
-      key: 'meetingRooms' as keyof TenantFeatures,
-      title: 'Meeting Room Reservations',
-      desc: 'Conference room calendar scheduling, focus pod booking, and occupancy management.',
+      key: "meetingRooms" as keyof TenantFeatures,
+      title: "Meeting Room Reservations",
+      desc: "Conference room calendar scheduling, focus pod booking, and occupancy management.",
       icon: DoorOpen,
-      color: 'teal',
+      color: "teal",
     },
     {
-      key: 'documentVault' as keyof TenantFeatures,
-      title: 'Company Document Vault',
-      desc: 'Official company repository for policy PDFs, templates, and employee uploaded files.',
+      key: "documentVault" as keyof TenantFeatures,
+      title: "Company Document Vault",
+      desc: "Official company repository for policy PDFs, templates, and employee uploaded files.",
       icon: FileText,
-      color: 'blue',
+      color: "blue",
     },
     {
-      key: 'orgStructure' as keyof TenantFeatures,
-      title: 'Organizational Structure (Depts & Roles)',
-      desc: 'Management of Regions, Departments, Designations, and reporting relationships.',
+      key: "orgStructure" as keyof TenantFeatures,
+      title: "Organizational Structure (Depts & Roles)",
+      desc: "Management of Regions, Departments, Designations, and reporting relationships.",
       icon: Building2,
-      color: 'purple',
+      color: "purple",
     },
   ];
 
@@ -257,7 +309,11 @@ export const TenantDetailPage: React.FC = () => {
             {/* Logo on white surface */}
             <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 p-1.5 shadow-xs flex items-center justify-center shrink-0">
               {tenant.logoUrl ? (
-                <img src={tenant.logoUrl} alt={tenant.name} className="max-w-full max-h-full object-contain" />
+                <img
+                  src={tenant.logoUrl}
+                  alt={tenant.name}
+                  className="max-w-full max-h-full object-contain"
+                />
               ) : (
                 <div className="w-full h-full bg-indigo-600 rounded-lg text-white font-bold text-lg flex items-center justify-center">
                   {tenant.name.slice(0, 2).toUpperCase()}
@@ -267,15 +323,17 @@ export const TenantDetailPage: React.FC = () => {
 
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-slate-900">{tenant.name}</h2>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  {tenant.name}
+                </h2>
                 <Badge status={status} />
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
                 <span className="font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 font-semibold">
-                  cyrcalur.hr/{tenant.slug}
+                  Peopleworkplaces.hr/{tenant.slug}
                 </span>
                 <span>•</span>
-                <span>{tenant.industry || 'Software & Cloud Technology'}</span>
+                <span>{tenant.industry || "Software & Cloud Technology"}</span>
                 <span>•</span>
                 <span>{tenant.employeeCount || 12} Employees</span>
               </div>
@@ -289,18 +347,20 @@ export const TenantDetailPage: React.FC = () => {
               onClick={() => {
                 setEditName(tenant.name);
                 setEditSlug(tenant.slug);
-                setEditLogoUrl(tenant.logoUrl || '');
-                setEditIndustry(tenant.industry || 'Software & Cloud Technology');
-                setEditAdminEmail(tenant.adminEmail || '');
-                setEditWebsiteUrl(tenant.websiteUrl || '');
+                setEditLogoUrl(tenant.logoUrl || "");
+                setEditIndustry(
+                  tenant.industry || "Software & Cloud Technology",
+                );
+                setEditAdminEmail(tenant.adminEmail || "");
+                setEditWebsiteUrl(tenant.websiteUrl || "");
                 setEditOfferExpiry(tenant.offerLetterExpiryDays || 14);
                 setEditLeaveAllowance(tenant.annualLeaveAllowance || 24);
                 setEditProbationDays(tenant.probationPeriodDays || 90);
                 setEditNoticeDays(tenant.noticePeriodDays || 30);
                 setEditWorkWeek(tenant.workWeekDays || 5);
                 setEditDailyHours(tenant.dailyWorkingHours || 8);
-                setEditCurrency(tenant.currency || 'USD');
-                setEditTimezone(tenant.timezone || 'America/New_York (EST)');
+                setEditCurrency(tenant.currency || "USD");
+                setEditTimezone(tenant.timezone || "America/New_York (EST)");
                 setIsEditModalOpen(true);
               }}
               leftIcon={<Edit3 className="w-3.5 h-3.5 text-indigo-600" />}
@@ -333,7 +393,8 @@ export const TenantDetailPage: React.FC = () => {
                   <span>Super Admin Feature Flags & Module Toggles</span>
                 </CardTitle>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Enable or disable operational software modules specifically for <strong>{tenant.name}</strong>.
+                  Enable or disable operational software modules specifically
+                  for <strong>{tenant.name}</strong>.
                 </p>
               </div>
               <Badge variant="indigo" size="sm">
@@ -350,23 +411,29 @@ export const TenantDetailPage: React.FC = () => {
                     key={feat.key}
                     className={`p-3.5 rounded-xl border flex flex-col justify-between gap-3 transition-all ${
                       isEnabled
-                        ? 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
-                        : 'bg-slate-50 border-slate-200/60 opacity-80'
+                        ? "bg-white border-slate-200 hover:border-slate-300 shadow-2xs"
+                        : "bg-slate-50 border-slate-200/60 opacity-80"
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div
                         className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-                          isEnabled ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-200 text-slate-400'
+                          isEnabled
+                            ? "bg-indigo-50 text-indigo-600"
+                            : "bg-slate-200 text-slate-400"
                         }`}
                       >
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className={`text-sm font-bold ${isEnabled ? 'text-slate-900' : 'text-slate-500'}`}>
+                        <h4
+                          className={`text-sm font-bold ${isEnabled ? "text-slate-900" : "text-slate-500"}`}
+                        >
                           {feat.title}
                         </h4>
-                        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{feat.desc}</p>
+                        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                          {feat.desc}
+                        </p>
                       </div>
                     </div>
 
@@ -374,8 +441,10 @@ export const TenantDetailPage: React.FC = () => {
                     <div className="self-end shrink-0 pt-1">
                       <Switch
                         checked={isEnabled}
-                        onChange={() => handleToggleFeature(feat.key, isEnabled)}
-                        label={isEnabled ? 'Active' : 'Disabled'}
+                        onChange={() =>
+                          handleToggleFeature(feat.key, isEnabled)
+                        }
+                        label={isEnabled ? "Active" : "Disabled"}
                         size="md"
                       />
                     </div>
@@ -389,7 +458,8 @@ export const TenantDetailPage: React.FC = () => {
           <Card className="shadow-xs border border-slate-200">
             <CardHeader className="border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <FileText className="w-4 h-4 text-emerald-600" /> Company Parameters & HR Policies
+                <FileText className="w-4 h-4 text-emerald-600" /> Company
+                Parameters & HR Policies
               </CardTitle>
               <Button
                 variant="ghost"
@@ -402,7 +472,9 @@ export const TenantDetailPage: React.FC = () => {
             </CardHeader>
             <CardContent className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px]">Offer Expiration</span>
+                <span className="text-slate-400 font-semibold block text-[11px]">
+                  Offer Expiration
+                </span>
                 <span className="font-bold text-slate-900 text-base mt-1 block font-mono">
                   {tenant.offerLetterExpiryDays || 14} Days
                 </span>
@@ -410,40 +482,58 @@ export const TenantDetailPage: React.FC = () => {
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px]">Annual PTO Leaves</span>
+                <span className="text-slate-400 font-semibold block text-[11px]">
+                  Annual PTO Leaves
+                </span>
                 <span className="font-bold text-emerald-700 text-base mt-1 block font-mono">
                   {tenant.annualLeaveAllowance || 24} Days
                 </span>
-                <span className="text-[10px] text-slate-500">Per employee / yr</span>
+                <span className="text-[10px] text-slate-500">
+                  Per employee / yr
+                </span>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px]">Probation Period</span>
+                <span className="text-slate-400 font-semibold block text-[11px]">
+                  Probation Period
+                </span>
                 <span className="font-bold text-slate-900 text-base mt-1 block font-mono">
                   {tenant.probationPeriodDays || 90} Days
                 </span>
-                <span className="text-[10px] text-slate-500">Evaluation window</span>
+                <span className="text-[10px] text-slate-500">
+                  Evaluation window
+                </span>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px]">Notice Period</span>
+                <span className="text-slate-400 font-semibold block text-[11px]">
+                  Notice Period
+                </span>
                 <span className="font-bold text-slate-900 text-base mt-1 block font-mono">
                   {tenant.noticePeriodDays || 30} Days
                 </span>
-                <span className="text-[10px] text-slate-500">Separation timeline</span>
-              </div>
-
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 col-span-2">
-                <span className="text-slate-400 font-semibold block text-[11px]">Working Schedule</span>
-                <span className="font-bold text-slate-900 text-sm mt-1 block">
-                  {tenant.workWeekDays || 5} Days / Week • {tenant.dailyWorkingHours || 8} Hours / Day
+                <span className="text-[10px] text-slate-500">
+                  Separation timeline
                 </span>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 col-span-2">
-                <span className="text-slate-400 font-semibold block text-[11px]">Currency & Timezone</span>
+                <span className="text-slate-400 font-semibold block text-[11px]">
+                  Working Schedule
+                </span>
                 <span className="font-bold text-slate-900 text-sm mt-1 block">
-                  {tenant.currency || 'USD'} • {tenant.timezone || 'America/New_York (EST)'}
+                  {tenant.workWeekDays || 5} Days / Week •{" "}
+                  {tenant.dailyWorkingHours || 8} Hours / Day
+                </span>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 col-span-2">
+                <span className="text-slate-400 font-semibold block text-[11px]">
+                  Currency & Timezone
+                </span>
+                <span className="font-bold text-slate-900 text-sm mt-1 block">
+                  {tenant.currency || "USD"} •{" "}
+                  {tenant.timezone || "America/New_York (EST)"}
                 </span>
               </div>
             </CardContent>
@@ -454,24 +544,29 @@ export const TenantDetailPage: React.FC = () => {
         <div className="xl:col-span-4 space-y-6">
           <Card className="shadow-xs border border-slate-200 space-y-4">
             <CardHeader className="border-b border-slate-100 pb-3">
-              <CardTitle className="text-sm font-bold">Portal Lifecycle Control</CardTitle>
+              <CardTitle className="text-sm font-bold">
+                Portal Lifecycle Control
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-500 font-medium">Access Status:</span>
+                <span className="text-xs text-slate-500 font-medium">
+                  Access Status:
+                </span>
                 <Badge status={status} />
               </div>
 
-              {status === 'ACTIVE' ? (
+              {status === "ACTIVE" ? (
                 <div className="space-y-3">
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Company portal is active. Deactivating will block normal access for employees and admins.
+                    Company portal is active. Deactivating will block normal
+                    access for employees and admins.
                   </p>
                   <Button
                     variant="destructive"
                     className="w-full text-xs font-semibold"
                     leftIcon={<Ban className="w-4 h-4" />}
-                    onClick={() => handleStatusChange('DEACTIVATED')}
+                    onClick={() => handleStatusChange("DEACTIVATED")}
                   >
                     Deactivate Company Portal
                   </Button>
@@ -479,19 +574,78 @@ export const TenantDetailPage: React.FC = () => {
               ) : (
                 <div className="space-y-3">
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Company portal is currently suspended. Activate to restore employee access.
+                    Company portal is currently suspended. Activate to restore
+                    employee access.
                   </p>
                   <Button
                     variant="primary"
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold"
                     leftIcon={<CheckCircle className="w-4 h-4" />}
-                    onClick={() => handleStatusChange('ACTIVE')}
+                    onClick={() => handleStatusChange("ACTIVE")}
                   >
                     Activate Company Portal
                   </Button>
                 </div>
               )}
             </CardContent>
+          </Card>
+
+          {/* Company Admin Credentials Card */}
+          <Card className="shadow-xs border border-slate-200 p-4 space-y-3 text-xs bg-gradient-to-br from-indigo-50/50 to-white">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                Company Admin Credentials
+              </h4>
+              <Badge variant="indigo" size="sm">
+                Admin Access
+              </Badge>
+            </div>
+
+            {(() => {
+              const adminUser = mockStorage
+                .getUsers()
+                .find(
+                  (u) => u.tenantId === tenant.id && u.role === "TENANT_ADMIN",
+                );
+              if (adminUser) {
+                return (
+                  <div className="space-y-2 pt-1 font-mono text-[11px]">
+                    <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
+                      <span className="text-slate-500 font-sans">Email:</span>
+                      <span className="font-bold text-slate-900">
+                        {adminUser.email}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
+                      <span className="text-slate-500 font-sans">
+                        Password:
+                      </span>
+                      <span className="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                        {adminUser.password || "password123"}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs font-semibold mt-2"
+                      onClick={() => {
+                        const text = `Company: ${tenant.name}\nURL: ${window.location.origin}/${tenant.slug}/dashboard\nEmail: ${adminUser.email}\nPassword: ${adminUser.password || "password123"}`;
+                        navigator.clipboard.writeText(text);
+                        toast.success("Admin credentials copied to clipboard!");
+                      }}
+                    >
+                      Copy Admin Login Credentials
+                    </Button>
+                  </div>
+                );
+              }
+              return (
+                <p className="text-slate-500 text-xs">
+                  No designated Company Admin found for this tenant.
+                </p>
+              );
+            })()}
           </Card>
 
           {/* Organization Meta */}
@@ -502,15 +656,21 @@ export const TenantDetailPage: React.FC = () => {
             <div className="space-y-2 text-slate-600">
               <div className="flex justify-between border-b border-slate-100 pb-1.5">
                 <span className="text-slate-400">Tenant ID:</span>
-                <span className="font-mono text-slate-900 font-bold">{tenant.id}</span>
+                <span className="font-mono text-slate-900 font-bold">
+                  {tenant.id}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-1.5">
                 <span className="text-slate-400">Domain URL:</span>
-                <span className="font-mono text-indigo-600 font-semibold">/{tenant.slug}</span>
+                <span className="font-mono text-indigo-600 font-semibold">
+                  /{tenant.slug}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-1.5">
                 <span className="text-slate-400">Admin Email:</span>
-                <span className="font-semibold text-slate-900">{tenant.adminEmail || `hr@${tenant.slug}.com`}</span>
+                <span className="font-semibold text-slate-900">
+                  {tenant.adminEmail || `admin@${tenant.slug}.com`}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-100 pb-1.5">
                 <span className="text-slate-400">Website:</span>
@@ -525,7 +685,9 @@ export const TenantDetailPage: React.FC = () => {
               </div>
               <div className="flex justify-between pt-0.5">
                 <span className="text-slate-400">Created:</span>
-                <span className="text-slate-800">{new Date(tenant.createdAt).toLocaleDateString()}</span>
+                <span className="text-slate-800">
+                  {new Date(tenant.createdAt).toLocaleDateString()}
+                </span>
               </div>
             </div>
           </Card>
@@ -541,7 +703,9 @@ export const TenantDetailPage: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-indigo-600" />
-                <h3 className="font-bold text-lg text-slate-900">Edit Company Details</h3>
+                <h3 className="font-bold text-lg text-slate-900">
+                  Edit Company Details
+                </h3>
               </div>
               <button
                 onClick={() => setIsEditModalOpen(false)}
@@ -562,7 +726,11 @@ export const TenantDetailPage: React.FC = () => {
                   />
                 </FormField>
 
-                <FormField label="Domain Slug (URL)" required helperText={`cyrcalur.hr/${editSlug}`}>
+                <FormField
+                  label="Domain Slug (URL)"
+                  required
+                  helperText={`Peopleworkplaces.hr/${editSlug}`}
+                >
                   <Input
                     type="text"
                     value={editSlug}
@@ -573,20 +741,92 @@ export const TenantDetailPage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField label="Industry / Sector">
-                  <Select
-                    value={editIndustry}
-                    onChange={(e) => setEditIndustry(e.target.value)}
-                    options={[
-                      { value: 'Software & Cloud Technology', label: 'Software & Cloud Technology' },
-                      { value: 'Financial Services & Fintech', label: 'Financial Services & Fintech' },
-                      { value: 'Healthcare & Biotechnology', label: 'Healthcare & Biotechnology' },
-                      { value: 'Manufacturing & Heavy Industry', label: 'Manufacturing & Heavy Industry' },
-                      { value: 'Supply Chain & Global Logistics', label: 'Supply Chain & Global Logistics' },
-                      { value: 'Consulting & Professional Services', label: 'Consulting & Professional Services' },
-                      { value: 'E-Commerce & Retail', label: 'E-Commerce & Retail' },
-                    ]}
-                  />
+                <FormField
+                  label="Primary Industry / Sector"
+                  helperText={
+                    isEditCustomIndustry
+                      ? "Type custom industry name"
+                      : "Select or add custom industry (+)"
+                  }
+                >
+                  {isEditCustomIndustry ? (
+                    <div className="flex gap-1.5">
+                      <Input
+                        type="text"
+                        value={customEditIndustryText}
+                        onChange={(e) => {
+                          setCustomEditIndustryText(e.target.value);
+                          setEditIndustry(e.target.value);
+                        }}
+                        placeholder="e.g. Aerospace, Robotics, Biotech"
+                        autoFocus
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (customEditIndustryText.trim()) {
+                            if (
+                              !editIndustryOptions.includes(
+                                customEditIndustryText.trim(),
+                              )
+                            ) {
+                              setEditIndustryOptions((prev) => [
+                                ...prev,
+                                customEditIndustryText.trim(),
+                              ]);
+                            }
+                            setEditIndustry(customEditIndustryText.trim());
+                          }
+                          setIsEditCustomIndustry(false);
+                        }}
+                        className="shrink-0 text-xs"
+                        title="Back to predefined list"
+                      >
+                        List
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1.5">
+                      <div className="flex-1">
+                        <Select
+                          value={editIndustry}
+                          onChange={(e) => {
+                            if (e.target.value === "__OTHER__") {
+                              setIsEditCustomIndustry(true);
+                              setCustomEditIndustryText("");
+                            } else {
+                              setEditIndustry(e.target.value);
+                            }
+                          }}
+                          options={[
+                            ...editIndustryOptions.map((opt) => ({
+                              value: opt,
+                              label: opt,
+                            })),
+                            {
+                              value: "__OTHER__",
+                              label: "➕ Other / Custom Industry (Type)...",
+                            },
+                          ]}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setIsEditCustomIndustry(true);
+                          setCustomEditIndustryText("");
+                        }}
+                        className="shrink-0 text-xs font-semibold px-2.5"
+                        title="Add Custom Industry"
+                      >
+                        <Plus className="w-4 h-4 text-indigo-600" />
+                      </Button>
+                    </div>
+                  )}
                 </FormField>
 
                 <FormField label="HR / Admin Contact Email">
@@ -617,7 +857,9 @@ export const TenantDetailPage: React.FC = () => {
                     min="5"
                     max="60"
                     value={editLeaveAllowance}
-                    onChange={(e) => setEditLeaveAllowance(Number(e.target.value))}
+                    onChange={(e) =>
+                      setEditLeaveAllowance(Number(e.target.value))
+                    }
                     required
                   />
                 </FormField>
@@ -630,7 +872,9 @@ export const TenantDetailPage: React.FC = () => {
                     min="0"
                     max="365"
                     value={editProbationDays}
-                    onChange={(e) => setEditProbationDays(Number(e.target.value))}
+                    onChange={(e) =>
+                      setEditProbationDays(Number(e.target.value))
+                    }
                   />
                 </FormField>
 
@@ -651,10 +895,10 @@ export const TenantDetailPage: React.FC = () => {
                     value={String(editWorkWeek)}
                     onChange={(e) => setEditWorkWeek(Number(e.target.value))}
                     options={[
-                      { value: '5', label: '5 Days (Mon - Fri)' },
-                      { value: '5.5', label: '5.5 Days (Mon - Sat Half)' },
-                      { value: '6', label: '6 Days (Mon - Sat)' },
-                      { value: '4', label: '4 Days (Mon - Thu)' },
+                      { value: "5", label: "5 Days (Mon - Fri)" },
+                      { value: "5.5", label: "5.5 Days (Mon - Sat Half)" },
+                      { value: "6", label: "6 Days (Mon - Sat)" },
+                      { value: "4", label: "4 Days (Mon - Thu)" },
                     ]}
                   />
                 </FormField>
@@ -664,10 +908,10 @@ export const TenantDetailPage: React.FC = () => {
                     value={String(editDailyHours)}
                     onChange={(e) => setEditDailyHours(Number(e.target.value))}
                     options={[
-                      { value: '8', label: '8.0 Hours / Day' },
-                      { value: '7.5', label: '7.5 Hours / Day' },
-                      { value: '8.5', label: '8.5 Hours / Day' },
-                      { value: '9', label: '9.0 Hours / Day' },
+                      { value: "8", label: "8.0 Hours / Day" },
+                      { value: "7.5", label: "7.5 Hours / Day" },
+                      { value: "8.5", label: "8.5 Hours / Day" },
+                      { value: "9", label: "9.0 Hours / Day" },
                     ]}
                   />
                 </FormField>
@@ -678,20 +922,30 @@ export const TenantDetailPage: React.FC = () => {
                 <div className="flex items-center gap-4 p-3 rounded-xl border border-slate-200 bg-slate-50">
                   <div className="w-20 h-14 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1 shadow-xs shrink-0">
                     {editLogoUrl ? (
-                      <img src={editLogoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                      <img
+                        src={editLogoUrl}
+                        alt="Logo"
+                        className="max-w-full max-h-full object-contain"
+                      />
                     ) : (
                       <Building2 className="w-6 h-6 text-slate-300" />
                     )}
                   </div>
                   <div className="space-y-1">
                     <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer shadow-2xs">
-                      <Upload className="w-3.5 h-3.5 text-slate-500" /> Change Logo
-                      <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                      <Upload className="w-3.5 h-3.5 text-slate-500" /> Change
+                      Logo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleLogoUpload}
+                      />
                     </label>
                     {editLogoUrl && (
                       <button
                         type="button"
-                        onClick={() => setEditLogoUrl('')}
+                        onClick={() => setEditLogoUrl("")}
                         className="text-xs text-rose-600 hover:underline block"
                       >
                         Remove
@@ -702,10 +956,18 @@ export const TenantDetailPage: React.FC = () => {
               </FormField>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <Button variant="outline" type="button" onClick={() => setIsEditModalOpen(false)}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button type="submit" isLoading={isSavingEdit} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
+                <Button
+                  type="submit"
+                  isLoading={isSavingEdit}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+                >
                   Save Changes
                 </Button>
               </div>

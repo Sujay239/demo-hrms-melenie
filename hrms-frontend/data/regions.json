@@ -1,0 +1,218 @@
+[
+  {
+    "id": "reg-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "name": "New York HQ (Manhattan)",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "name": "Silicon Valley Tech Center (San Francisco)",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "name": "Austin Campus (Texas)",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-auto-computation-4",
+    "tenantId": "tenant-1787291784650",
+    "name": "Chicago Financial Center",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-auto-computation-5",
+    "tenantId": "tenant-1787291784650",
+    "name": "Seattle Engineering Hub",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-auto-computation-6",
+    "tenantId": "tenant-1787291784650",
+    "name": "Boston Innovation Lab",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "name": "New York HQ (Manhattan)",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "name": "Silicon Valley Tech Center (San Francisco)",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "name": "Austin Campus (Texas)",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-apex-cloud-4",
+    "tenantId": "tenant-apex-101",
+    "name": "Chicago Financial Center",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-apex-cloud-5",
+    "tenantId": "tenant-apex-101",
+    "name": "Seattle Engineering Hub",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-apex-cloud-6",
+    "tenantId": "tenant-apex-101",
+    "name": "Boston Innovation Lab",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "name": "New York HQ (Manhattan)",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "name": "Silicon Valley Tech Center (San Francisco)",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "name": "Austin Campus (Texas)",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-horizon-health-4",
+    "tenantId": "tenant-horizon-102",
+    "name": "Chicago Financial Center",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-horizon-health-5",
+    "tenantId": "tenant-horizon-102",
+    "name": "Seattle Engineering Hub",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-horizon-health-6",
+    "tenantId": "tenant-horizon-102",
+    "name": "Boston Innovation Lab",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "name": "New York HQ (Manhattan)",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Silicon Valley Tech Center (San Francisco)",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Austin Campus (Texas)",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-vanguard-fintech-4",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Chicago Financial Center",
+    "countryCode": "US",
+    "timeZone": "America/Chicago",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-vanguard-fintech-5",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Seattle Engineering Hub",
+    "countryCode": "US",
+    "timeZone": "America/Los_Angeles",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "reg-vanguard-fintech-6",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Boston Innovation Lab",
+    "countryCode": "US",
+    "timeZone": "America/New_York",
+    "locale": "en-US",
+    "status": "ACTIVE"
+  }
+]

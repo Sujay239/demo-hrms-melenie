@@ -20,6 +20,8 @@ import {
   RoomReservation,
   AuditLog,
   OnboardingCase,
+  OnboardingDocRequirement,
+  DEFAULT_ONBOARDING_DOCUMENTS,
   INITIAL_TENANTS,
   INITIAL_USERS,
   INITIAL_REGIONS,
@@ -40,87 +42,193 @@ import {
   INITIAL_RESERVATIONS,
   INITIAL_AUDIT_LOGS,
   INITIAL_ONBOARDING_CASES,
-} from '@/demo-data/seedData';
+} from "@/demo-data/seedData";
 
 export const KEYS = {
-  TENANTS: 'cyrcalur_tenants_v6',
-  USERS: 'cyrcalur_users_v6',
-  REGIONS: 'cyrcalur_regions_v6',
-  DEPARTMENTS: 'cyrcalur_departments_v6',
-  DESIGNATIONS: 'cyrcalur_designations_v6',
-  EMPLOYEES: 'cyrcalur_employees_v6',
-  DOCUMENTS: 'cyrcalur_documents_v6',
-  LEAVE_TYPES: 'cyrcalur_leave_types_v6',
-  LEAVE_REQUESTS: 'cyrcalur_leave_requests_v6',
-  HOLIDAYS: 'cyrcalur_holidays_v6',
-  ATTENDANCE: 'cyrcalur_attendance_v6',
-  OVERTIME: 'cyrcalur_overtime_v6',
-  KB_ARTICLES: 'cyrcalur_kb_articles_v6',
-  ANNOUNCEMENTS: 'cyrcalur_announcements_v6',
-  TICKETS: 'cyrcalur_tickets_v6',
-  BUILDINGS: 'cyrcalur_buildings_v6',
-  ROOMS: 'cyrcalur_rooms_v6',
-  RESERVATIONS: 'cyrcalur_reservations_v6',
-  AUDIT_LOGS: 'cyrcalur_audit_logs_v6',
-  ONBOARDING_CASES: 'cyrcalur_onboarding_cases_v6',
-  CURRENT_USER: 'cyrcalur_current_user_v6',
+  TENANTS: "tenants",
+  USERS: "users",
+  REGIONS: "regions",
+  DEPARTMENTS: "departments",
+  DESIGNATIONS: "designations",
+  EMPLOYEES: "employees",
+  DOCUMENTS: "documents",
+  LEAVE_TYPES: "leave-types",
+  LEAVE_REQUESTS: "leave-requests",
+  HOLIDAYS: "holidays",
+  ATTENDANCE: "attendance",
+  OVERTIME: "overtime",
+  KB_ARTICLES: "kb-articles",
+  ANNOUNCEMENTS: "announcements",
+  TICKETS: "tickets",
+  BUILDINGS: "buildings",
+  ROOMS: "rooms",
+  RESERVATIONS: "reservations",
+  AUDIT_LOGS: "audit-logs",
+  ONBOARDING_CASES: "onboarding-cases",
+  ONBOARDING_DOC_TEMPLATES: "onboarding-doc-templates",
+  CURRENT_USER: "Peopleworkplaces_current_user_v7",
+};
+
+const DEFAULT_INITIAL_MAP: Record<string, any[]> = {
+  [KEYS.TENANTS]: INITIAL_TENANTS,
+  [KEYS.USERS]: INITIAL_USERS,
+  [KEYS.REGIONS]: INITIAL_REGIONS,
+  [KEYS.DEPARTMENTS]: INITIAL_DEPARTMENTS,
+  [KEYS.DESIGNATIONS]: INITIAL_DESIGNATIONS,
+  [KEYS.EMPLOYEES]: INITIAL_EMPLOYEES,
+  [KEYS.DOCUMENTS]: INITIAL_DOCUMENTS,
+  [KEYS.LEAVE_TYPES]: INITIAL_LEAVE_TYPES,
+  [KEYS.LEAVE_REQUESTS]: INITIAL_LEAVE_REQUESTS,
+  [KEYS.HOLIDAYS]: INITIAL_HOLIDAYS,
+  [KEYS.ATTENDANCE]: INITIAL_ATTENDANCE,
+  [KEYS.OVERTIME]: INITIAL_OVERTIME,
+  [KEYS.KB_ARTICLES]: INITIAL_KB_ARTICLES,
+  [KEYS.ANNOUNCEMENTS]: INITIAL_ANNOUNCEMENTS,
+  [KEYS.TICKETS]: INITIAL_TICKETS,
+  [KEYS.BUILDINGS]: INITIAL_BUILDINGS,
+  [KEYS.ROOMS]: INITIAL_ROOMS,
+  [KEYS.RESERVATIONS]: INITIAL_RESERVATIONS,
+  [KEYS.AUDIT_LOGS]: INITIAL_AUDIT_LOGS,
+  [KEYS.ONBOARDING_CASES]: INITIAL_ONBOARDING_CASES,
 };
 
 class MockStorage {
+  private memoryCache: Record<string, any[]> = {};
+  private isInitialized = false;
+
   constructor() {
-    this.init();
+    this.initSync();
+    this.syncFromDisk();
   }
 
-  private init() {
-    this.ensureKey(KEYS.TENANTS, INITIAL_TENANTS);
-    this.ensureKey(KEYS.USERS, INITIAL_USERS);
-    this.ensureKey(KEYS.REGIONS, INITIAL_REGIONS);
-    this.ensureKey(KEYS.DEPARTMENTS, INITIAL_DEPARTMENTS);
-    this.ensureKey(KEYS.DESIGNATIONS, INITIAL_DESIGNATIONS);
-    this.ensureKey(KEYS.EMPLOYEES, INITIAL_EMPLOYEES);
-    this.ensureKey(KEYS.DOCUMENTS, INITIAL_DOCUMENTS);
-    this.ensureKey(KEYS.LEAVE_TYPES, INITIAL_LEAVE_TYPES);
-    this.ensureKey(KEYS.LEAVE_REQUESTS, INITIAL_LEAVE_REQUESTS);
-    this.ensureKey(KEYS.HOLIDAYS, INITIAL_HOLIDAYS);
-    this.ensureKey(KEYS.ATTENDANCE, INITIAL_ATTENDANCE);
-    this.ensureKey(KEYS.OVERTIME, INITIAL_OVERTIME);
-    this.ensureKey(KEYS.KB_ARTICLES, INITIAL_KB_ARTICLES);
-    this.ensureKey(KEYS.ANNOUNCEMENTS, INITIAL_ANNOUNCEMENTS);
-    this.ensureKey(KEYS.TICKETS, INITIAL_TICKETS);
-    this.ensureKey(KEYS.BUILDINGS, INITIAL_BUILDINGS);
-    this.ensureKey(KEYS.ROOMS, INITIAL_ROOMS);
-    this.ensureKey(KEYS.RESERVATIONS, INITIAL_RESERVATIONS);
-    this.ensureKey(KEYS.AUDIT_LOGS, INITIAL_AUDIT_LOGS);
-    this.ensureKey(KEYS.ONBOARDING_CASES, INITIAL_ONBOARDING_CASES);
+  private initSync() {
+    Object.keys(DEFAULT_INITIAL_MAP).forEach((key) => {
+      const stored = localStorage.getItem(`json_${key}`);
+      if (stored) {
+        try {
+          this.memoryCache[key] = JSON.parse(stored);
+        } catch {
+          this.memoryCache[key] = DEFAULT_INITIAL_MAP[key] || [];
+        }
+      } else {
+        this.memoryCache[key] = DEFAULT_INITIAL_MAP[key] || [];
+        localStorage.setItem(
+          `json_${key}`,
+          JSON.stringify(this.memoryCache[key]),
+        );
+      }
+    });
 
     if (!localStorage.getItem(KEYS.CURRENT_USER)) {
       localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(INITIAL_USERS[0]));
     }
+    this.isInitialized = true;
   }
 
-  private ensureKey<T>(key: string, initialData: T[]) {
-    if (!localStorage.getItem(key)) {
-      localStorage.setItem(key, JSON.stringify(initialData));
+  public async syncFromDisk(): Promise<void> {
+    if (typeof window === "undefined") return;
+
+    try {
+      const keys = Object.keys(DEFAULT_INITIAL_MAP);
+      await Promise.all(
+        keys.map(async (key) => {
+          try {
+            const res = await fetch(`/api/data/${key}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (Array.isArray(data)) {
+                this.memoryCache[key] = data;
+                localStorage.setItem(`json_${key}`, JSON.stringify(data));
+              }
+            }
+          } catch {
+            // Server might not be reachable yet or in static build
+          }
+        }),
+      );
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("storage"));
+        window.dispatchEvent(new CustomEvent("dataSynced"));
+      }
+    } catch {
+      // Ignored
+    }
+  }
+
+  private persistKey<T>(key: string, data: T[]): void {
+    this.memoryCache[key] = data;
+    try {
+      localStorage.setItem(`json_${key}`, JSON.stringify(data));
+    } catch (e) {
+      console.warn(`localStorage save error for key "${key}":`, e);
+    }
+
+    // Always asynchronously persist to backend JSON file on disk
+    if (typeof window !== "undefined") {
+      fetch(`/api/data/${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).catch((err) => {
+        console.warn(`Failed to write to disk at /api/data/${key}:`, err);
+      });
     }
   }
 
   public getItem<T>(key: string): T[] {
-    try {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
+    if (this.memoryCache[key]) {
+      return this.memoryCache[key] as T[];
     }
+    try {
+      const stored = localStorage.getItem(`json_${key}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this.memoryCache[key] = parsed;
+        return parsed;
+      }
+    } catch {
+      // fallback
+    }
+    return (DEFAULT_INITIAL_MAP[key] || []) as T[];
   }
 
   public setItem<T>(key: string, value: T[]): void {
-    localStorage.setItem(key, JSON.stringify(value));
+    this.persistKey(key, value);
   }
 
-  private tenantMetrics(tenantId: string, users: User[], employees: Employee[]) {
+  public async uploadFile(
+    fileName: string,
+    fileData: string,
+  ): Promise<{ url: string; fileName: string }> {
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName, fileData }),
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // fallback
+    }
+    return { url: fileData, fileName };
+  }
+
+  private tenantMetrics(
+    tenantId: string,
+    users: User[],
+    employees: Employee[],
+  ) {
     return {
-      consultantCount: users.filter((u) => u.role === 'CONSULTANT' && (u.assignedTenantIds || []).includes(tenantId)).length,
-      employeeCount: employees.filter((e) => e.tenantId === tenantId && e.employmentStatus === 'ACTIVE').length,
+      consultantCount: users.filter(
+        (u) =>
+          u.role === "CONSULTANT" &&
+          (u.assignedTenantIds || []).includes(tenantId),
+      ).length,
+      employeeCount: employees.filter(
+        (e) => e.tenantId === tenantId && e.employmentStatus === "ACTIVE",
+      ).length,
     };
   }
 
@@ -132,7 +240,10 @@ class MockStorage {
 
     const synced = tenants.map((tenant) => {
       const metrics = this.tenantMetrics(tenant.id, users, employees);
-      if (tenant.consultantCount !== metrics.consultantCount || tenant.employeeCount !== metrics.employeeCount) {
+      if (
+        tenant.consultantCount !== metrics.consultantCount ||
+        tenant.employeeCount !== metrics.employeeCount
+      ) {
         changed = true;
         return { ...tenant, ...metrics };
       }
@@ -146,21 +257,23 @@ class MockStorage {
     return synced;
   }
 
-  public getRoleLabel(role: User['role']): string {
-    const labels: Record<User['role'], string> = {
-      SUPER_ADMIN: 'Super Admin',
-      CONSULTANT: 'Consultant',
-      TENANT_ADMIN: 'Company Admin',
-      EMPLOYEE: 'Employee',
-      NEW_HIRE: 'New Hire',
+  public getRoleLabel(role: User["role"]): string {
+    const labels: Record<User["role"], string> = {
+      SUPER_ADMIN: "Super Admin",
+      CONSULTANT: "Consultant",
+      TENANT_ADMIN: "Company Admin",
+      EMPLOYEE: "Employee",
+      NEW_HIRE: "New Hire",
     };
-    return labels[role];
+    return labels[role] || role;
   }
 
-  public getVisibleTenantsForUser(user: User = this.getCurrentUser()): Tenant[] {
+  public getVisibleTenantsForUser(
+    user: User = this.getCurrentUser(),
+  ): Tenant[] {
     const tenants = this.getTenants();
-    if (user.role === 'SUPER_ADMIN') return tenants;
-    if (user.role === 'CONSULTANT') {
+    if (user.role === "SUPER_ADMIN") return tenants;
+    if (user.role === "CONSULTANT") {
       const assignedTenantIds = new Set(user.assignedTenantIds || []);
       return tenants.filter((tenant) => assignedTenantIds.has(tenant.id));
     }
@@ -170,26 +283,43 @@ class MockStorage {
     return [];
   }
 
-  public getAccessibleTenant(user: User, requestedSlug?: string): Tenant | null {
+  public getAccessibleTenant(
+    user: User,
+    requestedSlug?: string,
+  ): Tenant | null {
     const visibleTenants = this.getVisibleTenantsForUser(user);
-    return visibleTenants.find((tenant) => tenant.slug === requestedSlug) || visibleTenants[0] || null;
+    if (!requestedSlug) return visibleTenants[0] || null;
+    return (
+      visibleTenants.find((tenant) => tenant.slug === requestedSlug) || null
+    );
   }
 
   public isTenantAdminFor(user: User, tenantId?: string): boolean {
-    if (user.role === 'SUPER_ADMIN') return true;
-    if (user.role === 'TENANT_ADMIN') return Boolean(tenantId && user.tenantId === tenantId);
-    if (user.role === 'CONSULTANT') return Boolean(tenantId && (user.assignedTenantIds || []).includes(tenantId));
+    if (user.role === "TENANT_ADMIN")
+      return Boolean(tenantId && user.tenantId === tenantId);
+    if (user.role === "CONSULTANT")
+      return Boolean(
+        tenantId && (user.assignedTenantIds || []).includes(tenantId),
+      );
     return false;
   }
 
-  private syncUserFromEmployee(employee: Employee, previousEmployee?: Employee): void {
+  private syncUserFromEmployee(
+    employee: Employee,
+    previousEmployee?: Employee,
+  ): void {
     const users = this.getUsers();
     const normalizedEmail = employee.email.toLowerCase();
     const previousEmail = previousEmployee?.email.toLowerCase();
     const userIdx = users.findIndex((u) => {
       const sameTenant = u.tenantId === employee.tenantId;
-      const emailMatch = u.email.toLowerCase() === normalizedEmail || (!!previousEmail && u.email.toLowerCase() === previousEmail);
-      const legacyNameMatch = !!previousEmployee && sameTenant && u.name.toLowerCase() === previousEmployee.name.toLowerCase();
+      const emailMatch =
+        u.email.toLowerCase() === normalizedEmail ||
+        (!!previousEmail && u.email.toLowerCase() === previousEmail);
+      const legacyNameMatch =
+        !!previousEmployee &&
+        sameTenant &&
+        u.name.toLowerCase() === previousEmployee.name.toLowerCase();
       return sameTenant && (emailMatch || legacyNameMatch);
     });
 
@@ -200,7 +330,7 @@ class MockStorage {
       name: employee.name,
       email: employee.email,
       avatarUrl: employee.avatarUrl || users[userIdx].avatarUrl,
-      status: employee.employmentStatus === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
+      status: employee.employmentStatus === "INACTIVE" ? "INACTIVE" : "ACTIVE",
       tenantId: employee.tenantId,
     };
     this.setItem(KEYS.USERS, users);
@@ -213,7 +343,9 @@ class MockStorage {
 
   private createUserForEmployee(employee: Employee): void {
     const users = this.getUsers();
-    const exists = users.some((u) => u.email.toLowerCase() === employee.email.toLowerCase());
+    const exists = users.some(
+      (u) => u.email.toLowerCase() === employee.email.toLowerCase(),
+    );
     if (exists) return;
 
     this.setItem<User>(KEYS.USERS, [
@@ -221,9 +353,11 @@ class MockStorage {
         id: `user-${employee.id}`,
         name: employee.name,
         email: employee.email,
-        role: 'EMPLOYEE',
+        password: "password123",
+        role: "EMPLOYEE",
         tenantId: employee.tenantId,
-        status: employee.employmentStatus === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
+        status:
+          employee.employmentStatus === "INACTIVE" ? "INACTIVE" : "ACTIVE",
         avatarUrl: employee.avatarUrl,
       },
       ...users,
@@ -235,7 +369,13 @@ class MockStorage {
     return this.syncTenantMetrics();
   }
 
-  public addTenant(tenant: Omit<Tenant, 'id' | 'createdAt' | 'consultantCount' | 'employeeCount'>): Tenant {
+  public addTenant(
+    tenant: Omit<
+      Tenant,
+      "id" | "createdAt" | "consultantCount" | "employeeCount"
+    >,
+    adminPassword?: string,
+  ): { tenant: Tenant; adminUser: User; generatedPassword: string } {
     const tenants = this.getTenants();
     const newTenant: Tenant = {
       ...tenant,
@@ -245,8 +385,30 @@ class MockStorage {
       createdAt: new Date().toISOString(),
     };
     this.setItem(KEYS.TENANTS, [newTenant, ...tenants]);
-    this.addAuditLog('TENANT_CREATED', 'TENANT', newTenant.id);
-    return newTenant;
+
+    // Create Company Admin with generated credentials
+    const generatedPassword =
+      adminPassword ||
+      `${tenant.slug.charAt(0).toUpperCase() + tenant.slug.slice(1)}@${Math.floor(1000 + Math.random() * 9000)}`;
+    const adminEmail = tenant.adminEmail || `admin@${tenant.slug}.com`;
+
+    const adminUser: User = {
+      id: `user-admin-${newTenant.id}`,
+      name: `${tenant.name} Admin`,
+      email: adminEmail,
+      password: generatedPassword,
+      role: "TENANT_ADMIN",
+      tenantId: newTenant.id,
+      status: "ACTIVE",
+    };
+
+    const users = this.getUsers().filter(
+      (u) => u.email.toLowerCase() !== adminEmail.toLowerCase(),
+    );
+    this.setItem(KEYS.USERS, [adminUser, ...users]);
+
+    this.addAuditLog("TENANT_CREATED", "TENANT", newTenant.id);
+    return { tenant: newTenant, adminUser, generatedPassword };
   }
 
   public updateTenant(id: string, updates: Partial<Tenant>): Tenant | null {
@@ -255,8 +417,23 @@ class MockStorage {
     if (idx === -1) return null;
     tenants[idx] = { ...tenants[idx], ...updates };
     this.setItem(KEYS.TENANTS, tenants);
-    this.addAuditLog('TENANT_UPDATED', 'TENANT', id);
+    this.addAuditLog("TENANT_UPDATED", "TENANT", id);
     return tenants[idx];
+  }
+
+  public deleteTenant(id: string): void {
+    const tenants = this.getTenants();
+    this.setItem(
+      KEYS.TENANTS,
+      tenants.filter((t) => t.id !== id),
+    );
+    // Remove users belonging to this tenant
+    const users = this.getUsers();
+    this.setItem(
+      KEYS.USERS,
+      users.filter((u) => u.tenantId !== id),
+    );
+    this.addAuditLog("TENANT_DELETED", "TENANT", id);
   }
 
   // Users & Current Auth
@@ -267,7 +444,7 @@ class MockStorage {
   public addUser(user: User): User {
     const users = this.getUsers();
     this.setItem(KEYS.USERS, [user, ...users]);
-    if (user.role === 'CONSULTANT') {
+    if (user.role === "CONSULTANT") {
       this.syncTenantMetrics();
     }
     return user;
@@ -279,17 +456,51 @@ class MockStorage {
     if (idx === -1) return null;
     users[idx] = { ...users[idx], ...updates };
     this.setItem(KEYS.USERS, users);
-    if (users[idx].role === 'CONSULTANT' || updates.role === 'CONSULTANT' || updates.assignedTenantIds) {
+    if (
+      users[idx].role === "CONSULTANT" ||
+      updates.role === "CONSULTANT" ||
+      updates.assignedTenantIds
+    ) {
       this.syncTenantMetrics();
     }
     return users[idx];
+  }
+
+  public deleteUser(id: string): void {
+    const users = this.getUsers();
+    this.setItem(
+      KEYS.USERS,
+      users.filter((u) => u.id !== id),
+    );
   }
 
   public getCurrentUser(): User {
     const stored = localStorage.getItem(KEYS.CURRENT_USER);
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.email) {
+          // Re-verify against latest users in case of updates or deletions
+          const latestUsers = this.getUsers();
+          const found = latestUsers.find(
+            (u) =>
+              u.id === parsed.id ||
+              u.email.toLowerCase() === parsed.email.toLowerCase(),
+          );
+          if (found) {
+            if (JSON.stringify(found) !== stored) {
+              localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(found));
+            }
+            return found;
+          }
+
+          // If the user was removed from users data, invalidate stale cached session
+          if (parsed.role !== "SUPER_ADMIN") {
+            localStorage.removeItem(KEYS.CURRENT_USER);
+            return INITIAL_USERS[0];
+          }
+          return parsed;
+        }
       } catch {
         // fallback
       }
@@ -301,17 +512,25 @@ class MockStorage {
     localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(user));
   }
 
+  public logout(): void {
+    localStorage.removeItem(KEYS.CURRENT_USER);
+  }
+
   // Audit Logs
   public getAuditLogs(): AuditLog[] {
     return this.getItem<AuditLog>(KEYS.AUDIT_LOGS);
   }
 
-  public addAuditLog(action: string, resourceType: string, resourceId: string): void {
+  public addAuditLog(
+    action: string,
+    resourceType: string,
+    resourceId: string,
+  ): void {
     const logs = this.getAuditLogs();
     const currentUser = this.getCurrentUser();
     const newLog: AuditLog = {
       id: `aud-${Date.now()}`,
-      tenantId: currentUser.tenantId || 'platform',
+      tenantId: currentUser.tenantId || "platform",
       actorId: currentUser.id,
       actorName: currentUser.name,
       action,
@@ -323,18 +542,24 @@ class MockStorage {
     this.setItem(KEYS.AUDIT_LOGS, [newLog, ...logs]);
   }
 
-  // Generic Tenant Item Helpers
-  public getTenantItems<T extends { tenantId?: string }>(key: string, tenantId?: string): T[] {
+  // Generic Tenant Item Helpers (Ensures 100% tenant isolation)
+  public getTenantItems<T extends { tenantId?: string }>(
+    key: string,
+    tenantId?: string,
+  ): T[] {
     const items = this.getItem<T>(key);
     if (!tenantId) return items;
-    return items.filter((item) => item.tenantId === tenantId || !item.tenantId);
+    return items.filter((item) => item.tenantId === tenantId);
   }
 
-  public addTenantItem<T extends { id?: string; tenantId?: string }>(key: string, item: T): T {
+  public addTenantItem<T extends { id?: string; tenantId?: string }>(
+    key: string,
+    item: T,
+  ): T {
     const items = this.getItem<T>(key);
     const newItem = {
       ...item,
-      id: item.id || `id-${Date.now()}`,
+      id: item.id || `${key.slice(0, 4)}-${Date.now()}`,
     };
     this.setItem(key, [newItem, ...items]);
     if (key === KEYS.EMPLOYEES) {
@@ -344,7 +569,11 @@ class MockStorage {
     return newItem;
   }
 
-  public updateTenantItem<T extends { id: string }>(key: string, id: string, updates: Partial<T>): T | null {
+  public updateTenantItem<T extends { id: string }>(
+    key: string,
+    id: string,
+    updates: Partial<T>,
+  ): T | null {
     const items = this.getItem<T>(key);
     const idx = items.findIndex((i) => i.id === id);
     if (idx === -1) return null;
@@ -352,33 +581,59 @@ class MockStorage {
     items[idx] = { ...items[idx], ...updates };
     this.setItem(key, items);
     if (key === KEYS.EMPLOYEES) {
-      this.syncUserFromEmployee(items[idx] as unknown as Employee, previous as unknown as Employee);
+      this.syncUserFromEmployee(
+        items[idx] as unknown as Employee,
+        previous as unknown as Employee,
+      );
       this.syncTenantMetrics();
     }
     return items[idx];
   }
 
-  public removeTenantItem<T extends { id: string }>(key: string, id: string): void {
+  public removeTenantItem<T extends { id: string }>(
+    key: string,
+    id: string,
+  ): void {
     const items = this.getItem<T>(key);
     this.setItem(
       key,
-      items.filter((i) => i.id !== id)
+      items.filter((i) => i.id !== id),
     );
     if (key === KEYS.EMPLOYEES) {
       this.syncTenantMetrics();
     }
   }
 
-  public deleteTenantItem<T extends { id: string }>(key: string, id: string): void {
+  public deleteTenantItem<T extends { id: string }>(
+    key: string,
+    id: string,
+  ): void {
     this.removeTenantItem<T>(key, id);
   }
 
   // Onboarding Workflow & Approval
+  public getOnboardingDocRequirements(tenantId?: string): OnboardingDocRequirement[] {
+    const key = tenantId ? `${KEYS.ONBOARDING_DOC_TEMPLATES}_${tenantId}` : KEYS.ONBOARDING_DOC_TEMPLATES;
+    const stored = this.getItem<OnboardingDocRequirement>(key);
+    if (!stored || stored.length === 0) {
+      return [...DEFAULT_ONBOARDING_DOCUMENTS];
+    }
+    return stored;
+  }
+
+  public saveOnboardingDocRequirements(tenantId: string, requirements: OnboardingDocRequirement[]): void {
+    const key = tenantId ? `${KEYS.ONBOARDING_DOC_TEMPLATES}_${tenantId}` : KEYS.ONBOARDING_DOC_TEMPLATES;
+    this.setItem(key, requirements);
+  }
+
   public getOnboardingCases(tenantId?: string): OnboardingCase[] {
     return this.getTenantItems<OnboardingCase>(KEYS.ONBOARDING_CASES, tenantId);
   }
 
-  public approveOnboardingCase(caseId: string, approverName: string): OnboardingCase | null {
+  public approveOnboardingCase(
+    caseId: string,
+    approverName: string,
+  ): OnboardingCase | null {
     const cases = this.getItem<OnboardingCase>(KEYS.ONBOARDING_CASES);
     const caseIdx = cases.findIndex((c) => c.id === caseId);
     if (caseIdx === -1) return null;
@@ -386,7 +641,7 @@ class MockStorage {
     const targetCase = cases[caseIdx];
     const updatedCase: OnboardingCase = {
       ...targetCase,
-      status: 'APPROVED',
+      status: "APPROVED",
       approvedAt: new Date().toISOString(),
       approvedBy: approverName,
       personalDetailsCompleted: true,
@@ -399,57 +654,81 @@ class MockStorage {
 
     // 1. Upgrade User Role to EMPLOYEE (Permanent Access)
     const users = this.getUsers();
-    const userIdx = users.findIndex((u) => u.id === targetCase.userId || u.email.toLowerCase() === targetCase.email.toLowerCase());
+    const userIdx = users.findIndex(
+      (u) =>
+        u.id === targetCase.userId ||
+        u.email.toLowerCase() === targetCase.email.toLowerCase(),
+    );
     if (userIdx !== -1) {
       users[userIdx] = {
         ...users[userIdx],
-        role: 'EMPLOYEE',
-        status: 'ACTIVE',
+        role: "EMPLOYEE",
+        status: "ACTIVE",
+        isPermanent: true,
       };
       this.setItem(KEYS.USERS, users);
 
-      // If active demo user in session matches, update session too
       const current = this.getCurrentUser();
-      if (current.id === users[userIdx].id || current.email.toLowerCase() === users[userIdx].email.toLowerCase()) {
+      if (
+        current.id === users[userIdx].id ||
+        current.email.toLowerCase() === users[userIdx].email.toLowerCase()
+      ) {
         this.setCurrentUser(users[userIdx]);
       }
     }
 
-    // 2. Ensure Employee record in EMPLOYEES is ACTIVE
+    // 2. Ensure Employee record in EMPLOYEES is ACTIVE and Permanent
     const employees = this.getItem<Employee>(KEYS.EMPLOYEES);
-    const empIdx = employees.findIndex((e) => e.email.toLowerCase() === targetCase.email.toLowerCase() || (targetCase.employeeId && e.employeeId === targetCase.employeeId));
+    const empIdx = employees.findIndex(
+      (e) =>
+        e.email.toLowerCase() === targetCase.email.toLowerCase() ||
+        (targetCase.employeeId && e.employeeId === targetCase.employeeId),
+    );
     if (empIdx !== -1) {
       employees[empIdx] = {
         ...employees[empIdx],
-        employmentStatus: 'ACTIVE',
+        employmentStatus: "ACTIVE",
+        isPermanent: true,
       };
       this.setItem(KEYS.EMPLOYEES, employees);
     } else {
       const newEmp: Employee = {
         id: `emp-${Date.now()}`,
         tenantId: targetCase.tenantId,
-        employeeId: targetCase.employeeId || `EMP-${Date.now().toString().slice(-4)}`,
+        employeeId:
+          targetCase.employeeId || `EMP-${Date.now().toString().slice(-4)}`,
         name: targetCase.candidateName,
         email: targetCase.email,
         phone: targetCase.phone,
         departmentId: targetCase.departmentId,
         designationId: targetCase.designationId,
-        regionId: this.getTenants().find((tenant) => tenant.id === targetCase.tenantId)?.defaultRegionId || 'region-acme-us',
+        regionId:
+          this.getTenants().find((tenant) => tenant.id === targetCase.tenantId)
+            ?.defaultRegionId || "",
         managerId: targetCase.managerId || null,
         joiningDate: targetCase.joiningDate,
-        employmentStatus: 'ACTIVE',
+        employmentStatus: "ACTIVE",
+        isPermanent: true,
         avatarUrl: targetCase.avatarUrl,
       };
       this.setItem(KEYS.EMPLOYEES, [newEmp, ...employees]);
     }
 
     // 3. Register Audit Log
-    this.addAuditLog('ONBOARDING_APPROVED_PERMANENT', 'ONBOARDING_CASE', targetCase.id);
+    this.addAuditLog(
+      "ONBOARDING_APPROVED_PERMANENT",
+      "ONBOARDING_CASE",
+      targetCase.id,
+    );
 
     return updatedCase;
   }
 
-  public rejectOnboardingCase(caseId: string, reason: string, rejectorName: string): OnboardingCase | null {
+  public rejectOnboardingCase(
+    caseId: string,
+    reason: string,
+    rejectorName: string,
+  ): OnboardingCase | null {
     const cases = this.getItem<OnboardingCase>(KEYS.ONBOARDING_CASES);
     const caseIdx = cases.findIndex((c) => c.id === caseId);
     if (caseIdx === -1) return null;
@@ -457,8 +736,10 @@ class MockStorage {
     const targetCase = cases[caseIdx];
     const updatedCase: OnboardingCase = {
       ...targetCase,
-      status: 'REJECTED',
-      rejectionReason: reason || 'Onboarding compliance verification failed or was declined by HR.',
+      status: "REJECTED",
+      rejectionReason:
+        reason ||
+        "Onboarding compliance verification failed or was declined by HR.",
       rejectedAt: new Date().toISOString(),
       rejectedBy: rejectorName,
     };
@@ -467,22 +748,50 @@ class MockStorage {
 
     // Revoke User status / suspend permissions
     const users = this.getUsers();
-    const userIdx = users.findIndex((u) => u.id === targetCase.userId || u.email.toLowerCase() === targetCase.email.toLowerCase());
+    const userIdx = users.findIndex(
+      (u) =>
+        u.id === targetCase.userId ||
+        u.email.toLowerCase() === targetCase.email.toLowerCase(),
+    );
     if (userIdx !== -1) {
       users[userIdx] = {
         ...users[userIdx],
-        status: 'SUSPENDED',
+        status: "SUSPENDED",
+        isPermanent: false,
       };
       this.setItem(KEYS.USERS, users);
 
       const current = this.getCurrentUser();
-      if (current.id === users[userIdx].id || current.email.toLowerCase() === users[userIdx].email.toLowerCase()) {
+      if (
+        current.id === users[userIdx].id ||
+        current.email.toLowerCase() === users[userIdx].email.toLowerCase()
+      ) {
         this.setCurrentUser(users[userIdx]);
       }
     }
 
+    // Update Employee record
+    const employees = this.getItem<Employee>(KEYS.EMPLOYEES);
+    const empIdx = employees.findIndex(
+      (e) =>
+        e.email.toLowerCase() === targetCase.email.toLowerCase() ||
+        (targetCase.employeeId && e.employeeId === targetCase.employeeId),
+    );
+    if (empIdx !== -1) {
+      employees[empIdx] = {
+        ...employees[empIdx],
+        employmentStatus: "INACTIVE",
+        isPermanent: false,
+      };
+      this.setItem(KEYS.EMPLOYEES, employees);
+    }
+
     // Register Audit Log
-    this.addAuditLog('ONBOARDING_REJECTED_REVOKED', 'ONBOARDING_CASE', targetCase.id);
+    this.addAuditLog(
+      "ONBOARDING_REJECTED_REVOKED",
+      "ONBOARDING_CASE",
+      targetCase.id,
+    );
 
     return updatedCase;
   }

@@ -3,47 +3,41 @@ import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { FormField } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
 import { mockStorage, KEYS } from '@/services/mock-storage';
-import { Employee, Department, Designation, Region, Tenant } from '@/demo-data/seedData';
+import { Employee, Department, Designation, Region, User } from '@/demo-data/seedData';
+import { generateTotpSecret, generateTotpUri, generateQRCodeDataUrl, verifyTotpCode } from '@/utils/totp';
 import {
-  User,
-  Mail,
+  User as UserIcon,
   Phone,
-  MapPin,
-  Briefcase,
-  Building2,
-  DollarSign,
-  Award,
-  Upload,
-  CheckCircle2,
   ShieldCheck,
-  Calendar,
   Lock,
-  Edit3,
+  Upload,
   Save,
-  CreditCard,
-  Heart,
-  Home,
-  UserCheck,
+  Building2,
+  Briefcase,
+  KeyRound,
+  ShieldAlert,
+  Smartphone,
+  Copy,
+  QrCode as QrIcon,
 } from 'lucide-react';
 
 export const ProfileSettingsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const currentUser = mockStorage.getCurrentUser();
+  const [currentUser, setCurrentUser] = useState<User>(() => mockStorage.getCurrentUser());
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
 
-  const employees = mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant.id);
-  const departments = mockStorage.getTenantItems<Department>(KEYS.DEPARTMENTS, currentTenant.id);
-  const designations = mockStorage.getTenantItems<Designation>(KEYS.DESIGNATIONS, currentTenant.id);
-  const regions = mockStorage.getTenantItems<Region>(KEYS.REGIONS, currentTenant.id);
+  const employees = mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant?.id);
+  const departments = mockStorage.getTenantItems<Department>(KEYS.DEPARTMENTS, currentTenant?.id);
+  const designations = mockStorage.getTenantItems<Designation>(KEYS.DESIGNATIONS, currentTenant?.id);
+  const regions = mockStorage.getTenantItems<Region>(KEYS.REGIONS, currentTenant?.id);
 
-  // Find matching employee record for active user
+  // Check if active user has an associated Employee HR record
   const myEmployee =
     employees.find(
       (e) =>
@@ -52,31 +46,54 @@ export const ProfileSettingsPage: React.FC = () => {
         (currentUser.name && e.name.toLowerCase() === currentUser.name.toLowerCase())
     ) || null;
 
-  const deptObj = departments.find((d) => d.id === myEmployee?.departmentId);
-  const desigObj = designations.find((d) => d.id === myEmployee?.designationId);
-  const regionObj = regions.find((r) => r.id === myEmployee?.regionId);
-  const managerObj = employees.find((e) => e.id === myEmployee?.managerId);
+  // Profile fields state
+  const [name, setName] = useState(currentUser.name || '');
+  const [email] = useState(currentUser.email || '');
+  const [phone, setPhone] = useState(currentUser.phone || myEmployee?.phone || '');
+  const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || myEmployee?.avatarUrl || '');
 
-  // Editable Form State
-  const [phone, setPhone] = useState(myEmployee?.phone || '+91 98765 43210');
-  const [currentAddress, setCurrentAddress] = useState(
-    myEmployee?.currentAddress || '21, 5th Cross, Koramangala, Bangalore - 560034, India'
-  );
-  const [permanentAddress, setPermanentAddress] = useState(
-    myEmployee?.permanentAddress || myEmployee?.currentAddress || '21, 5th Cross, Koramangala, Bangalore - 560034, India'
-  );
-  const [emergencyContactName, setEmergencyContactName] = useState(
-    myEmployee?.emergencyContactName || 'Family Contact'
-  );
-  const [emergencyContactPhone, setEmergencyContactPhone] = useState(
-    myEmployee?.emergencyContactPhone || '+91 91234 56789'
-  );
-  const [avatarUrl, setAvatarUrl] = useState(myEmployee?.avatarUrl || currentUser.avatarUrl || '');
-  const [skills, setSkills] = useState<string[]>(
-    myEmployee?.skills || ['JavaScript', 'React', 'TypeScript', 'Node.js', 'PostgreSQL', 'AWS']
-  );
-  const [newSkillInput, setNewSkillInput] = useState('');
-  const [activeTab, setActiveTab] = useState<'Personal' | 'Job' | 'Compensation' | 'Skills'>('Personal');
+  // Employee-only fields state
+  const [currentAddress, setCurrentAddress] = useState(myEmployee?.currentAddress || '');
+  const [emergencyContactName, setEmergencyContactName] = useState(myEmployee?.emergencyContactName || '');
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState(myEmployee?.emergencyContactPhone || '');
+
+  // Password fields state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // 2FA State
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(currentUser.twoFactorEnabled || false);
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [show2FADisable, setShow2FADisable] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [disable2FACode, setDisable2FACode] = useState('');
+  const [totpSecret, setTotpSecret] = useState(currentUser.twoFactorSecret || '');
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+
+  // Navigation tab
+  const [activeTab, setActiveTab] = useState<'Profile' | 'Security' | 'Employment'>('Profile');
+
+  // Generate real TOTP Secret & QR Code when setting up 2FA
+  const init2FASetup = async () => {
+    setIsGeneratingQR(true);
+    try {
+      const secret = generateTotpSecret();
+      setTotpSecret(secret);
+      const appName = currentTenant ? `Peopleworkplaces (${currentTenant.name})` : 'Peopleworkplaces';
+      const otpauth = generateTotpUri(currentUser.email, appName, secret);
+      const qrUrl = await generateQRCodeDataUrl(otpauth);
+      setQrCodeDataUrl(qrUrl);
+      setShow2FASetup(true);
+      setShow2FADisable(false);
+    } catch (err) {
+      toast.error('Failed to generate 2FA QR code');
+    } finally {
+      setIsGeneratingQR(false);
+    }
+  };
 
   const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,94 +116,160 @@ export const ProfileSettingsPage: React.FC = () => {
     }
   };
 
-  const handleAddSkill = () => {
-    if (!newSkillInput.trim()) return;
-    if (skills.includes(newSkillInput.trim())) {
-      toast.error('Skill already exists');
-      return;
-    }
-    setSkills([...skills, newSkillInput.trim()]);
-    setNewSkillInput('');
-    toast.success('Skill added');
-  };
-
-  const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills(skills.filter((s) => s !== skillToRemove));
-  };
-
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (myEmployee) {
-      const updated: Partial<Employee> = {
-        phone,
-        currentAddress,
-        permanentAddress,
-        emergencyContactName,
-        emergencyContactPhone,
-        avatarUrl,
-        skills,
-      };
-
-      mockStorage.updateTenantItem<Employee>(KEYS.EMPLOYEES, myEmployee.id, updated);
+    if (!name.trim()) {
+      toast.error('Name cannot be empty');
+      return;
     }
 
-    // Update currentUser in mock storage if matching
-    mockStorage.setCurrentUser({
+    const updatedUser: User = {
       ...currentUser,
-      avatarUrl,
-    });
+      name: name.trim(),
+      phone: phone.trim() || undefined,
+      avatarUrl: avatarUrl.trim() || undefined,
+    };
 
-    mockStorage.addAuditLog('EMPLOYEE_PROFILE_UPDATED', 'USER', currentUser.id);
-    toast.success('🎉 Your profile information has been successfully updated!');
+    mockStorage.updateUser(currentUser.id, updatedUser);
+    mockStorage.setCurrentUser(updatedUser);
+    setCurrentUser(updatedUser);
+
+    if (myEmployee) {
+      mockStorage.updateTenantItem<Employee>(KEYS.EMPLOYEES, myEmployee.id, {
+        name: name.trim(),
+        phone: phone.trim() || undefined,
+        avatarUrl: avatarUrl.trim() || undefined,
+        currentAddress: currentAddress.trim() || undefined,
+        emergencyContactName: emergencyContactName.trim() || undefined,
+        emergencyContactPhone: emergencyContactPhone.trim() || undefined,
+      });
+    }
+
+    mockStorage.addAuditLog('USER_PROFILE_UPDATED', 'USER', currentUser.id);
+    toast.success('🎉 Profile information successfully saved!');
   };
 
-  if (!myEmployee) {
-    return (
-      <div className="space-y-6 w-full animate-in fade-in duration-200 pb-16">
-        <Card className="shadow-xs border border-slate-200 p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-            <div className="flex items-center gap-4">
-              <Avatar src={avatarUrl || currentUser.avatarUrl} name={currentUser.name} size="lg" />
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">{currentUser.name}</h2>
-                <p className="text-sm text-slate-500">{currentUser.email}</p>
-                <Badge variant="indigo" size="sm" className="mt-2">
-                  {mockStorage.getRoleLabel(currentUser.role)}
-                </Badge>
-              </div>
-            </div>
-            <Button variant="outline" onClick={() => window.location.assign(`/${currentTenant.slug}/employees`)}>
-              Open Employee Directory
-            </Button>
-          </div>
-          <div className="mt-5 p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-sm text-indigo-950">
-            This account has company access, but it is not linked to a personal employee HR record in {currentTenant.name}.
-            Employee-only personal, payroll, and reporting fields are hidden to prevent mixing this account with Sarah, Asha, or any other employee profile.
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters long');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New password and Confirm password do not match');
+      return;
+    }
+
+    if (currentUser.password && currentPassword && currentUser.password !== currentPassword) {
+      toast.error('Current password is incorrect');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    setTimeout(() => {
+      mockStorage.updateUser(currentUser.id, { password: newPassword });
+      const updated = { ...currentUser, password: newPassword };
+      mockStorage.setCurrentUser(updated);
+      setCurrentUser(updated);
+      setIsChangingPassword(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      mockStorage.addAuditLog('USER_PASSWORD_CHANGED', 'USER', currentUser.id);
+      toast.success('🔒 Password has been updated successfully!');
+    }, 400);
+  };
+
+  const handleToggle2FA = () => {
+    if (!twoFactorEnabled) {
+      init2FASetup();
+    } else {
+      setShow2FADisable(!show2FADisable);
+      setShow2FASetup(false);
+      setDisable2FACode('');
+    }
+  };
+
+  const handleDisable2FA = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!disable2FACode || disable2FACode.trim().length !== 6) {
+      toast.error('Please enter the current 6-digit code from your Authenticator app');
+      return;
+    }
+
+    const secret = currentUser.twoFactorSecret || totpSecret;
+    if (!secret) {
+      toast.error('Authenticator secret not found.');
+      return;
+    }
+
+    const isValid = verifyTotpCode(disable2FACode.trim(), secret);
+    if (!isValid) {
+      toast.error('Invalid 6-digit verification code. Please check your Authenticator app.');
+      return;
+    }
+
+    const updated = { ...currentUser, twoFactorEnabled: false, twoFactorSecret: undefined };
+    mockStorage.updateUser(currentUser.id, { twoFactorEnabled: false, twoFactorSecret: undefined });
+    mockStorage.setCurrentUser(updated);
+    setCurrentUser(updated);
+    setTwoFactorEnabled(false);
+    setShow2FADisable(false);
+    setDisable2FACode('');
+    setQrCodeDataUrl('');
+    mockStorage.addAuditLog('2FA_DISABLED', 'USER', currentUser.id);
+    toast.success('Two-Factor Authentication (2FA) has been safely deactivated.');
+  };
+
+  const handleConfirm2FA = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!twoFactorCode || twoFactorCode.trim().length !== 6) {
+      toast.error('Please enter the 6-digit code from your Authenticator app');
+      return;
+    }
+
+    try {
+      const isValid = verifyTotpCode(twoFactorCode.trim(), totpSecret);
+      if (!isValid) {
+        toast.error('Invalid 6-digit verification code. Please check your authenticator clock/app.');
+        return;
+      }
+
+      const updated = { ...currentUser, twoFactorEnabled: true, twoFactorSecret: totpSecret };
+      mockStorage.updateUser(currentUser.id, { twoFactorEnabled: true, twoFactorSecret: totpSecret });
+      mockStorage.setCurrentUser(updated);
+      setCurrentUser(updated);
+      setTwoFactorEnabled(true);
+      setShow2FASetup(false);
+      setTwoFactorCode('');
+      mockStorage.addAuditLog('2FA_ENABLED', 'USER', currentUser.id);
+      toast.success('🛡️ Two-Factor Authentication (2FA) is now active on your account!');
+    } catch {
+      toast.error('Error verifying 2FA code. Please try again.');
+    }
+  };
+
+  const deptObj = departments.find((d) => d.id === myEmployee?.departmentId);
+  const desigObj = designations.find((d) => d.id === myEmployee?.designationId);
+  const regionObj = regions.find((r) => r.id === myEmployee?.regionId);
 
   return (
     <div className="space-y-6 w-full animate-in fade-in duration-200 pb-16">
-      {/* Top Banner & Header */}
+      {/* Header Banner */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            {/* Avatar with upload trigger */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
             <div className="relative group">
               <Avatar
                 src={avatarUrl}
-                name={myEmployee?.name || currentUser.name}
+                name={currentUser.name}
                 size="lg"
-                className="w-20 h-20 ring-4 ring-indigo-50 shadow-md text-xl"
+                className="w-18 h-18 ring-4 ring-[#FF6900]/10 shadow-md text-xl"
               />
               <label
                 htmlFor="profile-avatar-upload"
                 className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                title="Change Profile Photo"
+                title="Upload Photo"
               >
                 <Upload className="w-5 h-5" />
               </label>
@@ -198,381 +281,457 @@ export const ProfileSettingsPage: React.FC = () => {
                 className="hidden"
               />
             </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-slate-900">{myEmployee?.name || currentUser.name}</h2>
-                <Badge variant="emerald" size="sm">
-                  {myEmployee?.employmentStatus || 'ACTIVE'}
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-slate-900">{currentUser.name}</h2>
+                <Badge variant={currentUser.status === 'ACTIVE' ? 'emerald' : 'neutral'} size="sm">
+                  {currentUser.status}
                 </Badge>
               </div>
-              <p className="text-sm text-slate-600 font-medium">
-                {desigObj?.name || 'Senior Software Engineer'} • {deptObj?.name || 'Engineering'}
-              </p>
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-1">
-                <span className="font-mono font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                  {myEmployee?.employeeId || 'EMP-1001'}
-                </span>
-                <span>•</span>
-                <span>{myEmployee?.email || currentUser.email}</span>
-                <span>•</span>
-                <span>{myEmployee?.workLocation || regionObj?.name || 'Bangalore, India'}</span>
+              <p className="text-sm text-slate-500 font-mono mt-0.5">{currentUser.email}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant="indigo" size="sm">
+                  {mockStorage.getRoleLabel(currentUser.role)}
+                </Badge>
+                {currentTenant && (
+                  <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                    <Building2 className="w-3.5 h-3.5 text-[#FF6900]" />
+                    {currentTenant.name}
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Button
-              variant="primary"
-              onClick={handleSaveProfile}
-              leftIcon={<Save className="w-4 h-4" />}
-              className="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-xs"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const text = `Name: ${currentUser.name}\nEmail: ${currentUser.email}\nRole: ${currentUser.role}`;
+                navigator.clipboard.writeText(text);
+                toast.success('Account info copied to clipboard');
+              }}
+              leftIcon={<Copy className="w-3.5 h-3.5" />}
             >
-              Save Profile Updates
+              Copy Info
             </Button>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-t border-slate-100 mt-6 pt-3 overflow-x-auto text-xs font-bold">
-          {[
-            { key: 'Personal', label: 'Personal Information', icon: User },
-            { key: 'Job', label: 'Job & Organizational Details', icon: Briefcase },
-            { key: 'Compensation', label: 'My Compensation & Bank', icon: DollarSign },
-            { key: 'Skills', label: 'Skills & Capabilities', icon: Award },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key as any)}
-                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-2 border-t border-slate-100 mt-6 pt-4">
+          <button
+            type="button"
+            onClick={() => setActiveTab('Profile')}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              activeTab === 'Profile'
+                ? 'bg-[#FF6900] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            Profile & Details
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('Security')}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'Security'
+                ? 'bg-[#FF6900] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            <span>Password & 2FA</span>
+            {twoFactorEnabled && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400" title="2FA Active" />
+            )}
+          </button>
+          {myEmployee && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('Employment')}
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'Employment'
+                  ? 'bg-[#FF6900] text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              Employment Record
+            </button>
+          )}
         </div>
       </div>
 
-      {/* TAB CONTENT: 1. PERSONAL INFORMATION */}
-      {activeTab === 'Personal' && (
-        <form onSubmit={handleSaveProfile} className="space-y-6 animate-in fade-in">
-          <Card className="shadow-xs border border-slate-200">
-            <CardHeader className="border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Heart className="w-4 h-4 text-indigo-600" />
-                <span>Personal & Contact Information</span>
-              </CardTitle>
-              <span className="text-xs text-slate-400">Keep your emergency and residential info updated</span>
-            </CardHeader>
-            <CardContent className="pt-5 space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                  <span className="text-slate-400 font-semibold block text-[10px] uppercase">Full Legal Name</span>
-                  <p className="font-bold text-slate-900 text-sm">{myEmployee?.name || currentUser.name}</p>
-                  <span className="text-[10px] text-slate-400">Fixed HR record</span>
-                </div>
+      {/* ============================================================ */}
+      {/* TAB 1: PROFILE & DETAILS                                     */}
+      {/* ============================================================ */}
+      {activeTab === 'Profile' && (
+        <Card className="shadow-xs border border-slate-200">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <UserIcon className="w-4 h-4 text-[#FF6900]" />
+              <span>Personal Profile Information</span>
+            </CardTitle>
+          </CardHeader>
+          <form onSubmit={handleSaveProfile}>
+            <CardContent className="p-6 space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField label="Full Name" required>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your name"
+                    required
+                  />
+                </FormField>
 
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                  <span className="text-slate-400 font-semibold block text-[10px] uppercase">Date of Birth</span>
-                  <p className="font-bold text-slate-900 text-sm">{myEmployee?.dateOfBirth || '12 Feb 1994'}</p>
-                  <span className="text-[10px] text-slate-400">Identity verification</span>
-                </div>
-
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                  <span className="text-slate-400 font-semibold block text-[10px] uppercase">Gender & Marital Status</span>
-                  <p className="font-bold text-slate-900 text-sm">
-                    {myEmployee?.gender || 'Female'} • {myEmployee?.maritalStatus || 'Single'}
-                  </p>
-                  <span className="text-[10px] text-slate-400">Demographic info</span>
-                </div>
+                <FormField label="Email Address (Read-Only)">
+                  <Input value={email} disabled className="bg-slate-100 text-slate-500 cursor-not-allowed" />
+                </FormField>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <FormField label="Primary Contact Phone" required helperText="Direct mobile number for work communication">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField label="Contact Phone Number">
                   <Input
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    required
+                    placeholder="+1 (555) 234-5678"
                   />
                 </FormField>
 
-                <FormField label="Official Work Email" helperText="Assigned company address">
-                  <Input value={myEmployee?.email || currentUser.email} disabled className="bg-slate-50" />
-                </FormField>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-                <FormField label="Current Residential Address" required>
+                <FormField label="Avatar Image URL (Optional)">
                   <Input
-                    value={currentAddress}
-                    onChange={(e) => setCurrentAddress(e.target.value)}
-                    placeholder="Residential address"
-                    required
-                  />
-                </FormField>
-
-                <FormField label="Permanent Address">
-                  <Input
-                    value={permanentAddress}
-                    onChange={(e) => setPermanentAddress(e.target.value)}
-                    placeholder="Permanent domicile address"
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    placeholder="https://..."
                   />
                 </FormField>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-                <FormField label="Emergency Contact (Name & Relationship)" required helperText="e.g. John Mitchell (Father)">
-                  <Input
-                    value={emergencyContactName}
-                    onChange={(e) => setEmergencyContactName(e.target.value)}
-                    placeholder="John Mitchell (Father)"
-                    required
-                  />
-                </FormField>
+              {myEmployee && (
+                <>
+                  <FormField label="Current Residential Address">
+                    <Input
+                      value={currentAddress}
+                      onChange={(e) => setCurrentAddress(e.target.value)}
+                      placeholder="742 Evergreen Terrace, San Francisco, CA 94102, USA"
+                    />
+                  </FormField>
 
-                <FormField label="Emergency Contact Phone" required>
-                  <Input
-                    value={emergencyContactPhone}
-                    onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                    placeholder="+91 91234 56789"
-                    required
-                  />
-                </FormField>
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                    <FormField label="Emergency Contact Person">
+                      <Input
+                        value={emergencyContactName}
+                        onChange={(e) => setEmergencyContactName(e.target.value)}
+                        placeholder="Sarah Miller (Spouse)"
+                      />
+                    </FormField>
+                    <FormField label="Emergency Contact Phone">
+                      <Input
+                        value={emergencyContactPhone}
+                        onChange={(e) => setEmergencyContactPhone(e.target.value)}
+                        placeholder="+1 (555) 019-2834"
+                      />
+                    </FormField>
+                  </div>
+                </>
+              )}
             </CardContent>
-            <CardFooter className="flex justify-end border-t border-slate-100 bg-slate-50/50">
-              <Button type="submit" leftIcon={<Save className="w-4 h-4" />}>
-                Save Personal Info Changes
+
+            <CardFooter className="bg-slate-50 border-t border-slate-100 p-4 flex justify-end">
+              <Button
+                type="submit"
+                variant="primary"
+                leftIcon={<Save className="w-4 h-4" />}
+                className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold"
+              >
+                Save Changes
               </Button>
             </CardFooter>
-          </Card>
-        </form>
-      )}
-
-      {/* TAB CONTENT: 2. JOB & ORGANIZATIONAL DETAILS */}
-      {activeTab === 'Job' && (
-        <Card className="shadow-xs border border-slate-200 animate-in fade-in">
-          <CardHeader className="border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-indigo-600" />
-              <span>Job Placement & Organizational Details</span>
-            </CardTitle>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-200">
-              <ShieldCheck className="w-3.5 h-3.5" /> VERIFIED HR PARAMETERS
-            </span>
-          </CardHeader>
-          <CardContent className="pt-5 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Department</span>
-              <p className="font-bold text-slate-900 text-sm">{deptObj?.name || 'Engineering'}</p>
-              <p className="text-[10px] text-slate-500">Business Unit</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Designation</span>
-              <p className="font-bold text-slate-900 text-sm">{desigObj?.name || 'Senior Software Engineer'}</p>
-              <p className="text-[10px] text-slate-500">Official Job Role</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Employee ID</span>
-              <p className="font-mono font-bold text-indigo-600 text-sm">{myEmployee?.employeeId || 'EMP-1001'}</p>
-              <p className="text-[10px] text-slate-500">Organizational Code</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Employment Type</span>
-              <p className="font-bold text-slate-900 text-sm">{myEmployee?.employmentType || 'Full Time'}</p>
-              <p className="text-[10px] text-slate-500">Contract Class</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Date of Joining</span>
-              <p className="font-bold text-slate-900 text-sm">
-                {myEmployee?.joiningDate ? new Date(myEmployee.joiningDate).toLocaleDateString() : '15 Jan 2023'}
-              </p>
-              <p className="text-[10px] text-slate-500">Tenure Start</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Confirmation Date</span>
-              <p className="font-bold text-slate-900 text-sm">
-                {myEmployee?.confirmationDate
-                  ? new Date(myEmployee.confirmationDate).toLocaleDateString()
-                  : '15 Jul 2023'}
-              </p>
-              <p className="text-[10px] text-slate-500">Probation Passed</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Office Location</span>
-              <p className="font-bold text-slate-900 text-sm">
-                {myEmployee?.workLocation || regionObj?.name || 'Bangalore, India'}
-              </p>
-              <p className="text-[10px] text-slate-500">Primary Workplace</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Reporting Supervisor</span>
-              <p className="font-bold text-slate-900 text-sm">{managerObj?.name || 'Michael Brown (VP Engineering)'}</p>
-              <p className="text-[10px] text-slate-500">Direct Manager</p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Assigned Team / Pod</span>
-              <p className="font-bold text-indigo-700 text-sm">{myEmployee?.teamName || 'Backend Team'}</p>
-              <p className="text-[10px] text-slate-500">Operational Unit</p>
-            </div>
-          </CardContent>
+          </form>
         </Card>
       )}
 
-      {/* TAB CONTENT: 3. COMPENSATION & PAYROLL (CONFIDENTIAL VIEW OWN) */}
-      {activeTab === 'Compensation' && (
-        <Card className="shadow-xs border border-slate-200 animate-in fade-in">
-          <CardHeader className="border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-emerald-600" />
-                <span>My Annual Compensation & Payroll Details</span>
+      {/* ============================================================ */}
+      {/* TAB 2: SECURITY, PASSWORD & 2FA                             */}
+      {/* ============================================================ */}
+      {activeTab === 'Security' && (
+        <div className="space-y-6">
+          {/* Change Password Card */}
+          <Card className="shadow-xs border border-slate-200">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-[#FF6900]" />
+                <span>Change Account Password</span>
               </CardTitle>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Confidential individual payroll ledger for <strong>{myEmployee?.name || currentUser.name}</strong>.
-              </p>
-            </div>
-            <Badge variant="emerald" size="sm">
-              RESTRICTED TO YOU
-            </Badge>
-          </CardHeader>
+            </CardHeader>
+            <form onSubmit={handleChangePassword}>
+              <CardContent className="p-6 space-y-4 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <FormField label="Current Password">
+                    <Input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter current password"
+                    />
+                  </FormField>
 
-          <CardContent className="pt-5 space-y-6 text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-                <span className="text-indigo-600 font-bold block text-[11px] uppercase">Total CTC (Annual)</span>
-                <p className="text-2xl font-extrabold text-indigo-950 mt-1">{myEmployee?.ctcAnnual || '₹18,00,000'}</p>
-                <span className="text-[10px] text-indigo-600 font-medium">Gross Annual Package</span>
-              </div>
+                  <FormField label="New Password" required helperText="Minimum 6 characters">
+                    <Input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      required
+                    />
+                  </FormField>
 
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px] uppercase">Basic Salary</span>
-                <p className="text-lg font-bold text-slate-900 mt-1">{myEmployee?.basicSalary || '₹9,00,000'}</p>
-                <span className="text-[10px] text-slate-500">Fixed Base</span>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px] uppercase">Variable Pay</span>
-                <p className="text-lg font-bold text-slate-900 mt-1">{myEmployee?.variablePay || '₹2,00,000'}</p>
-                <span className="text-[10px] text-slate-500">Performance bonus</span>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <span className="text-slate-400 font-semibold block text-[11px] uppercase">Special Allowances</span>
-                <p className="text-lg font-bold text-slate-900 mt-1">{myEmployee?.allowances || '₹7,00,000'}</p>
-                <span className="text-[10px] text-slate-500">HRA, Medical & Travel</span>
-              </div>
-            </div>
-
-            {/* Banking Details */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-              <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <CreditCard className="w-4 h-4 text-slate-600" />
-                <span>Direct Deposit & Banking Information</span>
-              </h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div>
-                  <span className="text-slate-400 block text-[11px]">Payment Mode</span>
-                  <strong className="text-slate-900">{myEmployee?.paymentMode || 'Bank Transfer'}</strong>
+                  <FormField label="Confirm New Password" required>
+                    <Input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter new password"
+                      required
+                    />
+                  </FormField>
                 </div>
+              </CardContent>
 
-                <div>
-                  <span className="text-slate-400 block text-[11px]">Bank Name</span>
-                  <strong className="text-slate-900">{myEmployee?.bankName || 'HDFC Bank'}</strong>
-                </div>
-
-                <div>
-                  <span className="text-slate-400 block text-[11px]">Bank Account Number</span>
-                  <strong className="font-mono text-slate-900">{myEmployee?.bankAccountNumber || 'XXXX XXXX 1234'}</strong>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* TAB CONTENT: 4. SKILLS & CAPABILITIES */}
-      {activeTab === 'Skills' && (
-        <Card className="shadow-xs border border-slate-200 animate-in fade-in">
-          <CardHeader className="border-b border-slate-100 pb-3 flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Award className="w-4 h-4 text-indigo-600" />
-                <span>Skills & Technical Capabilities</span>
-              </CardTitle>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Showcase your domain expertise and tools in the company directory.
-              </p>
-            </div>
-            <Badge variant="indigo" size="sm">
-              {skills.length} SKILLS
-            </Badge>
-          </CardHeader>
-
-          <CardContent className="pt-5 space-y-5 text-xs">
-            {/* Add Skill Input */}
-            <div className="flex items-center gap-2 max-w-md">
-              <Input
-                value={newSkillInput}
-                onChange={(e) => setNewSkillInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddSkill();
-                  }
-                }}
-                placeholder="Type a new skill (e.g. Docker, Python, GraphQL)..."
-              />
-              <Button type="button" onClick={handleAddSkill} variant="outline" size="sm">
-                Add Skill
-              </Button>
-            </div>
-
-            {/* Current Skills List */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="bg-indigo-50 text-indigo-700 font-semibold px-3 py-1.5 rounded-xl text-xs border border-indigo-100 flex items-center gap-2 shadow-2xs"
+              <CardFooter className="bg-slate-50 border-t border-slate-100 p-4 flex justify-end">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isChangingPassword}
+                  leftIcon={<KeyRound className="w-4 h-4" />}
+                  className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold"
                 >
-                  <span>{skill}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveSkill(skill)}
-                    className="text-indigo-400 hover:text-rose-600 font-bold cursor-pointer"
-                    title="Remove skill"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
+                  Update Password
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+
+          {/* Two-Factor Authentication (2FA) Card */}
+          <Card className="shadow-xs border border-slate-200">
+            <CardHeader className="border-b border-slate-100 pb-4 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#C800A1]" />
+                  <span>Two-Factor Authentication (2FA)</span>
+                </CardTitle>
+                <p className="text-xs text-slate-500 mt-1">
+                  Protect your account with standard TOTP Two-Factor Authentication (Google Authenticator, Microsoft Authenticator, Authy, 1Password).
+                </p>
+              </div>
+
+              <Badge variant={twoFactorEnabled ? 'emerald' : 'neutral'} size="md">
+                {twoFactorEnabled ? '2FA Enabled' : '2FA Disabled'}
+              </Badge>
+            </CardHeader>
+
+            <CardContent className="p-6 space-y-4 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${twoFactorEnabled ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm">Authenticator App (TOTP)</h4>
+                    <p className="text-xs text-slate-500">
+                      Generate dynamic 6-digit security codes from your mobile phone.
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  variant={twoFactorEnabled ? 'outline' : 'primary'}
+                  size="sm"
+                  onClick={handleToggle2FA}
+                  isLoading={isGeneratingQR}
+                  className={twoFactorEnabled ? 'border-rose-300 text-rose-700 hover:bg-rose-50 font-semibold' : 'bg-[#C800A1] hover:bg-[#A80088] text-white font-bold'}
+                >
+                  {twoFactorEnabled ? 'Disable 2FA' : 'Set Up 2FA'}
+                </Button>
+              </div>
+
+              {/* 2FA Setup Flow with Big QR Code */}
+              {show2FASetup && !twoFactorEnabled && (
+                <div className="p-6 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-5 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2 text-purple-900 font-bold text-base border-b border-purple-200/60 pb-3">
+                    <ShieldAlert className="w-5 h-5 text-[#C800A1]" />
+                    <span>Scan QR Code with Authenticator App</span>
+                  </div>
+
+                  <p className="text-purple-900 text-xs leading-relaxed">
+                    1. Open your authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, or Authy) and scan the QR code below:
+                  </p>
+
+                  <div className="flex flex-col md:flex-row items-center gap-6 bg-white p-5 rounded-2xl border border-purple-100 shadow-xs">
+                    {/* Big High-Res QR Code */}
+                    <div className="bg-white p-3 rounded-2xl border-2 border-purple-200 shadow-md flex items-center justify-center shrink-0">
+                      {qrCodeDataUrl ? (
+                        <img
+                          src={qrCodeDataUrl}
+                          alt="2FA QR Code"
+                          className="w-56 h-56 sm:w-64 sm:h-64 object-contain rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-56 h-56 flex flex-col items-center justify-center text-slate-400 gap-2">
+                          <QrIcon className="w-10 h-10 animate-pulse text-purple-400" />
+                          <span>Generating QR...</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Manual Secret Key */}
+                    <div className="space-y-3 text-xs flex-1">
+                      <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                        <span className="text-slate-500 font-medium block">Can't scan the QR code? Use Secret Key:</span>
+                        <div className="flex items-center gap-2">
+                          <code className="font-mono font-bold text-indigo-700 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-sm tracking-wider select-all">
+                            {totpSecret}
+                          </code>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(totpSecret);
+                              toast.success('Secret key copied to clipboard');
+                            }}
+                            className="shrink-0 p-1.5"
+                            title="Copy Key"
+                          >
+                            <Copy className="w-4 h-4 text-slate-600" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-[11px] leading-relaxed">
+                        <strong>Security Tip:</strong> Save your secret key in a safe password manager so you can recover access if you change mobile devices.
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6-Digit Code Verification */}
+                  <form onSubmit={handleConfirm2FA} className="space-y-3 pt-2">
+                    <FormField label="2. Enter the 6-digit code displayed in your Authenticator app:" required>
+                      <div className="flex flex-col sm:flex-row gap-2.5 max-w-md">
+                        <Input
+                          type="text"
+                          maxLength={6}
+                          value={twoFactorCode}
+                          onChange={(e) => setTwoFactorCode(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder="123456"
+                          className="font-mono text-center tracking-widest text-xl font-bold h-11"
+                          autoFocus
+                          required
+                        />
+                        <Button
+                          type="submit"
+                          className="bg-[#C800A1] hover:bg-[#A80088] text-white font-bold h-11 px-6 shrink-0 shadow-xs"
+                        >
+                          Verify & Activate 2FA
+                        </Button>
+                      </div>
+                    </FormField>
+                  </form>
+                </div>
+              )}
+
+              {/* 2FA Deactivation Security Challenge */}
+              {show2FADisable && twoFactorEnabled && (
+                <div className="p-6 bg-rose-50 border border-rose-200 rounded-2xl space-y-4 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2 text-rose-900 font-bold text-base border-b border-rose-200/60 pb-3">
+                    <ShieldAlert className="w-5 h-5 text-rose-600" />
+                    <span>Confirm 2FA Deactivation</span>
+                  </div>
+
+                  <p className="text-rose-800 text-xs leading-relaxed">
+                    To deactivate Two-Factor Authentication, you must confirm your identity by entering the current 6-digit code from your Authenticator app.
+                  </p>
+
+                  <form onSubmit={handleDisable2FA} className="space-y-3">
+                    <FormField label="Enter current 6-digit code to confirm deactivation:" required>
+                      <div className="flex flex-col sm:flex-row gap-2.5 max-w-md">
+                        <Input
+                          type="text"
+                          maxLength={6}
+                          value={disable2FACode}
+                          onChange={(e) => setDisable2FACode(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder="123456"
+                          className="font-mono text-center tracking-widest text-xl font-bold h-11 border-rose-300 focus:border-rose-500"
+                          autoFocus
+                          required
+                        />
+                        <Button
+                          type="submit"
+                          className="bg-rose-600 hover:bg-rose-700 text-white font-bold h-11 px-6 shrink-0 shadow-xs cursor-pointer"
+                        >
+                          Confirm & Deactivate
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShow2FADisable(false)}
+                          className="h-11 px-4 text-slate-600 hover:bg-slate-100"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </FormField>
+                  </form>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* TAB 3: EMPLOYMENT RECORD (If Linked Employee Exists)          */}
+      {/* ============================================================ */}
+      {activeTab === 'Employment' && myEmployee && (
+        <Card className="shadow-xs border border-slate-200">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Briefcase className="w-4 h-4 text-[#FF6900]" />
+              <span>Employment & Organizational Placement</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-slate-500 block font-medium">Employee ID:</span>
+                <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block">{myEmployee.employeeId}</span>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-slate-500 block font-medium">Department:</span>
+                <span className="font-bold text-slate-900 text-sm mt-0.5 block">{deptObj?.name || 'Operations'}</span>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-slate-500 block font-medium">Designation / Role:</span>
+                <span className="font-bold text-slate-900 text-sm mt-0.5 block">{desigObj?.name || 'Administrator'}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-slate-500 block font-medium">Work Region:</span>
+                <span className="font-bold text-slate-900 text-sm mt-0.5 block">{regionObj?.name || 'Global HQ'}</span>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-slate-500 block font-medium">Date of Joining:</span>
+                <span className="font-bold text-slate-900 text-sm mt-0.5 block">{myEmployee.joiningDate || '2026-01-01'}</span>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <span className="text-slate-500 block font-medium">Employment Type:</span>
+                <span className="font-bold text-slate-900 text-sm mt-0.5 block">{myEmployee.employmentType || 'Full Time'}</span>
+              </div>
             </div>
           </CardContent>
-
-          <CardFooter className="flex justify-end border-t border-slate-100 bg-slate-50/50">
-            <Button type="button" onClick={handleSaveProfile} leftIcon={<Save className="w-4 h-4" />}>
-              Save Skill Set
-            </Button>
-          </CardFooter>
         </Card>
       )}
     </div>

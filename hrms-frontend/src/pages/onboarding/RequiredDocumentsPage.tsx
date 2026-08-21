@@ -6,7 +6,13 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import { mockStorage, KEYS } from '@/services/mock-storage';
-import { OnboardingCase, OnboardingDocumentUpload } from '@/demo-data/seedData';
+import {
+  OnboardingCase,
+  OnboardingDocumentUpload,
+  OnboardingDocRequirement,
+  AllowedDocumentType,
+  DEFAULT_ONBOARDING_DOCUMENTS,
+} from '@/demo-data/seedData';
 import {
   CheckCircle2,
   Upload,
@@ -44,11 +50,55 @@ export const RequiredDocumentsPage: React.FC = () => {
 
   const isRejected = myCase?.status === 'REJECTED' || currentUser.status === 'SUSPENDED';
 
-  const defaultCategories = [
-    { id: 'cat-id', title: 'Government Photo ID (Passport / Driver License)', defaultFileName: 'Passport_Scan.pdf' },
-    { id: 'cat-tax', title: 'Tax & Withholding Form (Form W-4 / Form 16)', defaultFileName: 'Form_W4_Tax.pdf' },
-    { id: 'cat-edu', title: 'Educational Degree & Transcripts', defaultFileName: 'Degree_Certificate.pdf' },
-  ];
+  // Dynamically load custom checklist configured by Admin for this employee or fallback to company default
+  const categories: OnboardingDocRequirement[] =
+    myCase?.requiredDocsChecklist && myCase.requiredDocsChecklist.length > 0
+      ? myCase.requiredDocsChecklist
+      : mockStorage.getOnboardingDocRequirements(currentTenant?.id);
+
+  const getAcceptPattern = (allowedType: AllowedDocumentType) => {
+    switch (allowedType) {
+      case 'PDF':
+        return '.pdf,application/pdf';
+      case 'IMAGE':
+        return 'image/png,image/jpeg,image/webp,image/jpg,.png,.jpg,.jpeg,.webp';
+      case 'PDF_OR_IMAGE':
+        return '.pdf,application/pdf,image/png,image/jpeg,image/webp,image/jpg,.png,.jpg,.jpeg';
+      case 'ANY':
+      default:
+        return '*/*';
+    }
+  };
+
+  const getFormatBadge = (allowedType: AllowedDocumentType) => {
+    switch (allowedType) {
+      case 'PDF':
+        return (
+          <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+            📄 PDF only
+          </span>
+        );
+      case 'IMAGE':
+        return (
+          <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+            🖼️ Image only (PNG/JPG)
+          </span>
+        );
+      case 'PDF_OR_IMAGE':
+        return (
+          <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+            📄🖼️ PDF or Image
+          </span>
+        );
+      case 'ANY':
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 bg-slate-50 text-slate-700 border border-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+            📁 Any Document
+          </span>
+        );
+    }
+  };
 
   const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: FileUploadInfo }>(() => {
     const map: { [key: string]: FileUploadInfo } = {};
@@ -74,7 +124,7 @@ export const RequiredDocumentsPage: React.FC = () => {
     fileType?: string;
   } | null>(null);
 
-  const handleUpload = (catId: string, title: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = (doc: OnboardingDocRequirement, e: React.ChangeEvent<HTMLInputElement>) => {
     if (isRejected) {
       toast.error('Case is rejected. Document uploads are locked.');
       return;
@@ -82,6 +132,24 @@ export const RequiredDocumentsPage: React.FC = () => {
 
     const file = e.target.files?.[0];
     if (file) {
+      const fileNameLower = file.name.toLowerCase();
+      const isPdf = fileNameLower.endsWith('.pdf') || file.type === 'application/pdf';
+      const isImage = file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|bmp)$/i.test(fileNameLower);
+
+      // Validate format
+      if (doc.allowedType === 'PDF' && !isPdf) {
+        toast.error(`Format error: "${doc.title}" must be a PDF document (.pdf).`);
+        return;
+      }
+      if (doc.allowedType === 'IMAGE' && !isImage) {
+        toast.error(`Format error: "${doc.title}" must be an image file (PNG, JPG, WEBP).`);
+        return;
+      }
+      if (doc.allowedType === 'PDF_OR_IMAGE' && !isPdf && !isImage) {
+        toast.error(`Format error: "${doc.title}" must be a PDF or Image file.`);
+        return;
+      }
+
       const sizeFormatted = `${
         file.size / (1024 * 1024) > 0.1
           ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
@@ -94,21 +162,21 @@ export const RequiredDocumentsPage: React.FC = () => {
 
         const newMap: { [key: string]: FileUploadInfo } = {
           ...uploadedFiles,
-          [catId]: {
+          [doc.id]: {
             fileName: file.name,
             size: sizeFormatted || '450 KB',
             fileDataUrl,
-            fileType: file.type || 'application/pdf',
+            fileType: file.type || (isPdf ? 'application/pdf' : 'image/jpeg'),
           },
         };
         setUploadedFiles(newMap);
 
         // Save into storage
         const docsArray: OnboardingDocumentUpload[] = Object.entries(newMap).map(([id, info]) => {
-          const cat = defaultCategories.find((c) => c.id === id);
+          const cat = categories.find((c) => c.id === id);
           return {
             id,
-            title: cat?.title || title,
+            title: cat?.title || doc.title,
             fileName: info.fileName,
             fileSize: info.size,
             uploadedAt: new Date().toISOString(),
@@ -117,12 +185,13 @@ export const RequiredDocumentsPage: React.FC = () => {
           };
         });
 
-        const allUploaded = defaultCategories.every((cat) => !!newMap[cat.id]);
+        const mandatoryCategories = categories.filter((c) => c.isRequired);
+        const allMandatoryUploaded = mandatoryCategories.every((cat) => !!newMap[cat.id]);
 
         if (myCase) {
           mockStorage.updateTenantItem<OnboardingCase>(KEYS.ONBOARDING_CASES, myCase.id, {
             uploadedDocs: docsArray,
-            requiredDocsUploaded: allUploaded || docsArray.length >= 2,
+            requiredDocsUploaded: allMandatoryUploaded,
           });
         }
 
@@ -150,9 +219,11 @@ export const RequiredDocumentsPage: React.FC = () => {
   const isPhase2Locked = !myCase?.personalDetailsCompleted || !myCase?.offerSignedUploaded;
 
   const handleSaveAndReturn = () => {
-    const hasDocs = myCase?.requiredDocsUploaded || Object.keys(uploadedFiles).length > 0;
-    if (!hasDocs) {
-      toast.error('Please upload at least the required compliance documents before proceeding.');
+    const missingMandatory = categories.filter((c) => c.isRequired && !uploadedFiles[c.id]);
+    if (missingMandatory.length > 0) {
+      toast.error(
+        `Please upload all mandatory documents (${missingMandatory.map((m) => m.title).join(', ')}) before proceeding.`
+      );
       return;
     }
     toast.success('✅ Phase 3 Completed! Proceeding to Phase 4: Policy Acknowledgement');
@@ -207,7 +278,7 @@ export const RequiredDocumentsPage: React.FC = () => {
       )}
 
       <div className="space-y-4">
-        {defaultCategories.map((cat) => {
+        {categories.map((cat) => {
           const isUploaded = !!uploadedFiles[cat.id];
           const fileInfo = uploadedFiles[cat.id];
 
@@ -220,8 +291,23 @@ export const RequiredDocumentsPage: React.FC = () => {
                   ) : (
                     <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                   )}
-                  <div>
-                    <h4 className="text-sm font-semibold text-slate-900">{cat.title}</h4>
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-sm font-semibold text-slate-900">{cat.title}</h4>
+                      {getFormatBadge(cat.allowedType)}
+                      {cat.isRequired ? (
+                        <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100">
+                          * Mandatory
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                          Optional
+                        </span>
+                      )}
+                    </div>
+                    {cat.description && (
+                      <p className="text-xs text-slate-500">{cat.description}</p>
+                    )}
                     {isUploaded ? (
                       <p className="text-xs text-slate-500 flex flex-wrap items-center gap-1.5 mt-0.5">
                         <FileText className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
@@ -239,8 +325,8 @@ export const RequiredDocumentsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <Badge variant={isUploaded ? 'emerald' : 'amber'}>
-                  {isUploaded ? 'SUBMITTED' : 'REQUIRED'}
+                <Badge variant={isUploaded ? 'emerald' : cat.isRequired ? 'amber' : 'neutral'}>
+                  {isUploaded ? 'SUBMITTED' : cat.isRequired ? 'REQUIRED' : 'OPTIONAL'}
                 </Badge>
               </div>
 
@@ -263,8 +349,8 @@ export const RequiredDocumentsPage: React.FC = () => {
                     <span>{isUploaded ? 'Replace Document' : 'Upload Document Scan'}</span>
                     <input
                       type="file"
-                      accept=".pdf,image/png,image/jpeg,image/webp,image/jpg"
-                      onChange={(e) => handleUpload(cat.id, cat.title, e)}
+                      accept={getAcceptPattern(cat.allowedType)}
+                      onChange={(e) => handleUpload(cat, e)}
                       className="hidden"
                     />
                   </label>

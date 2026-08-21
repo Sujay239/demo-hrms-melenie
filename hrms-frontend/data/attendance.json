@@ -1,0 +1,77 @@
+[
+  {
+    "id": "att-1787312345262",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "user-emp-1787312095175",
+    "employeeName": "Noah Oliver",
+    "date": "2026-08-21",
+    "clockInTime": "05:09 PM",
+    "totalMinutes": 0,
+    "status": "PRESENT"
+  },
+  {
+    "id": "att-1787298944929",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "user-emp-ac-1",
+    "employeeName": "David Miller",
+    "date": "2026-08-21",
+    "clockInTime": "01:25 PM",
+    "totalMinutes": 0,
+    "status": "PRESENT"
+  },
+  {
+    "id": "att-ac-1",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-1",
+    "employeeName": "David Miller",
+    "date": "2026-08-21",
+    "clockInTime": "08:55 AM",
+    "clockOutTime": "05:15 PM",
+    "totalMinutes": 500,
+    "status": "PRESENT"
+  },
+  {
+    "id": "att-ac-2",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-2",
+    "employeeName": "Sarah Jenkins",
+    "date": "2026-08-21",
+    "clockInTime": "09:02 AM",
+    "clockOutTime": "05:30 PM",
+    "totalMinutes": 508,
+    "status": "PRESENT"
+  },
+  {
+    "id": "att-ac-3",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-3",
+    "employeeName": "Michael Chang",
+    "date": "2026-08-21",
+    "clockInTime": "09:10 AM",
+    "clockOutTime": "06:00 PM",
+    "totalMinutes": 530,
+    "status": "PRESENT"
+  },
+  {
+    "id": "att-ac-4",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-4",
+    "employeeName": "Emily Watson",
+    "date": "2026-08-21",
+    "clockInTime": "08:45 AM",
+    "clockOutTime": "05:00 PM",
+    "totalMinutes": 495,
+    "status": "PRESENT"
+  },
+  {
+    "id": "att-ac-5",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-5",
+    "employeeName": "Robert Davis",
+    "date": "2026-08-21",
+    "clockInTime": "09:00 AM",
+    "clockOutTime": "05:05 PM",
+    "totalMinutes": 485,
+    "status": "PRESENT"
+  }
+]

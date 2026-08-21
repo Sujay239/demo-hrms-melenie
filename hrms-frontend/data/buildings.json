@@ -1,0 +1,130 @@
+[
+  {
+    "id": "bld-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "name": "One Manhattan West Tower",
+    "address": "395 9th Ave, New York, NY 10001",
+    "floors": 67,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "name": "Salesforce Tower Silicon Center",
+    "address": "415 Mission St, San Francisco, CA 94105",
+    "floors": 61,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "name": "Silicon Hills Technology Complex",
+    "address": "500 West 2nd St, Austin, TX 78701",
+    "floors": 29,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-auto-computation-4",
+    "tenantId": "tenant-1787291784650",
+    "name": "Willis Innovation Plaza",
+    "address": "233 S Wacker Dr, Chicago, IL 60606",
+    "floors": 110,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "name": "One Manhattan West Tower",
+    "address": "395 9th Ave, New York, NY 10001",
+    "floors": 67,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "name": "Salesforce Tower Silicon Center",
+    "address": "415 Mission St, San Francisco, CA 94105",
+    "floors": 61,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "name": "Silicon Hills Technology Complex",
+    "address": "500 West 2nd St, Austin, TX 78701",
+    "floors": 29,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-apex-cloud-4",
+    "tenantId": "tenant-apex-101",
+    "name": "Willis Innovation Plaza",
+    "address": "233 S Wacker Dr, Chicago, IL 60606",
+    "floors": 110,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "name": "One Manhattan West Tower",
+    "address": "395 9th Ave, New York, NY 10001",
+    "floors": 67,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "name": "Salesforce Tower Silicon Center",
+    "address": "415 Mission St, San Francisco, CA 94105",
+    "floors": 61,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "name": "Silicon Hills Technology Complex",
+    "address": "500 West 2nd St, Austin, TX 78701",
+    "floors": 29,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-horizon-health-4",
+    "tenantId": "tenant-horizon-102",
+    "name": "Willis Innovation Plaza",
+    "address": "233 S Wacker Dr, Chicago, IL 60606",
+    "floors": 110,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "name": "One Manhattan West Tower",
+    "address": "395 9th Ave, New York, NY 10001",
+    "floors": 67,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Salesforce Tower Silicon Center",
+    "address": "415 Mission St, San Francisco, CA 94105",
+    "floors": 61,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Silicon Hills Technology Complex",
+    "address": "500 West 2nd St, Austin, TX 78701",
+    "floors": 29,
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bld-vanguard-fintech-4",
+    "tenantId": "tenant-vanguard-103",
+    "name": "Willis Innovation Plaza",
+    "address": "233 S Wacker Dr, Chicago, IL 60606",
+    "floors": 110,
+    "status": "ACTIVE"
+  }
+]

@@ -11,6 +11,10 @@ export interface ModalProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  zIndex?: number;
+  className?: string;
+  bodyClassName?: string;
+  closeOnOverlayClick?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -21,10 +25,14 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   footer,
   maxWidth = 'md',
+  zIndex = 50,
+  className,
+  bodyClassName,
+  closeOnOverlayClick = true,
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape' && isOpen && closeOnOverlayClick) {
         onClose();
       }
     };
@@ -36,7 +44,7 @@ export const Modal: React.FC<ModalProps> = ({
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, closeOnOverlayClick]);
 
   if (!isOpen) return null;
 
@@ -51,10 +59,20 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className={cn(
+        'fixed inset-0 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200',
+        className
+      )}
+      style={{ zIndex }}
+    >
       <div
         className="fixed inset-0"
-        onClick={onClose}
+        onClick={() => {
+          if (closeOnOverlayClick) {
+            onClose();
+          }
+        }}
         aria-hidden="true"
       />
       <div
@@ -76,7 +94,7 @@ export const Modal: React.FC<ModalProps> = ({
           </button>
         </div>
 
-        <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
+        <div className={cn('px-6 py-4 overflow-y-auto flex-1', bodyClassName)}>{children}</div>
 
         {footer && (
           <div className="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-100">

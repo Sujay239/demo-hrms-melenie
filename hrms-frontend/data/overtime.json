@@ -1,0 +1,12 @@
+[
+  {
+    "id": "ot-ac-1",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-3",
+    "employeeName": "Michael Chang",
+    "date": "2026-08-20",
+    "requestedMinutes": 120,
+    "reason": "Critical database migration deployment during maintenance window.",
+    "status": "APPROVED"
+  }
+]

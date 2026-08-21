@@ -1,0 +1,72 @@
+[
+  {
+    "id": "lr-1787301626544",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "user-emp-ac-1",
+    "employeeName": "David Miller",
+    "leaveTypeId": "lt-auto-computation-1",
+    "leaveTypeName": "Paid Time Off (PTO / Vacation)",
+    "startDate": "2026-08-22",
+    "endDate": "2026-08-27",
+    "requestedDays": 6,
+    "reason": "ok",
+    "status": "APPROVED",
+    "appliedDate": "2026-08-21T08:40:26.544Z"
+  },
+  {
+    "id": "lr-ac-101",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-3",
+    "employeeName": "Michael Chang",
+    "leaveTypeId": "lt-auto-computation-1",
+    "leaveTypeName": "Paid Time Off (PTO / Vacation)",
+    "startDate": "2026-09-01",
+    "endDate": "2026-09-05",
+    "requestedDays": 5,
+    "reason": "Late summer vacation with family in Lake Tahoe.",
+    "status": "APPROVED",
+    "appliedDate": "2026-08-10"
+  },
+  {
+    "id": "lr-ac-102",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-4",
+    "employeeName": "Emily Watson",
+    "leaveTypeId": "lt-auto-computation-2",
+    "leaveTypeName": "Sick & Medical Leave",
+    "startDate": "2026-08-18",
+    "endDate": "2026-08-19",
+    "requestedDays": 2,
+    "reason": "Dental procedure recovery and doctor advised rest.",
+    "status": "APPROVED",
+    "appliedDate": "2026-08-15"
+  },
+  {
+    "id": "lr-ac-103",
+    "tenantId": "tenant-1787291784650",
+    "employeeId": "emp-ac-6",
+    "employeeName": "Jessica Martinez",
+    "leaveTypeId": "lt-auto-computation-4",
+    "leaveTypeName": "Floating & Cultural Holiday",
+    "startDate": "2026-09-15",
+    "endDate": "2026-09-15",
+    "requestedDays": 1,
+    "reason": "Celebrating personal birthday and family event.",
+    "status": "PENDING",
+    "appliedDate": "2026-08-20"
+  },
+  {
+    "id": "lr-apex-201",
+    "tenantId": "tenant-apex-101",
+    "employeeId": "emp-apex-2",
+    "employeeName": "Elena Rostova",
+    "leaveTypeId": "lt-apex-cloud-1",
+    "leaveTypeName": "Paid Time Off (PTO / Vacation)",
+    "startDate": "2026-09-10",
+    "endDate": "2026-09-18",
+    "requestedDays": 7,
+    "reason": "Attending international AI research symposium and personal trip.",
+    "status": "APPROVED",
+    "appliedDate": "2026-08-12"
+  }
+]

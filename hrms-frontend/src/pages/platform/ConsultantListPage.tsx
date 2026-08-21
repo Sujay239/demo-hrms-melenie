@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { FormField } from '@/components/ui/FormField';
-import { mockStorage, KEYS } from '@/services/mock-storage';
-import { User, Tenant } from '@/demo-data/seedData';
+import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
+import { FormField } from "@/components/ui/FormField";
+import { mockStorage, KEYS } from "@/services/mock-storage";
+import { User, Tenant } from "@/demo-data/seedData";
 import {
   Users2,
   CheckCircle2,
@@ -18,23 +18,28 @@ import {
   Edit2,
   Trash2,
   Sparkles,
-} from 'lucide-react';
-import { toast } from '@/components/ui/Toast';
-import { Link } from 'react-router-dom';
+} from "lucide-react";
+import { toast } from "@/components/ui/Toast";
+import { Link } from "react-router-dom";
 
 export const ConsultantListPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>(() => mockStorage.getUsers());
-  const [tenants, setTenants] = useState<Tenant[]>(() => mockStorage.getTenants());
+  const [tenants, setTenants] = useState<Tenant[]>(() =>
+    mockStorage.getTenants(),
+  );
 
   // Modals
-  const [isAddConsultantModalOpen, setIsAddConsultantModalOpen] = useState(false);
+  const [isAddConsultantModalOpen, setIsAddConsultantModalOpen] =
+    useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [selectedConsultant, setSelectedConsultant] = useState<User | null>(null);
+  const [selectedConsultant, setSelectedConsultant] = useState<User | null>(
+    null,
+  );
 
   // Add Consultant Form
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [selectedTenantIds, setSelectedTenantIds] = useState<string[]>([]);
 
   const reloadData = () => {
@@ -42,20 +47,20 @@ export const ConsultantListPage: React.FC = () => {
     setTenants(mockStorage.getTenants());
   };
 
-  const consultants = users.filter((u) => u.role === 'CONSULTANT');
+  const consultants = users.filter((u) => u.role === "CONSULTANT");
 
   const handleOpenAdd = () => {
-    setName('');
-    setEmail('');
-    setAvatarUrl('');
-    setSelectedTenantIds([tenants[0]?.id || '']);
+    setName("");
+    setEmail("");
+    setAvatarUrl("");
+    setSelectedTenantIds([tenants[0]?.id || ""]);
     setIsAddConsultantModalOpen(true);
   };
 
   const handleSaveConsultant = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) {
-      toast.error('Name and Email are required');
+      toast.error("Name and Email are required");
       return;
     }
 
@@ -63,14 +68,14 @@ export const ConsultantListPage: React.FC = () => {
       id: `usr-c-${Date.now()}`,
       email: email.trim(),
       name: name.trim(),
-      role: 'CONSULTANT',
-      status: 'ACTIVE',
+      role: "CONSULTANT",
+      status: "ACTIVE",
       assignedTenantIds: selectedTenantIds,
       avatarUrl: avatarUrl.trim() || undefined,
     };
 
     mockStorage.addUser(newConsultant);
-    mockStorage.addAuditLog('CONSULTANT_CREATED', 'USER', newConsultant.id);
+    mockStorage.addAuditLog("CONSULTANT_CREATED", "USER", newConsultant.id);
     toast.success(`🎉 External consultant "${name}" added successfully!`);
     setIsAddConsultantModalOpen(false);
     reloadData();
@@ -84,7 +89,7 @@ export const ConsultantListPage: React.FC = () => {
 
   const handleToggleTenantAssignment = (tId: string) => {
     setSelectedTenantIds((prev) =>
-      prev.includes(tId) ? prev.filter((id) => id !== tId) : [...prev, tId]
+      prev.includes(tId) ? prev.filter((id) => id !== tId) : [...prev, tId],
     );
   };
 
@@ -94,8 +99,14 @@ export const ConsultantListPage: React.FC = () => {
     mockStorage.updateUser(selectedConsultant.id, {
       assignedTenantIds: selectedTenantIds,
     });
-    mockStorage.addAuditLog('CONSULTANT_ASSIGNMENTS_UPDATED', 'USER', selectedConsultant.id);
-    toast.success(`Assigned client companies updated for ${selectedConsultant.name}!`);
+    mockStorage.addAuditLog(
+      "CONSULTANT_ASSIGNMENTS_UPDATED",
+      "USER",
+      selectedConsultant.id,
+    );
+    toast.success(
+      `Assigned client companies updated for ${selectedConsultant.name}!`,
+    );
     setIsAssignModalOpen(false);
     reloadData();
   };
@@ -109,9 +120,12 @@ export const ConsultantListPage: React.FC = () => {
             <Users2 className="w-4 h-4" />
             <span>Platform Governance & Advisory Access</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Consultant Management</h2>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Consultant Management
+          </h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            Provision external advisors, audit consultants, and assign scoped multi-tenant company access.
+            Provision external advisors, audit consultants, and assign scoped
+            multi-tenant company access.
           </p>
         </div>
 
@@ -130,7 +144,7 @@ export const ConsultantListPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {consultants.map((c) => {
           const assignedTenants = tenants.filter((t) =>
-            c.assignedTenantIds?.includes(t.id)
+            c.assignedTenantIds?.includes(t.id),
           );
 
           return (
@@ -139,11 +153,16 @@ export const ConsultantListPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Avatar src={c.avatarUrl} name={c.name} size="md" />
                   <div>
-                    <h4 className="text-base font-bold text-slate-900">{c.name}</h4>
+                    <h4 className="text-base font-bold text-slate-900">
+                      {c.name}
+                    </h4>
                     <p className="text-xs text-slate-500">{c.email}</p>
                   </div>
                 </div>
-                <Badge variant={c.status === 'ACTIVE' ? 'emerald' : 'neutral'} size="sm">
+                <Badge
+                  variant={c.status === "ACTIVE" ? "emerald" : "neutral"}
+                  size="sm"
+                >
                   {c.status}
                 </Badge>
               </CardHeader>
@@ -172,17 +191,21 @@ export const ConsultantListPage: React.FC = () => {
                       >
                         <div className="flex items-center gap-2.5 font-medium text-slate-800">
                           {t.logoUrl ? (
-                            <img src={t.logoUrl} alt={t.name} className="w-5 h-5 rounded object-contain bg-white border border-slate-200" />
+                            <img
+                              src={t.logoUrl}
+                              alt={t.name}
+                              className="w-5 h-5 rounded object-contain bg-white border border-slate-200"
+                            />
                           ) : (
                             <Building2 className="w-4 h-4 text-indigo-500" />
                           )}
                           <span className="font-semibold">{t.name}</span>
                         </div>
                         <Link
-                          to={`/app/${t.slug}/dashboard`}
+                          to={`/${t.slug}/dashboard`}
                           className="flex items-center gap-1 font-mono text-[11px] text-indigo-600 hover:underline"
                         >
-                          <span>cyrcalur.hr/{t.slug}</span>
+                          <span>Peopleworkplaces.hr/{t.slug}</span>
                           <ExternalLink className="w-3 h-3" />
                         </Link>
                       </div>
@@ -210,10 +233,16 @@ export const ConsultantListPage: React.FC = () => {
         description="Provision an advisory account and authorize client companies."
         footer={
           <>
-            <Button variant="outline" onClick={() => setIsAddConsultantModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddConsultantModalOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSaveConsultant} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
+            <Button
+              onClick={handleSaveConsultant}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+            >
               Add Consultant
             </Button>
           </>
@@ -250,7 +279,9 @@ export const ConsultantListPage: React.FC = () => {
           </FormField>
 
           <div className="space-y-2 pt-2">
-            <span className="font-bold text-slate-700 block">Assign Client Companies:</span>
+            <span className="font-bold text-slate-700 block">
+              Assign Client Companies:
+            </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
               {tenants.map((t) => {
                 const isSelected = selectedTenantIds.includes(t.id);
@@ -261,12 +292,14 @@ export const ConsultantListPage: React.FC = () => {
                     onClick={() => handleToggleTenantAssignment(t.id)}
                     className={`p-2.5 rounded-lg border text-left flex items-center justify-between text-xs transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-50 border-indigo-300 text-indigo-900 font-bold'
-                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                        ? "bg-indigo-50 border-indigo-300 text-indigo-900 font-bold"
+                        : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
                     }`}
                   >
                     <span className="truncate">{t.name}</span>
-                    <span className="font-mono text-[10px] text-slate-400">/{t.slug}</span>
+                    <span className="font-mono text-[10px] text-slate-400">
+                      /{t.slug}
+                    </span>
                   </button>
                 );
               })}
@@ -287,10 +320,16 @@ export const ConsultantListPage: React.FC = () => {
           description="Grant or revoke multi-tenant organization authorization for this consultant."
           footer={
             <>
-              <Button variant="outline" onClick={() => setIsAssignModalOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsAssignModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSaveAssignments} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
+              <Button
+                onClick={handleSaveAssignments}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+              >
                 Save Access Assignments
               </Button>
             </>
@@ -298,7 +337,8 @@ export const ConsultantListPage: React.FC = () => {
         >
           <div className="space-y-4 text-xs">
             <p className="text-slate-600">
-              Select all tenant companies that <strong>{selectedConsultant.name}</strong> is permitted to access:
+              Select all tenant companies that{" "}
+              <strong>{selectedConsultant.name}</strong> is permitted to access:
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
@@ -311,17 +351,21 @@ export const ConsultantListPage: React.FC = () => {
                     onClick={() => handleToggleTenantAssignment(t.id)}
                     className={`p-3 rounded-xl border text-left flex items-center justify-between text-xs transition-all cursor-pointer ${
                       isAssigned
-                        ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-bold shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-950 font-bold shadow-xs"
+                        : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
-                      <div className={`w-4 h-4 rounded flex items-center justify-center ${isAssigned ? 'bg-emerald-600 text-white' : 'border border-slate-300'}`}>
+                      <div
+                        className={`w-4 h-4 rounded flex items-center justify-center ${isAssigned ? "bg-emerald-600 text-white" : "border border-slate-300"}`}
+                      >
                         {isAssigned && <CheckCircle2 className="w-3.5 h-3.5" />}
                       </div>
                       <span className="truncate">{t.name}</span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-400 shrink-0">/{t.slug}</span>
+                    <span className="font-mono text-[10px] text-slate-400 shrink-0">
+                      /{t.slug}
+                    </span>
                   </button>
                 );
               })}

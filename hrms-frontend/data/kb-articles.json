@@ -1,0 +1,450 @@
+[
+  {
+    "id": "kb-1787301043753",
+    "tenantId": "tenant-1787291784650",
+    "title": "gtwerhgdfghbfgn v tehm dgh",
+    "categoryId": "cat-1787301043753",
+    "categoryName": "Company Policies",
+    "content": "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.\n\nLorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.\n\nLorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.\n\nLorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.\n\nLorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.",
+    "tags": [
+      "guide",
+      "policy",
+      "step-by-step"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-21T08:30:43.753Z",
+    "targetDepartmentId": null,
+    "targetDepartmentName": null,
+    "attachments": [
+      {
+        "id": "att-1787301037972-jef4am",
+        "name": "ChatGPT Image Aug 18, 2026, 04_39_21 PM.png",
+        "size": "1.2 MB",
+        "type": "image",
+        "dataUrl": "/api/uploads/1787301037929-ChatGPT_Image_Aug_18__2026__04_39_21_PM.png",
+        "uploadedAt": "2026-08-21T08:30:37.972Z"
+      },
+      {
+        "id": "att-1787301037986-65xnbv",
+        "name": "ChatGPT Image Aug 18, 2026, 04_39_16 PM.png",
+        "size": "1.2 MB",
+        "type": "image",
+        "dataUrl": "/api/uploads/1787301037940-ChatGPT_Image_Aug_18__2026__04_39_16_PM.png",
+        "uploadedAt": "2026-08-21T08:30:37.986Z"
+      },
+      {
+        "id": "att-1787301037997-3k9qmm",
+        "name": "ChatGPT Image Aug 18, 2026, 04_38_59 PM.png",
+        "size": "1.2 MB",
+        "type": "image",
+        "dataUrl": "/api/uploads/1787301037963-ChatGPT_Image_Aug_18__2026__04_38_59_PM.png",
+        "uploadedAt": "2026-08-21T08:30:37.997Z"
+      },
+      {
+        "id": "att-1787301038014-3er9pw",
+        "name": "ChatGPT Image Aug 18, 2026, 04_38_43 PM.png",
+        "size": "1.2 MB",
+        "type": "image",
+        "dataUrl": "/api/uploads/1787301037986-ChatGPT_Image_Aug_18__2026__04_38_43_PM.png",
+        "uploadedAt": "2026-08-21T08:30:38.014Z"
+      },
+      {
+        "id": "att-1787301038025-2doxil",
+        "name": "ChatGPT Image Aug 18, 2026, 04_38_05 PM.png",
+        "size": "1.3 MB",
+        "type": "image",
+        "dataUrl": "/api/uploads/1787301037997-ChatGPT_Image_Aug_18__2026__04_38_05_PM.png",
+        "uploadedAt": "2026-08-21T08:30:38.025Z"
+      },
+      {
+        "id": "att-1787301041645-dkevky",
+        "name": "auto-computation-holiday-calendar-2026.pdf",
+        "size": "113.4 KB",
+        "type": "pdf",
+        "dataUrl": "/api/uploads/1787301041641-auto-computation-holiday-calendar-2026.pdf",
+        "uploadedAt": "2026-08-21T08:30:41.645Z"
+      }
+    ]
+  },
+  {
+    "id": "kb-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "title": "2026 US Benefits Enrollment & Healthcare Choices",
+    "categoryId": "cat-1",
+    "categoryName": "Benefits & Perks",
+    "content": "Overview of comprehensive medical, dental, and vision PPO/HDHP plans with employer HSA contribution. Please refer to the attached Benefit Guide PDF and Provider Network Directory for detailed co-pays, deductibles, and preventative care coverage.",
+    "tags": [
+      "Health Insurance",
+      "Dental PPO",
+      "Vision",
+      "HSA/FSA",
+      "Open Enrollment"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null,
+    "attachments": [
+      {
+        "id": "att-101",
+        "name": "2026_US_Healthcare_Benefits_Guide.pdf",
+        "size": "2.4 MB",
+        "type": "pdf",
+        "uploadedAt": "2026-08-15T14:30:00.000Z"
+      },
+      {
+        "id": "att-102",
+        "name": "Cigna_Dental_Vision_Network_List.docx",
+        "size": "840 KB",
+        "type": "docx",
+        "uploadedAt": "2026-08-15T14:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "kb-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "title": "Understanding 401(k) Employer Match & Vesting Schedule",
+    "categoryId": "cat-2",
+    "categoryName": "Retirement & Finance",
+    "content": "Company matches 100% of employee contributions up to 4% of eligible base salary with immediate vesting. Follow the attached setup walkthrough to link your Fidelity brokerage account.",
+    "tags": [
+      "401k",
+      "Retirement",
+      "Employer Match",
+      "Vesting",
+      "Fidelity"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null,
+    "attachments": [
+      {
+        "id": "att-103",
+        "name": "Fidelity_401k_Enrollment_Steps.pdf",
+        "size": "1.1 MB",
+        "type": "pdf",
+        "uploadedAt": "2026-08-15T14:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "kb-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "title": "PTO Accrual, Carry-Forward & Leave Policy",
+    "categoryId": "cat-3",
+    "categoryName": "Time Off & Leave",
+    "content": "Details on annual leave allowances, monthly accrual rates, and up to 5 days rollover per calendar year.",
+    "tags": [
+      "PTO",
+      "Vacation",
+      "Sick Leave",
+      "Carry Forward"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-auto-computation-4",
+    "tenantId": "tenant-1787291784650",
+    "title": "Business Expense Reporting & Travel Reimbursement",
+    "categoryId": "cat-4",
+    "categoryName": "Finance & Operations",
+    "content": "Guidelines for corporate expense claims, client dinners, flights, and software tool purchases.",
+    "tags": [
+      "Expensify",
+      "Travel",
+      "Meals",
+      "Per Diem",
+      "Reimbursement"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-auto-computation-5",
+    "tenantId": "tenant-1787291784650",
+    "title": "Information Security: Hardware Encryption & 2FA Enforcements",
+    "categoryId": "cat-5",
+    "categoryName": "IT & Security",
+    "content": "Mandatory security standards: FileVault disk encryption, password managers, and multi-factor authentication.",
+    "tags": [
+      "Cybersecurity",
+      "1Password",
+      "2FA",
+      "FileVault",
+      "SOC2"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "title": "2026 US Benefits Enrollment & Healthcare Choices",
+    "categoryId": "cat-1",
+    "categoryName": "Benefits & Perks",
+    "content": "Overview of comprehensive medical, dental, and vision PPO/HDHP plans with employer HSA contribution.",
+    "tags": [
+      "Health Insurance",
+      "Dental PPO",
+      "Vision",
+      "HSA/FSA",
+      "Open Enrollment"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "title": "Understanding 401(k) Employer Match & Vesting Schedule",
+    "categoryId": "cat-2",
+    "categoryName": "Retirement & Finance",
+    "content": "Company matches 100% of employee contributions up to 4% of eligible base salary with immediate vesting.",
+    "tags": [
+      "401k",
+      "Retirement",
+      "Employer Match",
+      "Vesting",
+      "Fidelity"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "title": "PTO Accrual, Carry-Forward & Leave Policy",
+    "categoryId": "cat-3",
+    "categoryName": "Time Off & Leave",
+    "content": "Details on annual leave allowances, monthly accrual rates, and up to 5 days rollover per calendar year.",
+    "tags": [
+      "PTO",
+      "Vacation",
+      "Sick Leave",
+      "Carry Forward"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-apex-cloud-4",
+    "tenantId": "tenant-apex-101",
+    "title": "Business Expense Reporting & Travel Reimbursement",
+    "categoryId": "cat-4",
+    "categoryName": "Finance & Operations",
+    "content": "Guidelines for corporate expense claims, client dinners, flights, and software tool purchases.",
+    "tags": [
+      "Expensify",
+      "Travel",
+      "Meals",
+      "Per Diem",
+      "Reimbursement"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-apex-cloud-5",
+    "tenantId": "tenant-apex-101",
+    "title": "Information Security: Hardware Encryption & 2FA Enforcements",
+    "categoryId": "cat-5",
+    "categoryName": "IT & Security",
+    "content": "Mandatory security standards: FileVault disk encryption, password managers, and multi-factor authentication.",
+    "tags": [
+      "Cybersecurity",
+      "1Password",
+      "2FA",
+      "FileVault",
+      "SOC2"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "title": "2026 US Benefits Enrollment & Healthcare Choices",
+    "categoryId": "cat-1",
+    "categoryName": "Benefits & Perks",
+    "content": "Overview of comprehensive medical, dental, and vision PPO/HDHP plans with employer HSA contribution.",
+    "tags": [
+      "Health Insurance",
+      "Dental PPO",
+      "Vision",
+      "HSA/FSA",
+      "Open Enrollment"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "title": "Understanding 401(k) Employer Match & Vesting Schedule",
+    "categoryId": "cat-2",
+    "categoryName": "Retirement & Finance",
+    "content": "Company matches 100% of employee contributions up to 4% of eligible base salary with immediate vesting.",
+    "tags": [
+      "401k",
+      "Retirement",
+      "Employer Match",
+      "Vesting",
+      "Fidelity"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "title": "PTO Accrual, Carry-Forward & Leave Policy",
+    "categoryId": "cat-3",
+    "categoryName": "Time Off & Leave",
+    "content": "Details on annual leave allowances, monthly accrual rates, and up to 5 days rollover per calendar year.",
+    "tags": [
+      "PTO",
+      "Vacation",
+      "Sick Leave",
+      "Carry Forward"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-horizon-health-4",
+    "tenantId": "tenant-horizon-102",
+    "title": "Business Expense Reporting & Travel Reimbursement",
+    "categoryId": "cat-4",
+    "categoryName": "Finance & Operations",
+    "content": "Guidelines for corporate expense claims, client dinners, flights, and software tool purchases.",
+    "tags": [
+      "Expensify",
+      "Travel",
+      "Meals",
+      "Per Diem",
+      "Reimbursement"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-horizon-health-5",
+    "tenantId": "tenant-horizon-102",
+    "title": "Information Security: Hardware Encryption & 2FA Enforcements",
+    "categoryId": "cat-5",
+    "categoryName": "IT & Security",
+    "content": "Mandatory security standards: FileVault disk encryption, password managers, and multi-factor authentication.",
+    "tags": [
+      "Cybersecurity",
+      "1Password",
+      "2FA",
+      "FileVault",
+      "SOC2"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "title": "2026 US Benefits Enrollment & Healthcare Choices",
+    "categoryId": "cat-1",
+    "categoryName": "Benefits & Perks",
+    "content": "Overview of comprehensive medical, dental, and vision PPO/HDHP plans with employer HSA contribution.",
+    "tags": [
+      "Health Insurance",
+      "Dental PPO",
+      "Vision",
+      "HSA/FSA",
+      "Open Enrollment"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "title": "Understanding 401(k) Employer Match & Vesting Schedule",
+    "categoryId": "cat-2",
+    "categoryName": "Retirement & Finance",
+    "content": "Company matches 100% of employee contributions up to 4% of eligible base salary with immediate vesting.",
+    "tags": [
+      "401k",
+      "Retirement",
+      "Employer Match",
+      "Vesting",
+      "Fidelity"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "title": "PTO Accrual, Carry-Forward & Leave Policy",
+    "categoryId": "cat-3",
+    "categoryName": "Time Off & Leave",
+    "content": "Details on annual leave allowances, monthly accrual rates, and up to 5 days rollover per calendar year.",
+    "tags": [
+      "PTO",
+      "Vacation",
+      "Sick Leave",
+      "Carry Forward"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-vanguard-fintech-4",
+    "tenantId": "tenant-vanguard-103",
+    "title": "Business Expense Reporting & Travel Reimbursement",
+    "categoryId": "cat-4",
+    "categoryName": "Finance & Operations",
+    "content": "Guidelines for corporate expense claims, client dinners, flights, and software tool purchases.",
+    "tags": [
+      "Expensify",
+      "Travel",
+      "Meals",
+      "Per Diem",
+      "Reimbursement"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  },
+  {
+    "id": "kb-vanguard-fintech-5",
+    "tenantId": "tenant-vanguard-103",
+    "title": "Information Security: Hardware Encryption & 2FA Enforcements",
+    "categoryId": "cat-5",
+    "categoryName": "IT & Security",
+    "content": "Mandatory security standards: FileVault disk encryption, password managers, and multi-factor authentication.",
+    "tags": [
+      "Cybersecurity",
+      "1Password",
+      "2FA",
+      "FileVault",
+      "SOC2"
+    ],
+    "status": "PUBLISHED",
+    "updatedAt": "2026-08-15T14:30:00.000Z",
+    "targetDepartmentId": null
+  }
+]

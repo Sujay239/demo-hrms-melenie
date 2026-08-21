@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { DataTable, Column } from '@/components/ui/DataTable';
@@ -448,7 +449,7 @@ export const AttendancePage: React.FC = () => {
 
       {/* Hero Interactive Punch Clock Card */}
       <Card className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-0 shadow-xl p-6 sm:p-8 rounded-2xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-400/30 flex items-center gap-1.5">
@@ -697,10 +698,10 @@ export const AttendancePage: React.FC = () => {
       >
         <form onSubmit={handleRequestCorrection} className="space-y-4 text-xs">
           <FormField label="Shift Date" required>
-            <Input
-              type="date"
+            <DatePicker
               value={corrDate}
-              onChange={(e) => setCorrDate(e.target.value)}
+              onChange={setCorrDate}
+              placeholder="Select shift date"
               required
             />
           </FormField>

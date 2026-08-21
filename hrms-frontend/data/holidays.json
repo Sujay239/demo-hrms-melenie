@@ -1,0 +1,506 @@
+[
+  {
+    "id": "hol-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "New Year's Day",
+    "date": "2026-01-01",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Martin Luther King Jr. Day",
+    "date": "2026-01-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Presidents' Day (Washington's Birthday)",
+    "date": "2026-02-16",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-4",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Memorial Day",
+    "date": "2026-05-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-5",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Juneteenth National Independence Day",
+    "date": "2026-06-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-6",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Independence Day (Observed)",
+    "date": "2026-07-03",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-7",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Labor Day",
+    "date": "2026-09-07",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-8",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Indigenous Peoples' / Columbus Day",
+    "date": "2026-10-12",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-9",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Veterans Day",
+    "date": "2026-11-11",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-10",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Thanksgiving Day",
+    "date": "2026-11-26",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-11",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Day After Thanksgiving (Black Friday)",
+    "date": "2026-11-27",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-12",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Christmas Eve (Half Day)",
+    "date": "2026-12-24",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-13",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "Christmas Day",
+    "date": "2026-12-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-auto-computation-14",
+    "tenantId": "tenant-1787291784650",
+    "regionId": "reg-auto-computation-1",
+    "name": "New Year's Eve (Company Floating)",
+    "date": "2026-12-31",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "New Year's Day",
+    "date": "2026-01-01",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Martin Luther King Jr. Day",
+    "date": "2026-01-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Presidents' Day (Washington's Birthday)",
+    "date": "2026-02-16",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-4",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Memorial Day",
+    "date": "2026-05-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-5",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Juneteenth National Independence Day",
+    "date": "2026-06-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-6",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Independence Day (Observed)",
+    "date": "2026-07-03",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-7",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Labor Day",
+    "date": "2026-09-07",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-8",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Indigenous Peoples' / Columbus Day",
+    "date": "2026-10-12",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-9",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Veterans Day",
+    "date": "2026-11-11",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-10",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Thanksgiving Day",
+    "date": "2026-11-26",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-11",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Day After Thanksgiving (Black Friday)",
+    "date": "2026-11-27",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-12",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Christmas Eve (Half Day)",
+    "date": "2026-12-24",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-13",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "Christmas Day",
+    "date": "2026-12-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-apex-cloud-14",
+    "tenantId": "tenant-apex-101",
+    "regionId": "reg-apex-cloud-1",
+    "name": "New Year's Eve (Company Floating)",
+    "date": "2026-12-31",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "New Year's Day",
+    "date": "2026-01-01",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Martin Luther King Jr. Day",
+    "date": "2026-01-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Presidents' Day (Washington's Birthday)",
+    "date": "2026-02-16",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-4",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Memorial Day",
+    "date": "2026-05-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-5",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Juneteenth National Independence Day",
+    "date": "2026-06-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-6",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Independence Day (Observed)",
+    "date": "2026-07-03",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-7",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Labor Day",
+    "date": "2026-09-07",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-8",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Indigenous Peoples' / Columbus Day",
+    "date": "2026-10-12",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-9",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Veterans Day",
+    "date": "2026-11-11",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-10",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Thanksgiving Day",
+    "date": "2026-11-26",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-11",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Day After Thanksgiving (Black Friday)",
+    "date": "2026-11-27",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-12",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Christmas Eve (Half Day)",
+    "date": "2026-12-24",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-13",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "Christmas Day",
+    "date": "2026-12-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-horizon-health-14",
+    "tenantId": "tenant-horizon-102",
+    "regionId": "reg-horizon-health-1",
+    "name": "New Year's Eve (Company Floating)",
+    "date": "2026-12-31",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "New Year's Day",
+    "date": "2026-01-01",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Martin Luther King Jr. Day",
+    "date": "2026-01-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Presidents' Day (Washington's Birthday)",
+    "date": "2026-02-16",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-4",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Memorial Day",
+    "date": "2026-05-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-5",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Juneteenth National Independence Day",
+    "date": "2026-06-19",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-6",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Independence Day (Observed)",
+    "date": "2026-07-03",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-7",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Labor Day",
+    "date": "2026-09-07",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-8",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Indigenous Peoples' / Columbus Day",
+    "date": "2026-10-12",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-9",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Veterans Day",
+    "date": "2026-11-11",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-10",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Thanksgiving Day",
+    "date": "2026-11-26",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-11",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Day After Thanksgiving (Black Friday)",
+    "date": "2026-11-27",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-12",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Christmas Eve (Half Day)",
+    "date": "2026-12-24",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-13",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "Christmas Day",
+    "date": "2026-12-25",
+    "kind": "COMMON",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "hol-vanguard-fintech-14",
+    "tenantId": "tenant-vanguard-103",
+    "regionId": "reg-vanguard-fintech-1",
+    "name": "New Year's Eve (Company Floating)",
+    "date": "2026-12-31",
+    "kind": "FLEXIBLE",
+    "status": "ACTIVE"
+  }
+]

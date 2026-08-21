@@ -25,12 +25,13 @@ import {
   LogOut,
   Menu,
   ChevronDown,
-  UserCheck,
   Building2,
   Lock,
   User,
+  Sparkles,
 } from "lucide-react";
-import { mockStorage } from "@/services/mock-storage";
+import { mockStorage, KEYS } from "@/services/mock-storage";
+import { Employee } from "@/demo-data/seedData";
 import { Drawer } from "@/components/ui/Drawer";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
@@ -45,49 +46,159 @@ export const TenantShell: React.FC = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const currentUser = mockStorage.getCurrentUser();
-  const allUsers = mockStorage.getUsers();
-  const visibleTenants = mockStorage.getVisibleTenantsForUser(currentUser);
+  const allTenants = mockStorage.getTenants();
 
-  // Find active tenant by slug and user authorization scope.
-  const activeTenant = mockStorage.getAccessibleTenant(currentUser, slug);
+  // Find requested tenant by slug
+  const targetTenant = allTenants.find((t) => t.slug === slug) || allTenants[0];
 
-  if (!activeTenant) {
+  const handleSignOut = () => {
+    mockStorage.logout();
+    navigate("/auth/login");
+  };
+
+  // Check if current user is authenticated and belongs to this tenant or is an assigned consultant
+  const hasAccess =
+    currentUser &&
+    targetTenant &&
+    (currentUser.tenantId === targetTenant.id ||
+      (currentUser.role === "CONSULTANT" &&
+        (currentUser.assignedTenantIds || []).includes(targetTenant.id)));
+
+  if (!targetTenant || !currentUser || !hasAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <Card className="max-w-md p-6 text-center space-y-3">
-          <Lock className="w-10 h-10 text-slate-400 mx-auto" />
-          <h2 className="text-lg font-bold text-slate-900">
-            No Company Access
-          </h2>
-          <p className="text-sm text-slate-500">
-            The selected account is not assigned to any company portal.
-          </p>
-          <Link to="/admin">
-            <Button variant="primary">Return to Platform Admin</Button>
-          </Link>
+        <Card className="max-w-lg p-6 sm:p-8 text-center space-y-5 shadow-lg border border-slate-200 rounded-2xl">
+          <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl border border-amber-200 flex items-center justify-center mx-auto shadow-xs">
+            <Lock className="w-7 h-7" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              Company Portal Authentication Required
+            </h2>
+            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+              {currentUser?.role === "SUPER_ADMIN" ? (
+                <>
+                  You are currently signed in as <strong className="text-slate-800 font-semibold">Super Admin ({currentUser.email})</strong>. Direct bypass into tenant workspaces is restricted to preserve multi-tenant security.
+                  <br className="mb-1" />
+                  Please log in using the authorized <strong className="text-slate-800 font-semibold">Company Admin</strong> credentials for <strong className="text-indigo-600 font-semibold">{targetTenant?.name || slug}</strong>.
+                </>
+              ) : (
+                <>
+                  You must be logged in with an authorized account for{" "}
+                  <strong className="text-slate-800">
+                    {targetTenant?.name || slug || "this company"}
+                  </strong>{" "}
+                  to access this portal.
+                </>
+              )}
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            {currentUser?.role === "SUPER_ADMIN" && (
+              <Link to="/admin/tenants" className="w-full sm:w-1/2">
+                <Button variant="outline" className="w-full font-semibold">
+                  ← Back to Platform
+                </Button>
+              </Link>
+            )}
+            <Button
+              variant="primary"
+              onClick={handleSignOut}
+              className={cn("w-full bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold", currentUser?.role === "SUPER_ADMIN" ? "sm:w-1/2" : "")}
+            >
+              Sign In as Company Admin
+            </Button>
+          </div>
         </Card>
       </div>
     );
   }
 
+  const activeTenant = targetTenant;
   const currentSlug = activeTenant.slug;
 
   const isTenantAdmin = mockStorage.isTenantAdminFor(
     currentUser,
     activeTenant.id,
   );
-  const activeTenantUserIds = new Set(
-    allUsers
-      .filter(
-        (u) =>
-          u.role === "SUPER_ADMIN" ||
-          u.tenantId === activeTenant.id ||
-          (u.role === "CONSULTANT" &&
-            (u.assignedTenantIds || []).includes(activeTenant.id)),
-      )
-      .map((u) => u.id),
+
+  // Check employee record in the tenant
+  const tenantEmployees = mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, activeTenant.id);
+  const matchingEmployee = tenantEmployees.find(
+    (e) =>
+      e.email.toLowerCase() === currentUser.email.toLowerCase() ||
+      e.id === currentUser.id ||
+      `user-${e.id}` === currentUser.id
   );
-  const switchableUsers = allUsers.filter((u) => activeTenantUserIds.has(u.id));
+
+  const isPrivileged = isTenantAdmin || currentUser.role === "SUPER_ADMIN" || currentUser.role === "CONSULTANT";
+
+  // Check if employee is not a permanent confirmed employee of this tenant
+  const isNonPermanent =
+    !isPrivileged &&
+    (currentUser.role === "NEW_HIRE" ||
+      currentUser.isPermanent !== true ||
+      !matchingEmployee ||
+      matchingEmployee.isPermanent !== true ||
+      matchingEmployee.employmentStatus !== "ACTIVE");
+
+  if (isNonPermanent) {
+    const isMissingRecord = !matchingEmployee;
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <Card className="max-w-xl p-8 text-center space-y-6 shadow-xl border border-slate-200 rounded-3xl bg-white">
+          <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl border border-amber-200 flex items-center justify-center mx-auto shadow-sm">
+            <Sparkles className="w-8 h-8" />
+          </div>
+          <div>
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full mb-3 border border-amber-200">
+              {isMissingRecord ? "Profile Not Enrolled" : "Onboarding In Progress • Non-Permanent Access"}
+            </span>
+            <h2 className="text-2xl font-bold text-slate-900">
+              {isMissingRecord ? "Employee Profile Inactive" : `Welcome to ${activeTenant.name}, ${currentUser.name}!`}
+            </h2>
+            <p className="text-sm text-slate-600 mt-2 leading-relaxed max-w-md mx-auto">
+              {isMissingRecord
+                ? `No active employee record was found for ${currentUser.email} in ${activeTenant.name}. Access to tenant workspace resources is restricted. Please contact your company HR administrator.`
+                : "Your profile is currently undergoing new hire onboarding. Company resources (Leaves, Attendance, Knowledge Base, Meeting Rooms, etc.) are restricted until your onboarding is verified and approved as permanent by HR."}
+            </p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-left space-y-2 text-xs text-slate-700">
+            <div className="flex items-center justify-between font-semibold">
+              <span>Account Status:</span>
+              <span className="text-amber-600 font-bold">
+                {isMissingRecord ? "No Employee Record" : "New Hire / Onboarding Required"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-semibold">
+              <span>Work Email:</span>
+              <span className="text-slate-900 font-mono">{currentUser.email}</span>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="w-full sm:w-1/3 text-xs font-semibold cursor-pointer"
+            >
+              Sign Out
+            </Button>
+            {!isMissingRecord && (
+              <Link to={`/${currentSlug}/onboarding/dashboard`} className="w-full sm:w-2/3">
+                <Button
+                  variant="primary"
+                  className="w-full bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold text-sm shadow-md cursor-pointer"
+                >
+                  Go to Onboarding Portal →
+                </Button>
+              </Link>
+            )}
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const feats = activeTenant.features || {
     onboarding: true,
@@ -291,7 +402,6 @@ export const TenantShell: React.FC = () => {
 
   const navItems = isTenantAdmin ? adminNavItems : employeeNavItems;
 
-  // Check if current route is disabled
   const isCurrentFeatureDisabled =
     (location.pathname.includes("/onboarding-cases") &&
       feats.onboarding === false) ||
@@ -312,70 +422,22 @@ export const TenantShell: React.FC = () => {
       location.pathname.includes("/designations")) &&
       feats.orgStructure === false);
 
-  const handleRoleSwitch = (userId: string) => {
-    const targetUser = allUsers.find((u) => u.id === userId);
-    if (targetUser) {
-      mockStorage.setCurrentUser(targetUser);
-      if (targetUser.role === "SUPER_ADMIN") {
-        window.location.href = "/admin";
-      } else if (targetUser.role === "NEW_HIRE") {
-        window.location.href = `/${currentSlug}/onboarding/dashboard`;
-      } else if (targetUser.tenantId) {
-        const tenant = mockStorage
-          .getTenants()
-          .find((t) => t.id === targetUser.tenantId);
-        window.location.href = `/${tenant?.slug || currentSlug}/dashboard`;
-      } else if (targetUser.role === "CONSULTANT") {
-        const tenant = mockStorage.getAccessibleTenant(targetUser, currentSlug);
-        window.location.href = tenant
-          ? `/${tenant.slug}/dashboard`
-          : "/admin/consultants";
-      } else {
-        window.location.reload();
-      }
-    }
-  };
-
-  const handleTenantSwitch = (newSlug: string) => {
-    navigate(`/${newSlug}/dashboard`);
-  };
-
   const NavContent = () => (
     <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200">
       {/* Mandated Tenant Branding Surface: Logo displayed on WHITE background */}
-      <div className="bg-white px-6 py-4 border-b border-slate-100 flex items-center">
+      <div className="bg-white px-4 py-4 border-b border-slate-100 flex items-center gap-3 min-h-[72px]">
         {activeTenant.logoUrl ? (
           <img
             src={activeTenant.logoUrl}
             alt={activeTenant.name}
-            className="h-9 max-w-[160px] object-contain"
+            className="h-11 max-w-[170px] object-contain object-left shrink-0"
           />
         ) : (
-          <div className="h-9 px-3.5 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-base">
+          <div className="h-11 px-3.5 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-base shadow-xs shrink-0">
             {activeTenant.name.slice(0, 2).toUpperCase()}
           </div>
         )}
       </div>
-
-      {/* Tenant Context Selector */}
-      {visibleTenants.length > 1 && (
-        <div className="px-3 pt-3 pb-2 border-b border-slate-100 bg-slate-50/50">
-          <label className="text-[11px] font-medium text-slate-500 px-2 mb-1 block">
-            Company Portal Context:
-          </label>
-          <select
-            value={currentSlug}
-            onChange={(e) => handleTenantSwitch(e.target.value)}
-            className="w-full bg-white border border-slate-200 text-slate-800 text-xs rounded-lg p-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer font-medium"
-          >
-            {visibleTenants.map((t) => (
-              <option key={t.id} value={t.slug}>
-                {t.name} ({t.status})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
 
       {/* Navigation Links */}
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
@@ -402,33 +464,38 @@ export const TenantShell: React.FC = () => {
         })}
       </nav>
 
-      {/* Demo Switcher Footer */}
-      <div className="p-3 border-t border-slate-100 bg-slate-50/80">
-        <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5 font-medium">
-          <span className="flex items-center gap-1 text-[11px]">
-            <UserCheck className="w-3 h-3 text-indigo-600" />
-            Switch Active User:
-          </span>
+      {/* Clean User Footer (Role-switching dropdown removed) */}
+      <div className="p-3 border-t border-slate-100 bg-slate-50/80 flex items-center justify-between">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Avatar
+            src={currentUser.avatarUrl}
+            name={currentUser.name}
+            size="sm"
+          />
+          <div className="flex flex-col truncate">
+            <span className="text-xs font-semibold text-slate-800 truncate">
+              {currentUser.name}
+            </span>
+            <span className="text-[10px] text-indigo-600 font-medium">
+              {mockStorage.getRoleLabel(currentUser.role)}
+            </span>
+          </div>
         </div>
-        <select
-          value={currentUser.id}
-          onChange={(e) => handleRoleSwitch(e.target.value)}
-          className="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-md p-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-2xs cursor-pointer font-medium"
+        <button
+          onClick={handleSignOut}
+          title="Sign Out"
+          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
         >
-          {switchableUsers.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name} ({mockStorage.getRoleLabel(u.role)})
-            </option>
-          ))}
-        </select>
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
 
   return (
     <div className="min-h-screen flex bg-slate-50">
-      {/* Desktop Sidebar (Fixed in single screen) */}
-      <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-slate-200 z-20 sticky top-0 h-screen overflow-hidden">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-slate-200 z-30 sticky top-0 h-screen overflow-hidden">
         <NavContent />
       </aside>
 
@@ -440,7 +507,7 @@ export const TenantShell: React.FC = () => {
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileOpen(true)}
@@ -454,7 +521,7 @@ export const TenantShell: React.FC = () => {
               </span>
               <span className="text-xs text-slate-400 hidden sm:inline">•</span>
               <span className="text-xs text-slate-500 font-mono">
-                cyrcalur.hr/{currentSlug}
+                Peopleworkplaces.hr/{currentSlug}
               </span>
             </div>
           </div>
@@ -482,7 +549,7 @@ export const TenantShell: React.FC = () => {
             </button>
 
             {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-1 z-30 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-40 animate-in fade-in zoom-in-95">
                 <div className="px-4 py-2.5 border-b border-slate-100">
                   <p className="text-sm font-semibold text-slate-900">
                     {currentUser.name}
@@ -500,14 +567,13 @@ export const TenantShell: React.FC = () => {
                   <User className="w-4 h-4 text-indigo-600" />
                   My Profile & Settings
                 </Link>
-                <Link
-                  to="/auth/login"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
-                  onClick={() => setIsProfileMenuOpen(false)}
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
-                </Link>
+                </button>
               </div>
             )}
           </div>

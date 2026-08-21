@@ -1,0 +1,1234 @@
+[
+  {
+    "id": "room-auto-computation-1-1",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (One)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-1-2",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 38,
+    "name": "Discovery Strategic Room (One)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-1-3",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (One)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-1-4",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (One)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-1-5",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (One)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-2-1",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Salesforce)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-2-2",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Salesforce)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-2-3",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Salesforce)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-2-4",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Salesforce)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-2-5",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Salesforce)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-3-1",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Silicon)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-3-2",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Silicon)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-3-3",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Silicon)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-3-4",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Silicon)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-3-5",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Silicon)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-4-1",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Willis)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-4-2",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Willis)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-4-3",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Willis)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-4-4",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Willis)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-auto-computation-4-5",
+    "tenantId": "tenant-1787291784650",
+    "buildingId": "bld-auto-computation-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Willis)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-1-1",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (One)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-1-2",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 38,
+    "name": "Discovery Strategic Room (One)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-1-3",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (One)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-1-4",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (One)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-1-5",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (One)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-2-1",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Salesforce)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-2-2",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Salesforce)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-2-3",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Salesforce)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-2-4",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Salesforce)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-2-5",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Salesforce)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-3-1",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Silicon)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-3-2",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Silicon)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-3-3",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Silicon)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-3-4",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Silicon)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-3-5",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Silicon)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-4-1",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Willis)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-4-2",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Willis)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-4-3",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Willis)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-4-4",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Willis)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-apex-cloud-4-5",
+    "tenantId": "tenant-apex-101",
+    "buildingId": "bld-apex-cloud-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Willis)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-1-1",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (One)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-1-2",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 38,
+    "name": "Discovery Strategic Room (One)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-1-3",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (One)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-1-4",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (One)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-1-5",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (One)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-2-1",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Salesforce)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-2-2",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Salesforce)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-2-3",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Salesforce)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-2-4",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Salesforce)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-2-5",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Salesforce)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-3-1",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Silicon)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-3-2",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Silicon)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-3-3",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Silicon)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-3-4",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Silicon)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-3-5",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Silicon)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-4-1",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Willis)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-4-2",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Willis)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-4-3",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Willis)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-4-4",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Willis)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-horizon-health-4-5",
+    "tenantId": "tenant-horizon-102",
+    "buildingId": "bld-horizon-health-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Willis)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-1-1",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (One)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-1-2",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 38,
+    "name": "Discovery Strategic Room (One)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-1-3",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (One)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-1-4",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (One)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-1-5",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-1",
+    "buildingName": "One Manhattan West Tower",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (One)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-2-1",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Salesforce)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-2-2",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Salesforce)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-2-3",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Salesforce)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-2-4",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Salesforce)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-2-5",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-2",
+    "buildingName": "Salesforce Tower Silicon Center",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Salesforce)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-3-1",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Silicon)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-3-2",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Silicon)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-3-3",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Silicon)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-3-4",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Silicon)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-3-5",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-3",
+    "buildingName": "Silicon Hills Technology Complex",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Silicon)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-4-1",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 42,
+    "name": "Apollo Executive Boardroom (Willis)",
+    "capacity": 24,
+    "facilities": [
+      "4K Telepresence Video Wall",
+      "Zoom Rooms Integration",
+      "Wireless Boundary Mics",
+      "Executive Catering Bar"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-4-2",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 38,
+    "name": "Discovery Strategic Room (Willis)",
+    "capacity": 16,
+    "facilities": [
+      "Dual 85-inch Smart Displays",
+      "Digital Whiteboard",
+      "Conference Polycom",
+      "High-Speed Fiber Wi-Fi 7"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-4-3",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Endeavour Collaboration Hub (Willis)",
+    "capacity": 10,
+    "facilities": [
+      "Ultra-wide Curved Display",
+      "Video Conference Bar",
+      "Acoustic Noise Isolation"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-4-4",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 35,
+    "name": "Voyager Design & UX Lab (Willis)",
+    "capacity": 8,
+    "facilities": [
+      "Touchscreen Whiteboard",
+      "AirPlay Screen Cast",
+      "Wireless Microphones"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "id": "room-vanguard-fintech-4-5",
+    "tenantId": "tenant-vanguard-103",
+    "buildingId": "bld-vanguard-fintech-4",
+    "buildingName": "Willis Innovation Plaza",
+    "floor": 20,
+    "name": "Falcon Brainstorming Pod (Willis)",
+    "capacity": 6,
+    "facilities": [
+      "Interactive Digital Board",
+      "Webcam & Speakerphone",
+      "Standing Desk Setup"
+    ],
+    "status": "ACTIVE"
+  }
+]

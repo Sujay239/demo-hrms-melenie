@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ann-auto-computation-1",
+    "tenantId": "tenant-1787291784650",
+    "title": "🎉 Annual Company Summit 2026 in Austin, Texas",
+    "content": "We are thrilled to announce our 2026 Annual All-Hands Company Summit taking place in Austin, TX from October 14–17. Travel accommodations and flight booking details will be sent by People Ops next week!",
+    "priority": "HIGH",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": [
+      "user-admin-tenant-1787291784650",
+      "user-emp-ac-1",
+      "user-emp-1787312095175"
+    ]
+  },
+  {
+    "id": "ann-auto-computation-2",
+    "tenantId": "tenant-1787291784650",
+    "title": "📈 Q2 2026 Performance Highlights & Financial Milestones",
+    "content": "Thanks to our team's exceptional dedication, we exceeded our Q2 enterprise expansion targets by 134%! Annual profit-sharing bonus allocations will be reflected in the next payroll cycle.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": [
+      "user-emp-ac-1",
+      "user-admin-tenant-1787291784650",
+      "user-emp-1787312095175"
+    ]
+  },
+  {
+    "id": "ann-auto-computation-3",
+    "tenantId": "tenant-1787291784650",
+    "title": "🧘 Health, Mental Wellness & Home Ergonomics Stipend Launch",
+    "content": "Effective immediately, every full-time employee is eligible for an annual $1,200 Wellness & Home Office Ergonomics reimbursement via the benefits portal.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": [
+      "user-emp-ac-1",
+      "user-admin-tenant-1787291784650",
+      "user-emp-1787312095175"
+    ]
+  },
+  {
+    "id": "ann-apex-cloud-1",
+    "tenantId": "tenant-apex-101",
+    "title": "🎉 Annual Company Summit 2026 in Austin, Texas",
+    "content": "We are thrilled to announce our 2026 Annual All-Hands Company Summit taking place in Austin, TX from October 14–17. Travel accommodations and flight booking details will be sent by People Ops next week!",
+    "priority": "HIGH",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-apex-cloud-2",
+    "tenantId": "tenant-apex-101",
+    "title": "📈 Q2 2026 Performance Highlights & Financial Milestones",
+    "content": "Thanks to our team's exceptional dedication, we exceeded our Q2 enterprise expansion targets by 134%! Annual profit-sharing bonus allocations will be reflected in the next payroll cycle.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-apex-cloud-3",
+    "tenantId": "tenant-apex-101",
+    "title": "🧘 Health, Mental Wellness & Home Ergonomics Stipend Launch",
+    "content": "Effective immediately, every full-time employee is eligible for an annual $1,200 Wellness & Home Office Ergonomics reimbursement via the benefits portal.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-horizon-health-1",
+    "tenantId": "tenant-horizon-102",
+    "title": "🎉 Annual Company Summit 2026 in Austin, Texas",
+    "content": "We are thrilled to announce our 2026 Annual All-Hands Company Summit taking place in Austin, TX from October 14–17. Travel accommodations and flight booking details will be sent by People Ops next week!",
+    "priority": "HIGH",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-horizon-health-2",
+    "tenantId": "tenant-horizon-102",
+    "title": "📈 Q2 2026 Performance Highlights & Financial Milestones",
+    "content": "Thanks to our team's exceptional dedication, we exceeded our Q2 enterprise expansion targets by 134%! Annual profit-sharing bonus allocations will be reflected in the next payroll cycle.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-horizon-health-3",
+    "tenantId": "tenant-horizon-102",
+    "title": "🧘 Health, Mental Wellness & Home Ergonomics Stipend Launch",
+    "content": "Effective immediately, every full-time employee is eligible for an annual $1,200 Wellness & Home Office Ergonomics reimbursement via the benefits portal.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-vanguard-fintech-1",
+    "tenantId": "tenant-vanguard-103",
+    "title": "🎉 Annual Company Summit 2026 in Austin, Texas",
+    "content": "We are thrilled to announce our 2026 Annual All-Hands Company Summit taking place in Austin, TX from October 14–17. Travel accommodations and flight booking details will be sent by People Ops next week!",
+    "priority": "HIGH",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-vanguard-fintech-2",
+    "tenantId": "tenant-vanguard-103",
+    "title": "📈 Q2 2026 Performance Highlights & Financial Milestones",
+    "content": "Thanks to our team's exceptional dedication, we exceeded our Q2 enterprise expansion targets by 134%! Annual profit-sharing bonus allocations will be reflected in the next payroll cycle.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  },
+  {
+    "id": "ann-vanguard-fintech-3",
+    "tenantId": "tenant-vanguard-103",
+    "title": "🧘 Health, Mental Wellness & Home Ergonomics Stipend Launch",
+    "content": "Effective immediately, every full-time employee is eligible for an annual $1,200 Wellness & Home Office Ergonomics reimbursement via the benefits portal.",
+    "priority": "MEDIUM",
+    "publishAt": "2026-08-18T09:00:00.000Z",
+    "expiresAt": "2026-11-30T23:59:59.000Z",
+    "target": "TENANT_WIDE",
+    "readByIds": []
+  }
+]

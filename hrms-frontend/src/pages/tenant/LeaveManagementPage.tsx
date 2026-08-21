@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { DataTable, Column } from '@/components/ui/DataTable';
@@ -828,25 +829,26 @@ export const LeaveManagementPage: React.FC = () => {
       <Modal
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
-        maxWidth="lg"
+        maxWidth="2xl"
+        bodyClassName="overflow-visible min-h-[460px]"
         title="Apply for Leave"
         description="Submit your leave application. Duration is checked against company category quotas."
         footer={
           <>
-            <Button variant="outline" onClick={() => setIsApplyModalOpen(false)}>
+            <Button variant="outline" onClick={() => setIsApplyModalOpen(false)} className="cursor-pointer">
               Cancel
             </Button>
             <Button
               onClick={handleApplyLeave}
               disabled={isExceedingBalance || isExceedingConsecutive || computedDays <= 0}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+              className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold cursor-pointer"
             >
               Submit Application
             </Button>
           </>
         }
       >
-        <form onSubmit={handleApplyLeave} className="space-y-4 text-xs">
+        <form onSubmit={handleApplyLeave} className="space-y-4 text-xs pb-4">
           <FormField label="Select Leave Category / Type" required>
             <Select
               value={activeLeaveTypeId}
@@ -859,10 +861,10 @@ export const LeaveManagementPage: React.FC = () => {
           </FormField>
 
           {selectedTypeObj?.description && (
-            <div className="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 text-xs text-indigo-900 flex items-start gap-2">
-              <BookOpen className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+            <div className="p-3.5 bg-orange-50/60 rounded-xl border border-orange-200/70 text-xs text-orange-950 flex items-start gap-2.5">
+              <BookOpen className="w-4 h-4 text-[#FF6900] shrink-0 mt-0.5" />
               <div>
-                <strong className="block text-indigo-950 font-bold">{selectedTypeObj.name} Policy Guidelines</strong>
+                <strong className="block text-slate-900 font-bold">{selectedTypeObj.name} Policy Guidelines</strong>
                 <p className="text-slate-600 text-[11px] mt-0.5">{selectedTypeObj.description}</p>
               </div>
             </div>
@@ -870,52 +872,55 @@ export const LeaveManagementPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="Leave Start Date" required>
-              <Input
-                type="date"
+              <DatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={setStartDate}
+                placeholder="Select start date"
+                placement="bottom"
                 required
               />
             </FormField>
             <FormField label="Leave End Date" required>
-              <Input
-                type="date"
+              <DatePicker
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={setEndDate}
+                placeholder="Select end date"
+                placement="bottom"
+                minDate={startDate}
                 required
               />
             </FormField>
           </div>
 
           {/* Live Duration & Policy Validation Banner */}
-          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-slate-500 font-semibold">Requested Duration:</span>
-              <strong className="text-slate-900 font-bold text-sm font-mono">
+              <strong className="text-slate-900 font-bold text-sm font-mono bg-white px-2.5 py-1 rounded-lg border border-slate-200">
                 {computedDays} {computedDays === 1 ? 'Working Day' : 'Working Days'}
               </strong>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-200/60">
-              <div>
-                <span className="text-slate-400 block">Remaining Category Balance:</span>
-                <strong className="text-emerald-700 font-bold">{remainingBalance} Days Available</strong>
+            <div className="grid grid-cols-2 gap-3 text-[11px] pt-1.5 border-t border-slate-200/60">
+              <div className="bg-white p-2.5 rounded-xl border border-slate-200/60">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Remaining Category Balance:</span>
+                <strong className="text-emerald-700 font-bold text-xs mt-0.5 block">{remainingBalance} Days Available</strong>
               </div>
-              <div>
-                <span className="text-slate-400 block">Max Consecutive Rule:</span>
-                <strong className="text-indigo-700 font-bold">{selectedTypeObj?.maxConsecutiveDays} Days Max</strong>
+              <div className="bg-white p-2.5 rounded-xl border border-slate-200/60">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Max Consecutive Rule:</span>
+                <strong className="text-indigo-700 font-bold text-xs mt-0.5 block">{selectedTypeObj?.maxConsecutiveDays} Days Max</strong>
               </div>
             </div>
 
             {isExceedingBalance && (
-              <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-[11px] text-rose-700 flex items-center gap-2 font-semibold animate-in fade-in">
+              <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-700 flex items-center gap-2 font-semibold animate-in fade-in">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>Requested days ({computedDays}) exceed your remaining balance ({remainingBalance} days).</span>
               </div>
             )}
 
             {isExceedingConsecutive && (
-              <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-800 flex items-center gap-2 font-semibold animate-in fade-in">
+              <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-800 flex items-center gap-2 font-semibold animate-in fade-in">
                 <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
                 <span>
                   Policy Limit: Maximum consecutive days allowed for {selectedTypeObj?.name} is{' '}

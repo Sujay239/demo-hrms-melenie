@@ -1,0 +1,83 @@
+[
+  {
+    "id": "tkt-1787299543248",
+    "tenantId": "tenant-1787291784650",
+    "ticketNumber": "TKT-390912",
+    "subject": "Mac book fix",
+    "description": "gggg",
+    "category": "General",
+    "departmentId": "dept-auto-computation-7",
+    "departmentName": "People Operations & HR",
+    "priority": "HIGH",
+    "status": "RESOLVED",
+    "createdById": "emp-ac-1",
+    "createdByName": "David Miller",
+    "createdAt": "2026-08-21T08:05:43.248Z",
+    "comments": [
+      {
+        "id": "c-1787299543248",
+        "authorName": "System",
+        "authorRole": "SYSTEM",
+        "content": "Ticket created and assigned to support desk.",
+        "createdAt": "2026-08-21T08:05:43.248Z"
+      },
+      {
+        "id": "c-1787299585834",
+        "authorName": "Auto Computation Admin",
+        "authorRole": "TENANT_ADMIN",
+        "content": "Ok looking on that matters",
+        "createdAt": "2026-08-21T08:06:25.834Z"
+      }
+    ]
+  },
+  {
+    "id": "tkt-ac-101",
+    "tenantId": "tenant-1787291784650",
+    "ticketNumber": "TKT-4921",
+    "subject": "MacBook Pro M3 Max Engineering Hardware Upgrade",
+    "description": "Requesting upgraded 64GB Unified RAM MacBook for local Docker and Kubernetes workload development.",
+    "category": "IT Equipment",
+    "departmentId": "dept-auto-computation-9",
+    "departmentName": "DevOps & Information Security",
+    "priority": "HIGH",
+    "status": "IN_PROGRESS",
+    "createdById": "emp-ac-3",
+    "createdByName": "Michael Chang",
+    "assigneeName": "IT Provisioning Team",
+    "createdAt": "2026-08-19T11:20:00.000Z",
+    "comments": [
+      {
+        "id": "comm-1",
+        "authorName": "IT Provisioning Team",
+        "authorRole": "IT Specialist",
+        "content": "Approved by engineering manager. Laptop order placed with Apple Enterprise. Tracking ETA: Tuesday.",
+        "createdAt": "2026-08-19T14:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "tkt-ac-102",
+    "tenantId": "tenant-1787291784650",
+    "ticketNumber": "TKT-4922",
+    "subject": "Employment & Salary Verification Letter for Mortgage",
+    "description": "Need an official signed letter from HR verifying employment and annual compensation for home purchase application.",
+    "category": "Human Resources",
+    "departmentId": "dept-auto-computation-7",
+    "departmentName": "People Operations & HR",
+    "priority": "MEDIUM",
+    "status": "RESOLVED",
+    "createdById": "emp-ac-4",
+    "createdByName": "Emily Watson",
+    "assigneeName": "Sarah Jenkins",
+    "createdAt": "2026-08-17T09:15:00.000Z",
+    "comments": [
+      {
+        "id": "comm-2",
+        "authorName": "Sarah Jenkins",
+        "authorRole": "HR Director",
+        "content": "Signed employment verification letter has been generated and uploaded to your confidential Document Vault.",
+        "createdAt": "2026-08-17T11:30:00.000Z"
+      }
+    ]
+  }
+]

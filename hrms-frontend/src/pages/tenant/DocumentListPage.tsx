@@ -57,11 +57,22 @@ export const DocumentListPage: React.FC = () => {
     }
   };
 
-  const handleCreateDocument = (e: React.FormEvent) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleCreateDocument = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!docName || !fileData) {
       toast.error('Document file is required');
       return;
+    }
+
+    setIsUploading(true);
+    let uploadedFileUrl = '';
+    try {
+      const uploadRes = await mockStorage.uploadFile(fileName || `${docName}.pdf`, fileData);
+      uploadedFileUrl = uploadRes.url;
+    } catch {
+      // fallback
     }
 
     mockStorage.addTenantItem<DocumentRecord>(KEYS.DOCUMENTS, {
@@ -74,21 +85,34 @@ export const DocumentListPage: React.FC = () => {
       ownerId: currentUser.id,
       version: 1,
       fileSize: fileSize || '1.0 MB',
-      mimeType: 'application/pdf',
+      mimeType: fileName.endsWith('.png') ? 'image/png' : fileName.endsWith('.jpg') ? 'image/jpeg' : 'application/pdf',
       updatedAt: new Date().toISOString(),
       isSensitive,
+      fileUrl: uploadedFileUrl || fileData,
     });
 
+    setIsUploading(false);
     mockStorage.addAuditLog('DOCUMENT_UPLOADED', 'DOCUMENT', `doc-${Date.now()}`);
-    toast.success(`Document "${docName}" uploaded & validated cleanly!`);
+    toast.success(`Document "${docName}" uploaded & saved securely!`);
     setIsModalOpen(false);
     setDocName('');
     setFileData(null);
+    setFileName('');
   };
 
   const handleDownload = (doc: DocumentRecord) => {
     mockStorage.addAuditLog('DOCUMENT_DOWNLOADED', 'DOCUMENT', doc.id);
-    toast.success(`Authorized short-lived download initiated for "${doc.name}"`);
+    if (doc.fileUrl) {
+      const a = document.createElement('a');
+      a.href = doc.fileUrl;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast.success(`Downloading "${doc.name}"...`);
+    } else {
+      toast.success(`Authorized short-lived download initiated for "${doc.name}"`);
+    }
   };
 
   const columns: Column<DocumentRecord>[] = [

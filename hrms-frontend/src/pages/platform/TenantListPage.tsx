@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { Badge } from '@/components/ui/Badge';
-import { DataTable, Column } from '@/components/ui/DataTable';
-import { mockStorage } from '@/services/mock-storage';
-import { Tenant } from '@/demo-data/seedData';
-import { Plus, Search, ExternalLink } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { Badge } from "@/components/ui/Badge";
+import { DataTable, Column } from "@/components/ui/DataTable";
+import { mockStorage } from "@/services/mock-storage";
+import { Tenant } from "@/demo-data/seedData";
+import { Plus, Search, ExternalLink } from "lucide-react";
 
 export const TenantListPage: React.FC = () => {
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
 
   const allTenants = mockStorage.getTenants();
@@ -29,13 +29,13 @@ export const TenantListPage: React.FC = () => {
   const totalPages = Math.ceil(filteredTenants.length / pageSize) || 1;
   const paginatedTenants = filteredTenants.slice(
     (page - 1) * pageSize,
-    page * pageSize
+    page * pageSize,
   );
 
   const columns: Column<Tenant>[] = [
     {
-      key: 'name',
-      header: 'Company / Tenant',
+      key: "name",
+      header: "Company / Tenant",
       render: (t) => (
         <div className="flex items-center gap-3">
           {t.logoUrl ? (
@@ -51,19 +51,21 @@ export const TenantListPage: React.FC = () => {
           )}
           <div>
             <div className="font-semibold text-slate-900">{t.name}</div>
-            <div className="text-xs text-slate-400 font-mono">cyrcalur.hr/{t.slug}</div>
+            <div className="text-xs text-slate-400 font-mono">
+              Peopleworkplaces.hr/{t.slug}
+            </div>
           </div>
         </div>
       ),
     },
     {
-      key: 'status',
-      header: 'Status',
+      key: "status",
+      header: "Status",
       render: (t) => <Badge status={t.status} />,
     },
     {
-      key: 'consultantCount',
-      header: 'Consultants',
+      key: "consultantCount",
+      header: "Consultants",
       render: (t) => (
         <span className="text-xs font-medium text-slate-700">
           {t.consultantCount} assigned
@@ -71,8 +73,8 @@ export const TenantListPage: React.FC = () => {
       ),
     },
     {
-      key: 'employeeCount',
-      header: 'Employees',
+      key: "employeeCount",
+      header: "Employees",
       render: (t) => (
         <span className="text-xs font-medium text-slate-700">
           {t.employeeCount} active
@@ -80,8 +82,8 @@ export const TenantListPage: React.FC = () => {
       ),
     },
     {
-      key: 'createdAt',
-      header: 'Created On',
+      key: "createdAt",
+      header: "Created On",
       render: (t) => (
         <span className="text-xs text-slate-500">
           {new Date(t.createdAt).toLocaleDateString()}
@@ -89,11 +91,14 @@ export const TenantListPage: React.FC = () => {
       ),
     },
     {
-      key: 'actions',
-      header: 'Actions',
-      className: 'text-right',
+      key: "actions",
+      header: "Actions",
+      className: "text-right",
       render: (t) => (
-        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="flex items-center justify-end gap-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Link
             to={`/${t.slug}/dashboard`}
             className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:underline"
@@ -117,13 +122,15 @@ export const TenantListPage: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Tenants & Companies</h2>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Tenants & Companies
+          </h2>
           <p className="text-sm text-slate-500 mt-0.5">
             Manage customer tenant lifecycle and consultant assignments.
           </p>
         </div>
         <Button
-          onClick={() => navigate('/admin/tenants/new')}
+          onClick={() => navigate("/admin/tenants/new")}
           leftIcon={<Plus className="w-4 h-4" />}
         >
           Add Company / Tenant
@@ -145,10 +152,10 @@ export const TenantListPage: React.FC = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             options={[
-              { value: '', label: 'All Statuses' },
-              { value: 'ACTIVE', label: 'Active' },
-              { value: 'INACTIVE', label: 'Inactive' },
-              { value: 'DEACTIVATED', label: 'Deactivated' },
+              { value: "", label: "All Statuses" },
+              { value: "ACTIVE", label: "Active" },
+              { value: "INACTIVE", label: "Inactive" },
+              { value: "DEACTIVATED", label: "Deactivated" },
             ]}
           />
         </div>
@@ -173,7 +180,7 @@ export const TenantListPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/admin/tenants/new')}
+            onClick={() => navigate("/admin/tenants/new")}
           >
             Create Tenant
           </Button>

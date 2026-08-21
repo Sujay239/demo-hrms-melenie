@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
@@ -115,6 +116,7 @@ export const RoomReservationPage: React.FC = () => {
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
   const currentUser = mockStorage.getCurrentUser();
+  const isTenantAdmin = mockStorage.isTenantAdminFor(currentUser, currentTenant.id);
 
   const [rooms, setRooms] = useState<Room[]>(() =>
     mockStorage.getTenantItems<Room>(KEYS.ROOMS, currentTenant.id)
@@ -347,15 +349,17 @@ export const RoomReservationPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <Button
-            variant="outline"
-            size="md"
-            onClick={handleOpenAddRoom}
-            leftIcon={<Plus className="w-4 h-4 text-indigo-600" />}
-            className="font-semibold"
-          >
-             Add Meeting Room
-          </Button>
+          {isTenantAdmin && (
+            <Button
+              variant="outline"
+              size="md"
+              onClick={handleOpenAddRoom}
+              leftIcon={<Plus className="w-4 h-4 text-indigo-600" />}
+              className="font-semibold cursor-pointer"
+            >
+               Add Meeting Room
+            </Button>
+          )}
 
           <Button
             variant="primary"
@@ -365,7 +369,7 @@ export const RoomReservationPage: React.FC = () => {
               setIsReserveModalOpen(true);
             }}
             leftIcon={<Calendar className="w-4 h-4" />}
-            className="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-xs"
+            className="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-xs cursor-pointer"
           >
             Reserve a Room
           </Button>
@@ -537,7 +541,7 @@ export const RoomReservationPage: React.FC = () => {
                     <Button
                       variant="primary"
                       size="sm"
-                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-xs font-semibold"
+                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-xs font-semibold cursor-pointer"
                       onClick={() => {
                         setReserveRoomId(r.id);
                         setIsReserveModalOpen(true);
@@ -546,25 +550,29 @@ export const RoomReservationPage: React.FC = () => {
                       Reserve Room
                     </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenEditRoom(r)}
-                      className="text-slate-600 hover:text-indigo-600 p-2"
-                      title="Edit Room"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </Button>
+                    {isTenantAdmin && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenEditRoom(r)}
+                          className="text-slate-600 hover:text-indigo-600 p-2 cursor-pointer"
+                          title="Edit Room"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteRoom(r.id, r.name)}
-                      className="text-slate-400 hover:text-rose-600 p-2 border-slate-200"
-                      title="Delete Room"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteRoom(r.id, r.name)}
+                          className="text-slate-400 hover:text-rose-600 p-2 border-slate-200 cursor-pointer"
+                          title="Delete Room"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </Card>
               );
@@ -807,10 +815,10 @@ export const RoomReservationPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <FormField label="Meeting Date" required>
-              <Input
-                type="date"
+              <DatePicker
                 value={reserveDate}
-                onChange={(e) => setReserveDate(e.target.value)}
+                onChange={setReserveDate}
+                placeholder="Select meeting date"
                 required
               />
             </FormField>
