@@ -28,7 +28,11 @@ import {
   Sparkles,
   UserCheck,
   ShieldCheck,
+  Edit2,
+  CalendarDays,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { TimePicker } from '@/components/ui/TimePicker';
 
 const parseTimeToMinutes = (timeStr: string): number => {
   if (!timeStr) return 0;
@@ -53,10 +57,13 @@ const getMinutesDiff = (inTime?: string, outTime?: string): number => {
 
 export const AttendancePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
 
   // Modals
   const [isOtModalOpen, setIsOtModalOpen] = useState(false);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
 
   // Overtime Form
   const [otMinutes, setOtMinutes] = useState('120');
@@ -67,6 +74,21 @@ export const AttendancePage: React.FC = () => {
   const [corrClockIn, setCorrClockIn] = useState('09:00');
   const [corrClockOut, setCorrClockOut] = useState('18:00');
   const [corrReason, setCorrReason] = useState('');
+
+  // Admin Manual Attendance Form
+  const [manualEmployeeId, setManualEmployeeId] = useState('');
+  const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
+  const [manualClockIn, setManualClockIn] = useState('09:00 AM');
+  const [manualClockOut, setManualClockOut] = useState('05:00 PM');
+  const [manualStatus, setManualStatus] = useState<'PRESENT' | 'ABSENT' | 'LATE' | 'HALF_DAY' | 'ON_LEAVE'>('PRESENT');
+  const [manualNotes, setManualNotes] = useState('');
+
+  // Admin Edit Attendance Form
+  const [editDate, setEditDate] = useState('');
+  const [editClockIn, setEditClockIn] = useState('');
+  const [editClockOut, setEditClockOut] = useState('');
+  const [editStatus, setEditStatus] = useState<'PRESENT' | 'ABSENT' | 'LATE' | 'HALF_DAY' | 'ON_LEAVE'>('PRESENT');
+  const [editNotes, setEditNotes] = useState('');
 
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
@@ -79,6 +101,8 @@ export const AttendancePage: React.FC = () => {
   const [overtime, setOvertime] = useState<OvertimeRequest[]>(() =>
     mockStorage.getTenantItems<OvertimeRequest>(KEYS.OVERTIME, currentTenant.id)
   );
+
+  const employees = mockStorage.getTenantItems<any>(KEYS.EMPLOYEES, currentTenant.id);
 
   const reloadData = () => {
     setAttendance(mockStorage.getTenantItems<AttendanceRecord>(KEYS.ATTENDANCE, currentTenant.id));
@@ -301,6 +325,11 @@ export const AttendancePage: React.FC = () => {
       return;
     }
 
+    if (parseTimeToMinutes(corrClockIn) >= parseTimeToMinutes(corrClockOut)) {
+      toast.error('🚫 Invalid Time: Clock-in time must be earlier than clock-out time.');
+      return;
+    }
+
     const calculatedMins = getMinutesDiff(corrClockIn, corrClockOut) || 480;
 
     // Save correction entry with accurately calculated duration
@@ -318,9 +347,89 @@ export const AttendancePage: React.FC = () => {
 
     mockStorage.addTenantItem<AttendanceRecord>(KEYS.ATTENDANCE, newCorr);
     mockStorage.addAuditLog('ATTENDANCE_CORRECTION_SUBMITTED', 'ATTENDANCE', newCorr.id);
-    toast.success('Attendance correction submitted and synced successfully!');
+    toast.success('Time correction request submitted for admin review!');
     setIsCorrectionModalOpen(false);
     setCorrReason('');
+    reloadData();
+  };
+
+  const handleOpenManualModal = () => {
+    setManualEmployeeId(employees[0]?.id || '');
+    setManualDate(new Date().toISOString().split('T')[0]);
+    setManualClockIn('09:00 AM');
+    setManualClockOut('05:00 PM');
+    setManualStatus('PRESENT');
+    setManualNotes('');
+    setIsManualModalOpen(true);
+  };
+
+  const handleCreateManualAttendance = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualEmployeeId) {
+      toast.error('Please select an employee');
+      return;
+    }
+
+    if (manualClockIn && manualClockOut && parseTimeToMinutes(manualClockIn) >= parseTimeToMinutes(manualClockOut)) {
+      toast.error('🚫 Invalid Time: Clock-in time must be earlier than clock-out time.');
+      return;
+    }
+
+    const emp = employees.find((e: any) => e.id === manualEmployeeId);
+    const calculatedMins = getMinutesDiff(manualClockIn, manualClockOut) || (manualStatus === 'PRESENT' ? 480 : 0);
+
+    const newRecord: AttendanceRecord = {
+      id: `att-manual-${Date.now()}`,
+      tenantId: currentTenant.id,
+      employeeId: manualEmployeeId,
+      employeeName: emp ? emp.name : 'Employee',
+      date: manualDate,
+      clockInTime: manualClockIn,
+      clockOutTime: manualClockOut,
+      totalMinutes: calculatedMins,
+      status: manualStatus,
+      notes: manualNotes.trim() || undefined,
+    };
+
+    mockStorage.addTenantItem<AttendanceRecord>(KEYS.ATTENDANCE, newRecord);
+    mockStorage.addAuditLog('ADMIN_MANUAL_ATTENDANCE_CREATED', 'ATTENDANCE', newRecord.id);
+    toast.success(`Attendance record created for ${newRecord.employeeName}!`);
+    setIsManualModalOpen(false);
+    reloadData();
+  };
+
+  const handleOpenEditModal = (rec: AttendanceRecord) => {
+    setEditingRecord(rec);
+    setEditDate(rec.date);
+    setEditClockIn(rec.clockInTime || '09:00 AM');
+    setEditClockOut(rec.clockOutTime || '05:00 PM');
+    setEditStatus(rec.status);
+    setEditNotes(rec.notes || '');
+  };
+
+  const handleSaveEditAttendance = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord) return;
+
+    if (editClockIn && editClockOut && parseTimeToMinutes(editClockIn) >= parseTimeToMinutes(editClockOut)) {
+      toast.error('🚫 Invalid Time: Clock-in time must be earlier than clock-out time.');
+      return;
+    }
+
+    const calculatedMins = getMinutesDiff(editClockIn, editClockOut) || (editStatus === 'PRESENT' ? 480 : 0);
+
+    mockStorage.updateTenantItem<AttendanceRecord>(KEYS.ATTENDANCE, editingRecord.id, {
+      date: editDate,
+      clockInTime: editClockIn,
+      clockOutTime: editClockOut,
+      totalMinutes: calculatedMins,
+      status: editStatus,
+      notes: editNotes.trim() || undefined,
+    });
+
+    mockStorage.addAuditLog('ADMIN_ATTENDANCE_UPDATED', 'ATTENDANCE', editingRecord.id);
+    toast.success(`Attendance record for ${editingRecord.employeeName} updated successfully!`);
+    setEditingRecord(null);
     reloadData();
   };
 
@@ -405,6 +514,26 @@ export const AttendancePage: React.FC = () => {
         </Badge>
       ),
     },
+    {
+      key: 'actions',
+      header: 'Actions',
+      className: 'text-right',
+      render: (a) => {
+        if (!isTenantAdmin) return null;
+        return (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleOpenEditModal(a)}
+            className="h-7 px-2 border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold"
+            title="Edit attendance record"
+          >
+            <Edit2 className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Edit</span>
+          </Button>
+        );
+      },
+    },
   ];
 
   return (
@@ -424,7 +553,29 @@ export const AttendancePage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            variant="outline"
+            size="md"
+            onClick={() => navigate(`/${slug}/shifts`)}
+            leftIcon={<CalendarDays className="w-4 h-4 text-indigo-600" />}
+            className="font-semibold border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+          >
+            Shift Roster
+          </Button>
+
+          {isTenantAdmin && (
+            <Button
+              variant="outline"
+              size="md"
+              onClick={handleOpenManualModal}
+              leftIcon={<Plus className="w-4 h-4 text-emerald-600" />}
+              className="font-semibold border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+            >
+              Add Attendance
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="md"
@@ -682,7 +833,7 @@ export const AttendancePage: React.FC = () => {
       <Modal
         isOpen={isCorrectionModalOpen}
         onClose={() => setIsCorrectionModalOpen(false)}
-        maxWidth="md"
+        maxWidth="2xl"
         title="Submit Timesheet Correction"
         description="Fix missing clock-in or clock-out timestamps for previous shifts."
         footer={
@@ -736,6 +887,144 @@ export const AttendancePage: React.FC = () => {
           </FormField>
         </form>
       </Modal>
+      {/* MODAL: ADMIN MANUAL ATTENDANCE ENTRY */}
+      <Modal
+        isOpen={isManualModalOpen}
+        onClose={() => setIsManualModalOpen(false)}
+        title="Manually Add Attendance Record"
+        description="Admin Entry: Create an attendance timesheet log for an employee."
+        maxWidth="2xl"
+      >
+        <form onSubmit={handleCreateManualAttendance} className="space-y-4 text-xs pt-1 min-h-[380px] flex flex-col justify-between">
+          <FormField label="Employee" required>
+            <Select
+              value={manualEmployeeId}
+              onChange={(e) => setManualEmployeeId(e.target.value)}
+              placeholder="Select Employee"
+              options={employees.map((e: any) => ({ value: e.id, label: `${e.name} (${e.employeeId || 'EMP'})` }))}
+            />
+          </FormField>
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Date" required>
+              <DatePicker value={manualDate} onChange={setManualDate} required />
+            </FormField>
+
+            <FormField label="Status" required>
+              <Select
+                value={manualStatus}
+                onChange={(e) => setManualStatus(e.target.value as any)}
+                options={[
+                  { value: 'PRESENT', label: 'PRESENT — Full Shift' },
+                  { value: 'LATE', label: 'LATE — Late Arrival' },
+                  { value: 'HALF_DAY', label: 'HALF_DAY — Partial Shift' },
+                  { value: 'ABSENT', label: 'ABSENT — No Show' },
+                  { value: 'ON_LEAVE', label: 'ON_LEAVE — Approved Time Off' },
+                ]}
+              />
+            </FormField>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Clock In Time" required>
+              <TimePicker
+                value={manualClockIn}
+                onChange={setManualClockIn}
+              />
+            </FormField>
+
+            <FormField label="Clock Out Time" required>
+              <TimePicker
+                value={manualClockOut}
+                onChange={setManualClockOut}
+              />
+            </FormField>
+          </div>
+
+          <FormField label="Notes / Reason">
+            <Input
+              value={manualNotes}
+              onChange={(e) => setManualNotes(e.target.value)}
+              placeholder="e.g. Manual entry authorized by HR"
+            />
+          </FormField>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button type="button" variant="ghost" onClick={() => setIsManualModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Create Attendance Record
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* MODAL: ADMIN EDIT ATTENDANCE RECORD */}
+      {editingRecord && (
+        <Modal
+          isOpen={!!editingRecord}
+          onClose={() => setEditingRecord(null)}
+          title={`Edit Attendance: ${editingRecord.employeeName}`}
+          description={`Modify timesheet entry for ${editingRecord.date}`}
+          maxWidth="2xl"
+        >
+          <form onSubmit={handleSaveEditAttendance} className="space-y-4 text-xs pt-1 min-h-[380px] flex flex-col justify-between">
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="Date" required>
+                <DatePicker value={editDate} onChange={setEditDate} required />
+              </FormField>
+
+              <FormField label="Status" required>
+                <Select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value as any)}
+                  options={[
+                    { value: 'PRESENT', label: 'PRESENT' },
+                    { value: 'LATE', label: 'LATE' },
+                    { value: 'HALF_DAY', label: 'HALF_DAY' },
+                    { value: 'ABSENT', label: 'ABSENT' },
+                    { value: 'ON_LEAVE', label: 'ON_LEAVE' },
+                  ]}
+                />
+              </FormField>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="Clock In Time">
+                <TimePicker
+                  value={editClockIn}
+                  onChange={setEditClockIn}
+                />
+              </FormField>
+
+              <FormField label="Clock Out Time">
+                <TimePicker
+                  value={editClockOut}
+                  onChange={setEditClockOut}
+                />
+              </FormField>
+            </div>
+
+            <FormField label="Notes">
+              <Input
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+                placeholder="e.g. Time correction verified by Admin"
+              />
+            </FormField>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <Button type="button" variant="ghost" onClick={() => setEditingRecord(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary">
+                Save Attendance Changes
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 };

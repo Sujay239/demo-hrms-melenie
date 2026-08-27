@@ -59,9 +59,14 @@ import {
   Lock,
   GitGraph,
   ListFilter,
+  Globe,
 } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { OrgChartView } from '@/components/tenant/OrgChartView';
+import countryData from '@/data/country_and_codes.json';
+import languagesData from '@/data/languages.json';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import { MultiSelect } from '@/components/ui/MultiSelect';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: '$',
@@ -84,35 +89,71 @@ export const EmployeeListPage: React.FC = () => {
 
   const currentUser = mockStorage.getCurrentUser();
 
-  // Modals
+  // Modals & Draft State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileActiveTab, setProfileActiveTab] = useState<'Overview' | 'Documents'>('Overview');
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
-  // Form State - Personal Info (Clean empty values)
+  // Form State - Personal Info (Clean empty values, no defaults)
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [phoneCountryCode, setPhoneCountryCode] = useState('');
+  const [phoneDigits, setPhoneDigits] = useState('');
   const [phone, setPhone] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
-  const [gender, setGender] = useState<'Male' | 'Female' | 'Other' | 'Prefer not to say'>('Female');
-  const [maritalStatus, setMaritalStatus] = useState<'Single' | 'Married' | 'Divorced' | 'Widowed'>('Single');
+  const [gender, setGender] = useState<'Male' | 'Female' | 'Other' | 'Prefer not to say' | ''>('');
+  const [maritalStatus, setMaritalStatus] = useState<'Single' | 'Married' | 'Divorced' | 'Widowed' | ''>('');
   const [nationality, setNationality] = useState('');
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [emergencyContactName, setEmergencyContactName] = useState('');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
   const [currentAddress, setCurrentAddress] = useState('');
   const [permanentAddress, setPermanentAddress] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
 
-  // Form State - Job Details (Clean empty values)
+  // Inline Modals for Department & Designation add
+  const [isAddDeptModalOpen, setIsAddDeptModalOpen] = useState(false);
+  const [newDeptName, setNewDeptName] = useState('');
+  const [newDeptDesc, setNewDeptDesc] = useState('');
+  const [newDeptParentId, setNewDeptParentId] = useState('');
+
+  const [isAddDesigModalOpen, setIsAddDesigModalOpen] = useState(false);
+  const [newDesigName, setNewDesigName] = useState('');
+  const [newDesigDesc, setNewDesigDesc] = useState('');
+  const [newDesigDeptId, setNewDesigDeptId] = useState('');
+
+  const [isAddRegionModalOpen, setIsAddRegionModalOpen] = useState(false);
+  const [newRegionName, setNewRegionName] = useState('');
+  const [newRegionCountryCode, setNewRegionCountryCode] = useState('US');
+  const [newRegionTimeZone, setNewRegionTimeZone] = useState('UTC');
+
+  const [customTeams, setCustomTeams] = useState<string[]>([
+    'Backend Team',
+    'Frontend Engineering',
+    'Core UI Pod',
+    'DevOps & SRE',
+    'Product Management',
+    'Quality Assurance',
+    'Security & Compliance',
+    'Data Science & Analytics',
+    'Executive Leadership',
+    'Sales & Customer Success',
+  ]);
+  const [isAddTeamModalOpen, setIsAddTeamModalOpen] = useState(false);
+  const [newCustomTeamName, setNewCustomTeamName] = useState('');
+
+  // Form State - Job Details (Clean empty values, no defaults)
   const [employeeId, setEmployeeId] = useState('');
   const [departmentId, setDepartmentId] = useState('');
   const [designationId, setDesignationId] = useState('');
   const [regionId, setRegionId] = useState('');
   const [managerId, setManagerId] = useState('');
-  const [employmentType, setEmploymentType] = useState<'Full Time' | 'Part Time' | 'Contract' | 'Intern' | 'Probation'>('Full Time');
+  const [employmentType, setEmploymentType] = useState<'Full Time' | 'Part Time' | 'Contract' | 'Intern' | 'Probation' | ''>('');
   const [joiningDate, setJoiningDate] = useState('');
   const [confirmationDate, setConfirmationDate] = useState('');
   const [workLocation, setWorkLocation] = useState('');
@@ -181,9 +222,22 @@ export const EmployeeListPage: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>(() =>
     mockStorage.getTenantItems<Employee>(KEYS.EMPLOYEES, currentTenant?.id)
   );
-  const departments = mockStorage.getTenantItems<Department>(KEYS.DEPARTMENTS, currentTenant?.id);
-  const designations = mockStorage.getTenantItems<Designation>(KEYS.DESIGNATIONS, currentTenant?.id);
-  const regions = mockStorage.getTenantItems<Region>(KEYS.REGIONS, currentTenant?.id);
+  const [departments, setDepartments] = useState<Department[]>(() =>
+    mockStorage.getTenantItems<Department>(KEYS.DEPARTMENTS, currentTenant?.id)
+  );
+  const [designations, setDesignations] = useState<Designation[]>(() =>
+    mockStorage.getTenantItems<Designation>(KEYS.DESIGNATIONS, currentTenant?.id)
+  );
+  const [regionsList, setRegionsList] = useState<Region[]>(() =>
+    mockStorage.getTenantItems<Region>(KEYS.REGIONS, currentTenant?.id)
+  );
+
+  const availableTeams = Array.from(
+    new Set([
+      ...customTeams,
+      ...employees.map((e) => e.teamName).filter(Boolean) as string[],
+    ])
+  ).sort();
 
   const myEmployee = employees.find(
     (e) =>
@@ -207,33 +261,196 @@ export const EmployeeListPage: React.FC = () => {
     return `${currencySymbol}${num.toLocaleString('en-US')}`;
   };
 
-  const handleOpenAddModal = () => {
-    setEditingEmployee(null);
-    setCurrentStep(1);
+  const handleCountrySelectChange = (cName: string) => {
+    const found = countryData.find((c) => c.country === cName);
+    if (found) {
+      setSelectedCountry(found.country);
+      setPhoneCountryCode(found.code);
+      if (!nationality) {
+        setNationality(found.country);
+      }
+      const updatedPhone = phoneDigits ? `+${found.code} ${phoneDigits}` : `+${found.code}`;
+      setPhone(updatedPhone);
+    }
+  };
 
-    // Auto-generate employee code suggestion
-    const nextSeq = String(employees.length + 1).padStart(4, '0');
-    setEmployeeId(`TN-${nextSeq}`);
+  const handlePhoneDigitsChange = (val: string) => {
+    const cleanDigits = val.replace(/[^0-9]/g, '');
+    setPhoneDigits(cleanDigits);
+    setPhone(cleanDigits ? `+${phoneCountryCode} ${cleanDigits}` : '');
+  };
 
-    // Clean initial state (No dummy prefilled data)
+  const handleCreateDepartmentInline = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDeptName.trim()) {
+      toast.error('Department name is required');
+      return;
+    }
+    const newDept: Department = {
+      id: `dept-${Date.now()}`,
+      tenantId: currentTenant.id,
+      name: newDeptName.trim(),
+      description: newDeptDesc.trim() || undefined,
+      parentDepartmentId: newDeptParentId || null,
+      status: 'ACTIVE',
+    };
+    mockStorage.addTenantItem<Department>(KEYS.DEPARTMENTS, newDept);
+
+    const updatedDepts = mockStorage.getTenantItems<Department>(KEYS.DEPARTMENTS, currentTenant.id);
+    setDepartments(updatedDepts);
+    setDepartmentId(newDept.id);
+
+    toast.success(`Department "${newDept.name}" created and selected!`);
+    setIsAddDeptModalOpen(false);
+    setNewDeptName('');
+    setNewDeptDesc('');
+    setNewDeptParentId('');
+  };
+
+  const handleCreateDesignationInline = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDesigName.trim()) {
+      toast.error('Designation title is required');
+      return;
+    }
+    const newDesig: Designation = {
+      id: `desig-${Date.now()}`,
+      tenantId: currentTenant.id,
+      name: newDesigName.trim(),
+      description: newDesigDesc.trim() || undefined,
+      departmentId: newDesigDeptId || departmentId || null,
+      status: 'ACTIVE',
+    };
+    mockStorage.addTenantItem<Designation>(KEYS.DESIGNATIONS, newDesig);
+
+    const updatedDesigs = mockStorage.getTenantItems<Designation>(KEYS.DESIGNATIONS, currentTenant.id);
+    setDesignations(updatedDesigs);
+    setDesignationId(newDesig.id);
+
+    toast.success(`Designation "${newDesig.name}" created and selected!`);
+    setIsAddDesigModalOpen(false);
+    setNewDesigName('');
+    setNewDesigDesc('');
+    setNewDesigDeptId('');
+  };
+
+  const handleCreateRegionInline = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRegionName.trim()) {
+      toast.error('Region name is required');
+      return;
+    }
+    const newRegion: Region = {
+      id: `region-${Date.now()}`,
+      tenantId: currentTenant.id,
+      name: newRegionName.trim(),
+      countryCode: newRegionCountryCode.trim() || 'US',
+      timeZone: newRegionTimeZone.trim() || 'UTC',
+      locale: 'en-US',
+      status: 'ACTIVE',
+    };
+    mockStorage.addTenantItem<Region>(KEYS.REGIONS, newRegion);
+
+    const updatedRegions = mockStorage.getTenantItems<Region>(KEYS.REGIONS, currentTenant.id);
+    setRegionsList(updatedRegions);
+    setRegionId(newRegion.id);
+
+    toast.success(`Region "${newRegion.name}" created and selected!`);
+    setIsAddRegionModalOpen(false);
+    setNewRegionName('');
+    setNewRegionCountryCode('US');
+    setNewRegionTimeZone('UTC');
+  };
+
+  const handleCreateTeamInline = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCustomTeamName.trim()) {
+      toast.error('Team name is required');
+      return;
+    }
+    const nameToSave = newCustomTeamName.trim();
+    if (!customTeams.includes(nameToSave)) {
+      setCustomTeams((prev) => [...prev, nameToSave]);
+    }
+    setTeamName(nameToSave);
+    toast.success(`Team "${nameToSave}" created and selected!`);
+    setIsAddTeamModalOpen(false);
+    setNewCustomTeamName('');
+  };
+
+  const addEmployeeDraftData = {
+    currentStep,
+    employeeId,
+    name,
+    email,
+    selectedCountry,
+    phoneCountryCode,
+    phoneDigits,
+    phone,
+    dateOfBirth,
+    gender,
+    maritalStatus,
+    nationality,
+    emergencyContactName,
+    emergencyContactPhone,
+    currentAddress,
+    permanentAddress,
+    avatarUrl,
+    departmentId,
+    designationId,
+    regionId,
+    managerId,
+    employmentType,
+    joiningDate,
+    confirmationDate,
+    workLocation,
+    teamName,
+    employmentStatus,
+    isPermanent,
+    skillsInput,
+    selectedLanguages,
+    currency,
+    ctcAnnual,
+    basicSalary,
+    variablePay,
+    allowances,
+    paymentMode,
+    bankName,
+    bankAccountNumber,
+    ifscRoutingCode,
+  };
+
+  const { clearDraft: clearAddEmployeeDraft } = useFormDraft({
+    draftKey: 'add_employee',
+    data: addEmployeeDraftData,
+    enabled: isAddModalOpen && !editingEmployee,
+  });
+
+  const handleClearAddEmployeeDraft = () => {
+    clearAddEmployeeDraft();
+    setHasRestoredDraft(false);
+
+    setSelectedCountry('');
+    setPhoneCountryCode('');
+    setPhoneDigits('');
+    setPhone('');
     setName('');
     setEmail('');
-    setPhone('');
     setDateOfBirth('');
-    setGender('Female');
-    setMaritalStatus('Single');
+    setGender('' as any);
+    setMaritalStatus('' as any);
     setNationality('');
+    setSelectedLanguages([]);
     setEmergencyContactName('');
     setEmergencyContactPhone('');
     setCurrentAddress('');
     setPermanentAddress('');
     setAvatarUrl('');
-
-    setDepartmentId(departments[0]?.id || '');
-    setDesignationId(designations[0]?.id || '');
-    setRegionId(regions[0]?.id || currentTenant?.defaultRegionId || '');
+    setDepartmentId('');
+    setDesignationId('');
+    setRegionId('');
     setManagerId('');
-    setEmploymentType('Full Time');
+    setEmploymentType('' as any);
     setJoiningDate(new Date().toISOString().split('T')[0]);
     setConfirmationDate('');
     setWorkLocation('');
@@ -241,8 +458,6 @@ export const EmployeeListPage: React.FC = () => {
     setEmploymentStatus('INACTIVE');
     setIsPermanent(false);
     setSkillsInput('');
-
-    // Auto default to tenant currency
     setCurrency(currentTenant?.currency || 'INR');
     setCtcAnnual('');
     setBasicSalary('');
@@ -252,9 +467,114 @@ export const EmployeeListPage: React.FC = () => {
     setBankName('');
     setBankAccountNumber('');
     setIfscRoutingCode('');
+    setCurrentStep(1);
 
-    // Reset doc requirements template from storage
-    setDocRequirements(mockStorage.getOnboardingDocRequirements(currentTenant?.id));
+    toast.success('Form draft cleared.');
+  };
+
+  const handleOpenAddModal = () => {
+    setEditingEmployee(null);
+
+    const savedDraft = mockStorage.getFormDraft<any>('add_employee');
+    if (savedDraft?.data && (savedDraft.data.name || savedDraft.data.email || savedDraft.data.phoneDigits || savedDraft.data.currentStep > 1)) {
+      const d = savedDraft.data;
+      setEmployeeId(d.employeeId || `TN-${String(employees.length + 1).padStart(4, '0')}`);
+      setName(d.name || '');
+      setEmail(d.email || '');
+      setSelectedCountry(d.selectedCountry || 'United States');
+      setPhoneCountryCode(d.phoneCountryCode || '1');
+      setPhoneDigits(d.phoneDigits || '');
+      setPhone(d.phone || '');
+      setDateOfBirth(d.dateOfBirth || '');
+      setGender(d.gender || 'Female');
+      setMaritalStatus(d.maritalStatus || 'Single');
+      setNationality(d.nationality || d.selectedCountry || '');
+      setEmergencyContactName(d.emergencyContactName || '');
+      setEmergencyContactPhone(d.emergencyContactPhone || '');
+      setCurrentAddress(d.currentAddress || '');
+      setPermanentAddress(d.permanentAddress || '');
+      setAvatarUrl(d.avatarUrl || '');
+
+      setDepartmentId(d.departmentId || departments[0]?.id || '');
+      setDesignationId(d.designationId || designations[0]?.id || '');
+      setRegionId(d.regionId || regionsList[0]?.id || '');
+      setManagerId(d.managerId || '');
+      setEmploymentType(d.employmentType || 'Full Time');
+      setJoiningDate(d.joiningDate || new Date().toISOString().split('T')[0]);
+      setConfirmationDate(d.confirmationDate || '');
+      setWorkLocation(d.workLocation || '');
+      setTeamName(d.teamName || '');
+      setEmploymentStatus(d.employmentStatus || 'INACTIVE');
+      setIsPermanent(d.isPermanent ?? false);
+      setSkillsInput(d.skillsInput || '');
+      setSelectedLanguages(d.selectedLanguages || (d.languagesInput ? d.languagesInput.split(',').map((s: string) => s.trim()) : []));
+
+      setCurrency(d.currency || currentTenant?.currency || 'INR');
+      setCtcAnnual(d.ctcAnnual || '');
+      setBasicSalary(d.basicSalary || '');
+      setVariablePay(d.variablePay || '');
+      setAllowances(d.allowances || '');
+      setPaymentMode(d.paymentMode || 'Bank Transfer');
+      setBankName(d.bankName || '');
+      setBankAccountNumber(d.bankAccountNumber || '');
+      setIfscRoutingCode(d.ifscRoutingCode || '');
+
+      setCurrentStep(d.currentStep || 1);
+      setHasRestoredDraft(true);
+      toast.info('⚡ Restored unsaved employee draft! Resume your work or click "Clear Draft".');
+    } else {
+      setHasRestoredDraft(false);
+      setCurrentStep(1);
+
+      // Auto-generate employee code suggestion
+      const nextSeq = String(employees.length + 1).padStart(4, '0');
+      setEmployeeId(`TN-${nextSeq}`);
+
+      // Clean initial state (No pre-selected default values)
+      setSelectedCountry('');
+      setPhoneCountryCode('');
+      setPhoneDigits('');
+      setName('');
+      setEmail('');
+      setPhone('');
+      setDateOfBirth('');
+      setGender('' as any);
+      setMaritalStatus('' as any);
+      setNationality('');
+      setSelectedLanguages([]);
+      setEmergencyContactName('');
+      setEmergencyContactPhone('');
+      setCurrentAddress('');
+      setPermanentAddress('');
+      setAvatarUrl('');
+
+      setDepartmentId('');
+      setDesignationId('');
+      setRegionId('');
+      setManagerId('');
+      setEmploymentType('' as any);
+      setJoiningDate(new Date().toISOString().split('T')[0]);
+      setConfirmationDate('');
+      setWorkLocation('');
+      setTeamName('');
+      setEmploymentStatus('INACTIVE');
+      setIsPermanent(false);
+      setSkillsInput('');
+
+      // Auto default to tenant currency
+      setCurrency(currentTenant?.currency || 'INR');
+      setCtcAnnual('');
+      setBasicSalary('');
+      setVariablePay('');
+      setAllowances('');
+      setPaymentMode('Bank Transfer');
+      setBankName('');
+      setBankAccountNumber('');
+      setIfscRoutingCode('');
+
+      // Reset doc requirements template from storage
+      setDocRequirements(mockStorage.getOnboardingDocRequirements(currentTenant?.id));
+    }
 
     setIsAddModalOpen(true);
   };
@@ -265,11 +585,39 @@ export const EmployeeListPage: React.FC = () => {
     setEmployeeId(emp.employeeId);
     setName(emp.name);
     setEmail(emp.email);
-    setPhone(emp.phone || '');
+
+    let initialCountry = 'United States';
+    let initialCode = '1';
+    let digits = emp.phone || '';
+
+    if (emp.phone && emp.phone.trim().startsWith('+')) {
+      const trimmed = emp.phone.trim().substring(1);
+      const spaceIdx = trimmed.indexOf(' ');
+      const codePart = spaceIdx !== -1 ? trimmed.substring(0, spaceIdx) : trimmed;
+      const match = countryData.find((c) => c.code === codePart);
+      if (match) {
+        initialCountry = match.country;
+        initialCode = match.code;
+        digits = spaceIdx !== -1 ? trimmed.substring(spaceIdx + 1) : '';
+      }
+    } else if (emp.nationality) {
+      const match = countryData.find((c) => c.country.toLowerCase() === emp.nationality?.toLowerCase());
+      if (match) {
+        initialCountry = match.country;
+        initialCode = match.code;
+      }
+    }
+
+    setSelectedCountry(initialCountry);
+    setPhoneCountryCode(initialCode);
+    const cleanDigits = digits.replace(/[^0-9]/g, '');
+    setPhoneDigits(cleanDigits);
+    setPhone(emp.phone || (cleanDigits ? `+${initialCode} ${cleanDigits}` : ''));
+
     setDateOfBirth(emp.dateOfBirth || '');
     setGender(emp.gender || 'Female');
     setMaritalStatus(emp.maritalStatus || 'Single');
-    setNationality(emp.nationality || '');
+    setNationality(emp.nationality || initialCountry);
     setEmergencyContactName(emp.emergencyContactName || '');
     setEmergencyContactPhone(emp.emergencyContactPhone || '');
     setCurrentAddress(emp.currentAddress || '');
@@ -288,6 +636,7 @@ export const EmployeeListPage: React.FC = () => {
     setEmploymentStatus(emp.employmentStatus);
     setIsPermanent(emp.isPermanent ?? (emp.employmentStatus === 'ACTIVE'));
     setSkillsInput(emp.skills ? emp.skills.join(', ') : '');
+    setSelectedLanguages(emp.languagesKnown || []);
 
     // Extract numeric values from compensation strings if formatted
     const cleanNumber = (val?: string | number) => {
@@ -346,20 +695,28 @@ export const EmployeeListPage: React.FC = () => {
       toast.error('Please enter a valid work email address.');
       return false;
     }
-    if (!phone.trim()) {
-      toast.error('Please enter a primary phone number.');
-      return false;
-    }
     if (!dateOfBirth) {
       toast.error('Please select the date of birth.');
+      return false;
+    }
+    if (!gender) {
+      toast.error('Please select gender.');
+      return false;
+    }
+    if (!maritalStatus) {
+      toast.error('Please select marital status.');
+      return false;
+    }
+    if (!selectedCountry) {
+      toast.error('Please select a country.');
       return false;
     }
     if (!nationality.trim()) {
       toast.error('Please enter the nationality.');
       return false;
     }
-    if (!emergencyContactName.trim() || !emergencyContactPhone.trim()) {
-      toast.error('Please enter emergency contact name and phone number.');
+    if (!phoneDigits.trim()) {
+      toast.error('Please enter a primary phone number.');
       return false;
     }
     if (!currentAddress.trim()) {
@@ -372,6 +729,10 @@ export const EmployeeListPage: React.FC = () => {
   const validateStep2 = (): boolean => {
     if (!employeeId.trim()) {
       toast.error('Please enter a unique Employee ID.');
+      return false;
+    }
+    if (!employmentType) {
+      toast.error('Please select an employment type.');
       return false;
     }
     if (!departmentId) {
@@ -408,14 +769,6 @@ export const EmployeeListPage: React.FC = () => {
     }
     if (!basicSalary.trim() || isNaN(Number(basicSalary))) {
       toast.error('Please enter a valid basic salary amount.');
-      return false;
-    }
-    if (!bankName.trim()) {
-      toast.error('Please enter the bank name.');
-      return false;
-    }
-    if (!bankAccountNumber.trim()) {
-      toast.error('Please enter the bank account number.');
       return false;
     }
     return true;
@@ -470,6 +823,11 @@ export const EmployeeListPage: React.FC = () => {
       .map((s) => s.trim())
       .filter(Boolean);
 
+    const isBankPayment = paymentMode === 'Bank Transfer' || paymentMode === 'Direct Deposit';
+    const finalBankName = isBankPayment ? bankName : '';
+    const finalBankAccountNumber = isBankPayment ? bankAccountNumber : '';
+    const finalIfscRoutingCode = isBankPayment ? ifscRoutingCode : '';
+
     // Format compensation with chosen currency symbol
     const formatComp = (amt: string) => {
       if (!amt.trim()) return `${currencySymbol}0`;
@@ -492,15 +850,16 @@ export const EmployeeListPage: React.FC = () => {
       avatarUrl: avatarUrl.trim() || undefined,
 
       dateOfBirth,
-      gender,
-      maritalStatus,
+      gender: gender || undefined,
+      maritalStatus: maritalStatus || undefined,
       nationality,
+      languagesKnown: selectedLanguages,
       emergencyContactName,
       emergencyContactPhone,
       currentAddress,
       permanentAddress: permanentAddress || currentAddress,
 
-      employmentType,
+      employmentType: employmentType || undefined,
       confirmationDate: confirmationDate || undefined,
       workLocation,
       teamName,
@@ -511,9 +870,9 @@ export const EmployeeListPage: React.FC = () => {
       variablePay: formatComp(variablePay),
       allowances: formatComp(allowances),
       paymentMode,
-      bankName,
-      bankAccountNumber,
-      ifscRoutingCode,
+      bankName: finalBankName,
+      bankAccountNumber: finalBankAccountNumber,
+      ifscRoutingCode: finalIfscRoutingCode,
     };
 
     if (editingEmployee) {
@@ -570,6 +929,7 @@ export const EmployeeListPage: React.FC = () => {
         gender: payload.gender,
         maritalStatus: payload.maritalStatus,
         nationality: payload.nationality,
+        languagesKnown: payload.languagesKnown,
         emergencyContactName: payload.emergencyContactName,
         emergencyContactPhone: payload.emergencyContactPhone,
         currentAddress: payload.currentAddress,
@@ -586,9 +946,9 @@ export const EmployeeListPage: React.FC = () => {
         variablePay: payload.variablePay,
         allowances: payload.allowances,
         paymentMode,
-        bankName,
-        bankAccountNumber,
-        ifscRoutingCode,
+        bankName: payload.bankName,
+        bankAccountNumber: payload.bankAccountNumber,
+        ifscRoutingCode: payload.ifscRoutingCode,
       };
 
       mockStorage.addTenantItem<Employee>(KEYS.EMPLOYEES, newEmp);
@@ -632,7 +992,7 @@ export const EmployeeListPage: React.FC = () => {
         const deptName = departments.find((d) => d.id === newEmp.departmentId)?.name || 'General';
         const desigName = designations.find((d) => d.id === newEmp.designationId)?.name || 'Staff Member';
         const mgrName = employees.find((e) => e.id === newEmp.managerId)?.name || 'Department Manager';
-        const regName = regions.find((r) => r.id === newEmp.regionId)?.name || 'Headquarters';
+        const regName = regionsList.find((r) => r.id === newEmp.regionId)?.name || 'Headquarters';
         const validDocRequirements = docRequirements.filter((d) => d.title.trim().length > 0);
 
         const newCase: OnboardingCase = {
@@ -671,6 +1031,8 @@ export const EmployeeListPage: React.FC = () => {
       mockStorage.addAuditLog('EMPLOYEE_CREATED', 'EMPLOYEE', newEmp.id);
     }
 
+    clearAddEmployeeDraft();
+    setHasRestoredDraft(false);
     setIsAddModalOpen(false);
     reloadEmployees();
   };
@@ -719,7 +1081,7 @@ export const EmployeeListPage: React.FC = () => {
   const managerObj = employees.find((e) => e.id === selectedEmployee?.managerId);
   const deptObj = departments.find((d) => d.id === selectedEmployee?.departmentId);
   const desigObj = designations.find((d) => d.id === selectedEmployee?.designationId);
-  const regionObj = regions.find((r) => r.id === selectedEmployee?.regionId);
+  const regionObj = regionsList.find((r) => r.id === selectedEmployee?.regionId);
 
   // Is viewing self or admin
   const isViewingSelfOrAdmin = Boolean(
@@ -789,7 +1151,7 @@ export const EmployeeListPage: React.FC = () => {
       key: 'workLocation',
       header: 'Location / Address',
       render: (e) => {
-        const reg = regions.find((r) => r.id === e.regionId);
+        const reg = regionsList.find((r) => r.id === e.regionId);
         return <span className="text-xs text-slate-500">{e.workLocation || e.currentAddress || reg?.name || 'New York, NY, USA'}</span>;
       },
     },
@@ -1005,7 +1367,7 @@ export const EmployeeListPage: React.FC = () => {
           employees={employees}
           departments={departments}
           designations={designations}
-          regions={regions}
+          regions={regionsList}
           currentUser={currentUser}
           isTenantAdmin={isAdmin}
           myEmployee={myEmployee}
@@ -1020,7 +1382,7 @@ export const EmployeeListPage: React.FC = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         closeOnOverlayClick={false}
-        maxWidth="3xl"
+        maxWidth="4xl"
         title={editingEmployee ? `Edit Employee (${editingEmployee.name})` : 'New Employee Onboarding'}
         description="Step-by-step registration. Fill out each required step before saving."
         footer={
@@ -1112,6 +1474,24 @@ export const EmployeeListPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleSaveEmployee} className="space-y-4 text-xs pt-1">
+            {hasRestoredDraft && !editingEmployee && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-2 text-amber-900 text-xs shadow-2xs animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    <strong>Draft Restored:</strong> Unsaved changes from your previous session were automatically loaded.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleClearAddEmployeeDraft}
+                  className="px-2.5 py-1 text-xs font-bold text-amber-800 hover:text-amber-950 bg-amber-100/80 hover:bg-amber-200 rounded-lg border border-amber-300 transition-colors shrink-0 cursor-pointer"
+                >
+                  Clear Draft
+                </button>
+              </div>
+            )}
+
             {/* STEP 1: PERSONAL INFORMATION */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in">
@@ -1155,6 +1535,7 @@ export const EmployeeListPage: React.FC = () => {
                     <Select
                       value={gender}
                       onChange={(e) => setGender(e.target.value as any)}
+                      placeholder="Select Gender"
                       options={[
                         { value: 'Female', label: 'Female' },
                         { value: 'Male', label: 'Male' },
@@ -1168,6 +1549,7 @@ export const EmployeeListPage: React.FC = () => {
                     <Select
                       value={maritalStatus}
                       onChange={(e) => setMaritalStatus(e.target.value as any)}
+                      placeholder="Select Marital Status"
                       options={[
                         { value: 'Single', label: 'Single' },
                         { value: 'Married', label: 'Married' },
@@ -1179,6 +1561,18 @@ export const EmployeeListPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField label="Country" required helperText="Auto-selects phone country code">
+                    <Select
+                      value={selectedCountry}
+                      onChange={(e) => handleCountrySelectChange(e.target.value)}
+                      placeholder="Select Country"
+                      options={countryData.map((c) => ({
+                        value: c.country,
+                        label: `${c.country} (+${c.code})`,
+                      }))}
+                    />
+                  </FormField>
+
                   <FormField label="Nationality" required>
                     <Input
                       value={nationality}
@@ -1187,47 +1581,66 @@ export const EmployeeListPage: React.FC = () => {
                       required
                     />
                   </FormField>
+                </div>
 
-                  <FormField label="Primary Contact Phone" required>
+                <FormField label="Languages Known" helperText="Select one or more languages from list">
+                  <MultiSelect
+                    options={languagesData.map((l) => ({ value: l.name, label: l.name }))}
+                    value={selectedLanguages}
+                    onChange={setSelectedLanguages}
+                    placeholder="Select languages..."
+                  />
+                </FormField>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField label="Primary Contact Phone" required helperText="Numbers only">
+                    <div className="flex items-center w-full">
+                      <span className="flex h-10 items-center justify-center rounded-l-lg border border-r-0 border-slate-300 bg-slate-100 px-3 text-xs font-bold text-indigo-700 select-none shrink-0 shadow-2xs">
+                        +{phoneCountryCode || '--'}
+                      </span>
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={phoneDigits}
+                        onChange={(e) => handlePhoneDigitsChange(e.target.value)}
+                        placeholder="9876543210"
+                        className="rounded-l-none"
+                        required
+                      />
+                    </div>
+                  </FormField>
+
+                  <FormField label="Current Residential Address" required>
                     <Input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (555) 234-5678"
+                      value={currentAddress}
+                      onChange={(e) => setCurrentAddress(e.target.value)}
+                      placeholder="350 5th Avenue, New York, NY 10118, USA"
                       required
                     />
                   </FormField>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-                  <FormField label="Emergency Contact (Name & Relation)" required helperText="e.g. John Mitchell (Father)">
+                  <FormField label="Emergency Contact (Name & Relation)" helperText="Optional e.g. John Mitchell (Father)">
                     <Input
                       value={emergencyContactName}
                       onChange={(e) => setEmergencyContactName(e.target.value)}
                       placeholder="John Mitchell (Father)"
-                      required
                     />
                   </FormField>
 
-                  <FormField label="Emergency Phone Number" required>
+                  <FormField label="Emergency Phone Number" helperText="Optional numbers only">
                     <Input
-                      type="tel"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={emergencyContactPhone}
-                      onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                      placeholder="+1 (555) 019-2834"
-                      required
+                      onChange={(e) => setEmergencyContactPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                      placeholder="5550192834"
                     />
                   </FormField>
                 </div>
-
-                <FormField label="Current Residential Address" required>
-                  <Input
-                    value={currentAddress}
-                    onChange={(e) => setCurrentAddress(e.target.value)}
-                    placeholder="350 5th Avenue, New York, NY 10118, USA"
-                    required
-                  />
-                </FormField>
 
                 <FormField label="Employee Profile Photo / Avatar" helperText="Upload PNG, JPG, or WEBP photo from your computer (Max 5MB)">
                   <div className="flex items-center gap-4 p-3 bg-slate-50 border border-slate-200 rounded-xl">
@@ -1296,6 +1709,7 @@ export const EmployeeListPage: React.FC = () => {
                     <Select
                       value={employmentType}
                       onChange={(e) => setEmploymentType(e.target.value as any)}
+                      placeholder="Select Employment Type"
                       options={[
                         { value: 'Full Time', label: 'Full Time' },
                         { value: 'Part Time', label: 'Part Time' },
@@ -1307,33 +1721,92 @@ export const EmployeeListPage: React.FC = () => {
                   </FormField>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField label="Department" required>
-                    <Select
-                      value={departmentId}
-                      onChange={(e) => setDepartmentId(e.target.value)}
-                      options={departments.map((d) => ({ value: d.id, label: d.name }))}
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex-1 min-w-0">
+                        <Select
+                          value={departmentId}
+                          onChange={(e) => setDepartmentId(e.target.value)}
+                          placeholder="Select Department"
+                          options={departments.map((d) => ({ value: d.id, label: d.name }))}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsAddDeptModalOpen(true)}
+                        className="h-10 px-2.5 font-semibold shrink-0 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center gap-1 shadow-2xs cursor-pointer"
+                        title="Add New Department"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add</span>
+                      </Button>
+                    </div>
                   </FormField>
 
                   <FormField label="Designation / Job Role" required>
-                    <Select
-                      value={designationId}
-                      onChange={(e) => setDesignationId(e.target.value)}
-                      options={designations.map((d) => ({ value: d.id, label: d.name }))}
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex-1 min-w-0">
+                        <Select
+                          value={designationId}
+                          onChange={(e) => setDesignationId(e.target.value)}
+                          placeholder="Select Designation"
+                          options={designations.map((d) => ({ value: d.id, label: d.name }))}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsAddDesigModalOpen(true)}
+                        className="h-10 px-2.5 font-semibold shrink-0 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center gap-1 shadow-2xs cursor-pointer"
+                        title="Add New Designation"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add</span>
+                      </Button>
+                    </div>
+                  </FormField>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField label="Work Region / Office" required>
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex-1 min-w-0">
+                        <Select
+                          value={regionId}
+                          onChange={(e) => setRegionId(e.target.value)}
+                          placeholder="Select Region"
+                          options={regionsList.map((r) => ({ value: r.id, label: `${r.name} (${r.countryCode})` }))}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsAddRegionModalOpen(true)}
+                        className="h-10 px-2.5 font-semibold shrink-0 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center gap-1 shadow-2xs cursor-pointer"
+                        title="Add New Region"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add</span>
+                      </Button>
+                    </div>
                   </FormField>
 
-                  <FormField label="Work Region / Office" required>
-                    <Select
-                      value={regionId}
-                      onChange={(e) => setRegionId(e.target.value)}
-                      options={regions.map((r) => ({ value: r.id, label: `${r.name} (${r.countryCode})` }))}
+                  <FormField label="Work Location / City" required>
+                    <Input
+                      value={workLocation}
+                      onChange={(e) => setWorkLocation(e.target.value)}
+                      placeholder="e.g. New York, NY, USA"
+                      required
                     />
                   </FormField>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField label="Date of Joining" required>
                     <DatePicker
                       value={joiningDate}
@@ -1350,15 +1823,6 @@ export const EmployeeListPage: React.FC = () => {
                       onChange={setConfirmationDate}
                       placeholder="Select confirmation date"
                       placement="top"
-                    />
-                  </FormField>
-
-                  <FormField label="Work Location / City" required>
-                    <Input
-                      value={workLocation}
-                      onChange={(e) => setWorkLocation(e.target.value)}
-                      placeholder="e.g. New York, NY, USA"
-                      required
                     />
                   </FormField>
                 </div>
@@ -1502,23 +1966,25 @@ export const EmployeeListPage: React.FC = () => {
                     />
                   </FormField>
 
-                  <FormField label="Bank Account Number" required>
-                    <Input
-                      value={bankAccountNumber}
-                      onChange={(e) => setBankAccountNumber(e.target.value)}
-                      placeholder="e.g. 987654321098"
-                      required
-                    />
-                  </FormField>
+                  {(paymentMode === 'Bank Transfer' || paymentMode === 'Direct Deposit') && (
+                    <>
+                      <FormField label="Bank Account Number" helperText="Optional">
+                        <Input
+                          value={bankAccountNumber}
+                          onChange={(e) => setBankAccountNumber(e.target.value)}
+                          placeholder="e.g. 987654321098"
+                        />
+                      </FormField>
 
-                  <FormField label="Bank Name & Routing (ABA / ACH)" required>
-                    <Input
-                      value={bankName}
-                      onChange={(e) => setBankName(e.target.value)}
-                      placeholder="e.g. JPMorgan Chase (Routing: 021000021)"
-                      required
-                    />
-                  </FormField>
+                      <FormField label="Bank Name & Routing / IFSC" helperText="Optional">
+                        <Input
+                          value={bankName}
+                          onChange={(e) => setBankName(e.target.value)}
+                          placeholder="e.g. JPMorgan Chase (IFSC: HDFC0001234)"
+                        />
+                      </FormField>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -1531,13 +1997,28 @@ export const EmployeeListPage: React.FC = () => {
                   <span>Step 4 of 4: Finalize team assignment and technical skills list.</span>
                 </div>
 
-                <FormField label="Assigned Team / Pod" required helperText="e.g. Backend Team, Core UI Pod, DevOps SRE">
-                  <Input
-                    value={teamName}
-                    onChange={(e) => setTeamName(e.target.value)}
-                    placeholder="e.g. Backend Team"
-                    required
-                  />
+                <FormField label="Assigned Team / Pod" required helperText="Select team/pod from dropdown or click + Add to create new">
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex-1 min-w-0">
+                      <Select
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
+                        placeholder="Select Team / Pod"
+                        options={availableTeams.map((t) => ({ value: t, label: t }))}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsAddTeamModalOpen(true)}
+                      className="h-10 px-2.5 font-semibold shrink-0 border-indigo-200 text-indigo-700 hover:bg-indigo-50 flex items-center gap-1 shadow-2xs cursor-pointer"
+                      title="Add New Team"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add</span>
+                    </Button>
+                  </div>
                 </FormField>
 
                 <FormField
@@ -2164,6 +2645,176 @@ export const EmployeeListPage: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* INLINE ADD DEPARTMENT MODAL */}
+      <Modal
+        isOpen={isAddDeptModalOpen}
+        onClose={() => setIsAddDeptModalOpen(false)}
+        title="Add New Department"
+        description="Create a new department in organizational hierarchy"
+      >
+        <form onSubmit={handleCreateDepartmentInline} className="space-y-4 text-xs pt-1">
+          <FormField label="Department Name" required>
+            <Input
+              value={newDeptName}
+              onChange={(e) => setNewDeptName(e.target.value)}
+              placeholder="e.g. Artificial Intelligence & Automation"
+              required
+            />
+          </FormField>
+
+          <FormField label="Description">
+            <Input
+              value={newDeptDesc}
+              onChange={(e) => setNewDeptDesc(e.target.value)}
+              placeholder="e.g. Responsible for AI R&D and ML systems"
+            />
+          </FormField>
+
+          <FormField label="Parent Department">
+            <Select
+              value={newDeptParentId}
+              onChange={(e) => setNewDeptParentId(e.target.value)}
+              placeholder="None (Top Level Department)"
+              options={[
+                { value: '', label: 'None (Top Level Department)' },
+                ...departments.map((d) => ({ value: d.id, label: d.name })),
+              ]}
+            />
+          </FormField>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button type="button" variant="ghost" onClick={() => setIsAddDeptModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Create Department
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* INLINE ADD DESIGNATION MODAL */}
+      <Modal
+        isOpen={isAddDesigModalOpen}
+        onClose={() => setIsAddDesigModalOpen(false)}
+        title="Add New Designation"
+        description="Create a new job role / title designation"
+      >
+        <form onSubmit={handleCreateDesignationInline} className="space-y-4 text-xs pt-1">
+          <FormField label="Designation Title" required>
+            <Input
+              value={newDesigName}
+              onChange={(e) => setNewDesigName(e.target.value)}
+              placeholder="e.g. Senior AI Systems Architect"
+              required
+            />
+          </FormField>
+
+          <FormField label="Department">
+            <Select
+              value={newDesigDeptId}
+              onChange={(e) => setNewDesigDeptId(e.target.value)}
+              options={[
+                { value: '', label: 'All Departments / General' },
+                ...departments.map((d) => ({ value: d.id, label: d.name })),
+              ]}
+            />
+          </FormField>
+
+          <FormField label="Description">
+            <Input
+              value={newDesigDesc}
+              onChange={(e) => setNewDesigDesc(e.target.value)}
+              placeholder="e.g. Oversees enterprise AI models and architecture"
+            />
+          </FormField>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button type="button" variant="ghost" onClick={() => setIsAddDesigModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Create Designation
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* INLINE ADD REGION MODAL */}
+      <Modal
+        isOpen={isAddRegionModalOpen}
+        onClose={() => setIsAddRegionModalOpen(false)}
+        title="Add New Work Region / Office"
+        description="Create a new office location or geographical region"
+      >
+        <form onSubmit={handleCreateRegionInline} className="space-y-4 text-xs pt-1">
+          <FormField label="Region / Office Name" required>
+            <Input
+              value={newRegionName}
+              onChange={(e) => setNewRegionName(e.target.value)}
+              placeholder="e.g. European HQ (Berlin)"
+              required
+            />
+          </FormField>
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Country ISO Code" required>
+              <Input
+                value={newRegionCountryCode}
+                onChange={(e) => setNewRegionCountryCode(e.target.value.toUpperCase())}
+                placeholder="e.g. US, IN, DE"
+                required
+              />
+            </FormField>
+
+            <FormField label="Time Zone">
+              <Input
+                value={newRegionTimeZone}
+                onChange={(e) => setNewRegionTimeZone(e.target.value)}
+                placeholder="e.g. UTC, Asia/Kolkata"
+              />
+            </FormField>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button type="button" variant="ghost" onClick={() => setIsAddRegionModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Create Region
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* INLINE ADD TEAM MODAL */}
+      <Modal
+        isOpen={isAddTeamModalOpen}
+        onClose={() => setIsAddTeamModalOpen(false)}
+        title="Add New Team / Pod"
+        description="Create a new team or pod assignment for your organization"
+      >
+        <form onSubmit={handleCreateTeamInline} className="space-y-4 text-xs pt-1">
+          <FormField label="Team / Pod Name" required>
+            <Input
+              value={newCustomTeamName}
+              onChange={(e) => setNewCustomTeamName(e.target.value)}
+              placeholder="e.g. Mobile Engineering Pod"
+              required
+            />
+          </FormField>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <Button type="button" variant="ghost" onClick={() => setIsAddTeamModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary">
+              Create & Select Team
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

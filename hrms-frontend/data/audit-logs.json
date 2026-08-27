@@ -1,5 +1,27 @@
 [
   {
+    "id": "aud-1787752912685",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "EMPLOYEE_STATUS_CHANGED",
+    "resourceType": "EMPLOYEE",
+    "resourceId": "emp-1787752820312",
+    "timestamp": "2026-08-26T14:01:52.685Z",
+    "requestId": "req-is65zg8"
+  },
+  {
+    "id": "aud-1787752820323",
+    "tenantId": "tenant-1787291784650",
+    "actorId": "user-admin-tenant-1787291784650",
+    "actorName": "Auto Computation Admin",
+    "action": "EMPLOYEE_CREATED",
+    "resourceType": "EMPLOYEE",
+    "resourceId": "emp-1787752820312",
+    "timestamp": "2026-08-26T14:00:20.323Z",
+    "requestId": "req-5qr3udw"
+  },
+  {
     "id": "aud-1787314174986",
     "tenantId": "platform",
     "actorId": "user-superadmin",

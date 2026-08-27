@@ -1,0 +1,92 @@
+[
+  {
+    "id": "task-001",
+    "tenantId": "t-001",
+    "title": "Implement TimePicker & DatePicker z-index fixed positioning",
+    "description": "Ensure popovers float freely over modal headers and scrollable containers without clipping.",
+    "projectId": "proj-001",
+    "projectName": "HRMS Modernization & Portal Upgrade",
+    "assignedEmployeeId": "emp-001",
+    "assignedEmployeeName": "sujay kotal",
+    "priority": "HIGH",
+    "dueDate": "2026-08-28",
+    "status": "IN_PROGRESS",
+    "createdAt": "2026-08-27T10:00:00.000Z"
+  },
+  {
+    "id": "task-002",
+    "tenantId": "t-001",
+    "title": "Audit Shift Roster Time Validation",
+    "description": "Verify that shift start times are earlier than shift end times across all schedule definitions.",
+    "projectId": "proj-001",
+    "projectName": "HRMS Modernization & Portal Upgrade",
+    "assignedEmployeeId": "emp-002",
+    "assignedEmployeeName": "Noah Oliver",
+    "priority": "URGENT",
+    "dueDate": "2026-08-30",
+    "status": "PENDING",
+    "createdAt": "2026-08-27T11:00:00.000Z"
+  },
+  {
+    "id": "task-003",
+    "tenantId": "t-001",
+    "title": "General Maintenance & System Health Check",
+    "description": "Standalone internal maintenance task not attached to a specific project.",
+    "priority": "LOW",
+    "dueDate": "2026-09-05",
+    "status": "PENDING",
+    "createdAt": "2026-08-27T12:00:00.000Z"
+  },
+  {
+    "id": "task-tn-001",
+    "tenantId": "tenant-1787291784650",
+    "title": "Build Viewport-Floating TimePicker UI Component",
+    "description": "Create an interactive time picker with hour/minute grids, AM/PM switcher, and fixed positioning.",
+    "projectId": "proj-tn-001",
+    "projectName": "Enterprise Core System Transformation",
+    "assignedEmployeeId": "emp-1787752820312",
+    "assignedEmployeeName": "sujay kotal",
+    "priority": "HIGH",
+    "dueDate": "2026-08-29",
+    "status": "COMPLETED",
+    "createdAt": "2026-08-27T09:00:00.000Z"
+  },
+  {
+    "id": "task-tn-002",
+    "tenantId": "tenant-1787291784650",
+    "title": "Configure Roster Matrix Grid & Min Date Guards",
+    "description": "Ensure unassigned matrix cells display + Assign button and block past date assignments.",
+    "projectId": "proj-tn-002",
+    "projectName": "Automated Shift Scheduling & Roster Engine",
+    "assignedEmployeeId": "emp-1787752820312",
+    "assignedEmployeeName": "sujay kotal",
+    "priority": "URGENT",
+    "dueDate": "2026-08-31",
+    "status": "IN_PROGRESS",
+    "createdAt": "2026-08-27T10:30:00.000Z"
+  },
+  {
+    "id": "task-tn-003",
+    "tenantId": "tenant-1787291784650",
+    "title": "Perform Security Compliance & Audit Check",
+    "description": "Review data access controls and user permissions across all active departments.",
+    "projectId": "proj-tn-001",
+    "projectName": "Enterprise Core System Transformation",
+    "assignedEmployeeId": "emp-1787312095175",
+    "assignedEmployeeName": "Noah Oliver",
+    "priority": "MEDIUM",
+    "dueDate": "2026-09-02",
+    "status": "PENDING",
+    "createdAt": "2026-08-27T11:45:00.000Z"
+  },
+  {
+    "id": "task-tn-004",
+    "tenantId": "tenant-1787291784650",
+    "title": "Quarterly Workstation Software License Audit",
+    "description": "Standalone maintenance task for IT department to audit developer tool subscriptions.",
+    "priority": "LOW",
+    "dueDate": "2026-09-10",
+    "status": "PENDING",
+    "createdAt": "2026-08-27T12:00:00.000Z"
+  }
+]

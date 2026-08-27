@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -34,10 +34,13 @@ import {
   Search,
   Users,
   User,
+  Paperclip,
+  Eye,
 } from 'lucide-react';
 
 export const LeaveManagementPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const currentUser = mockStorage.getCurrentUser();
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
@@ -63,6 +66,8 @@ export const LeaveManagementPage: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
+  const [attachmentUrl, setAttachmentUrl] = useState('');
+  const [attachmentName, setAttachmentName] = useState('');
 
   // Policy Form state (Admin)
   const [policyName, setPolicyName] = useState('');
@@ -131,7 +136,27 @@ export const LeaveManagementPage: React.FC = () => {
     setStartDate(new Date().toISOString().split('T')[0]);
     setEndDate(new Date().toISOString().split('T')[0]);
     setReason('');
+    setAttachmentUrl('');
+    setAttachmentName('');
     setIsApplyModalOpen(true);
+  };
+
+  const handleLeaveAttachmentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 8 * 1024 * 1024) {
+        toast.error('Attachment file size must be less than 8MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttachmentUrl(reader.result as string);
+        setAttachmentName(file.name);
+        toast.success(`Document "${file.name}" attached successfully!`);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleApplyLeave = (e: React.FormEvent) => {
@@ -169,6 +194,8 @@ export const LeaveManagementPage: React.FC = () => {
       reason: reason.trim(),
       status: 'PENDING',
       appliedDate: new Date().toISOString(),
+      attachmentUrl: attachmentUrl || undefined,
+      attachmentName: attachmentName || undefined,
     };
 
     mockStorage.addTenantItem<LeaveRequest>(KEYS.LEAVE_REQUESTS, newReq);
@@ -353,8 +380,25 @@ export const LeaveManagementPage: React.FC = () => {
     },
     {
       key: 'reason',
-      header: 'Reason',
-      render: (r) => <span className="text-xs text-slate-600 truncate max-w-xs block">{r.reason}</span>,
+      header: 'Reason & Document',
+      render: (r) => (
+        <div className="space-y-1">
+          <span className="text-xs text-slate-600 truncate max-w-xs block">{r.reason}</span>
+          {r.attachmentUrl && (
+            <a
+              href={r.attachmentUrl}
+              target="_blank"
+              rel="noreferrer"
+              download={r.attachmentName || 'leave-medical-document'}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded border border-indigo-200 transition-colors"
+              title="Click to view or download attached medical document"
+            >
+              <Paperclip className="w-3 h-3 text-indigo-500" />
+              <span className="truncate max-w-[150px]">{r.attachmentName || 'Medical Certificate'}</span>
+            </a>
+          )}
+        </div>
+      ),
     },
     {
       key: 'status',
@@ -363,108 +407,75 @@ export const LeaveManagementPage: React.FC = () => {
     },
     {
       key: 'actions',
-      header: 'Decision & Actions',
+      header: 'Details & Decision',
       className: 'text-right',
       render: (r) => {
-        if (!isTenantAdmin) return null;
-
         const todayStr = new Date().toISOString().split('T')[0];
         const isBeforeStart = r.startDate >= todayStr;
 
-        if (r.status === 'PENDING') {
-          return (
-            <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+        return (
+          <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/${slug}/leave/detail/${r.id}`)}
+              className="h-8 px-2.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-semibold text-xs flex items-center gap-1 shadow-2xs cursor-pointer"
+              title="View Full Leave Details & Medical Documents"
+            >
+              <Eye className="w-3.5 h-3.5 text-indigo-600" />
+              <span>View Details</span>
+            </Button>
+
+            {isTenantAdmin && r.status === 'PENDING' && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs font-semibold"
+                  leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
+                  onClick={() => handleChangeDecision(r, 'APPROVED')}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-rose-600 border-rose-200 hover:bg-rose-50 text-xs font-semibold"
+                  leftIcon={<XCircle className="w-3.5 h-3.5" />}
+                  onClick={() => handleChangeDecision(r, 'REJECTED')}
+                >
+                  Reject
+                </Button>
+              </>
+            )}
+
+            {isTenantAdmin && r.status === 'APPROVED' && isBeforeStart && (
               <Button
                 variant="outline"
                 size="sm"
-                className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs font-semibold"
-                leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-                onClick={() => handleChangeDecision(r, 'APPROVED')}
-              >
-                Approve
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-rose-600 border-rose-200 hover:bg-rose-50 text-xs font-semibold"
+                className="h-8 text-rose-600 border-rose-200 hover:bg-rose-50 text-xs font-semibold"
                 leftIcon={<XCircle className="w-3.5 h-3.5" />}
                 onClick={() => handleChangeDecision(r, 'REJECTED')}
+                title="Change to Rejected"
               >
-                Reject
+                Change to Reject
               </Button>
-            </div>
-          );
-        }
+            )}
 
-        if (r.status === 'APPROVED') {
-          return (
-            <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
-              {isBeforeStart ? (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-rose-600 border-rose-200 hover:bg-rose-50 text-xs font-semibold"
-                    leftIcon={<XCircle className="w-3.5 h-3.5" />}
-                    onClick={() => handleChangeDecision(r, 'REJECTED')}
-                    title="Mistakenly approved? Change to Rejected before leave starts"
-                  >
-                    Change to Reject
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-slate-500 hover:text-slate-700 text-xs"
-                    onClick={() => handleChangeDecision(r, 'PENDING')}
-                    title="Reset back to Pending"
-                  >
-                    Reset
-                  </Button>
-                </>
-              ) : (
-                <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium border border-emerald-200">
-                  Approved (Active / Past)
-                </span>
-              )}
-            </div>
-          );
-        }
-
-        if (r.status === 'REJECTED') {
-          return (
-            <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
-              {isBeforeStart ? (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs font-semibold"
-                    leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-                    onClick={() => handleChangeDecision(r, 'APPROVED')}
-                    title="Mistakenly rejected? Change to Approved before leave starts"
-                  >
-                    Change to Approve
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-slate-500 hover:text-slate-700 text-xs"
-                    onClick={() => handleChangeDecision(r, 'PENDING')}
-                    title="Reset back to Pending"
-                  >
-                    Reset
-                  </Button>
-                </>
-              ) : (
-                <span className="text-[11px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-medium border border-rose-200">
-                  Rejected (Past)
-                </span>
-              )}
-            </div>
-          );
-        }
-
-        return null;
+            {isTenantAdmin && r.status === 'REJECTED' && isBeforeStart && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs font-semibold"
+                leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
+                onClick={() => handleChangeDecision(r, 'APPROVED')}
+                title="Change to Approved"
+              >
+                Change to Approve
+              </Button>
+            )}
+          </div>
+        );
       },
     },
   ];
@@ -699,6 +710,7 @@ export const LeaveManagementPage: React.FC = () => {
             columns={columns}
             data={filteredAllRequests}
             keyExtractor={(r) => r.id}
+            onRowClick={(r) => navigate(`/${slug}/leave/detail/${r.id}`)}
             emptyTitle="No company leave requests found"
             emptyDescription="Try adjusting search or status filters."
           />
@@ -712,6 +724,7 @@ export const LeaveManagementPage: React.FC = () => {
             columns={columns}
             data={pendingApprovals}
             keyExtractor={(r) => r.id}
+            onRowClick={(r) => navigate(`/${slug}/leave/detail/${r.id}`)}
             emptyTitle="No pending leave applications"
             emptyDescription="All employee leave requests have been reviewed."
           />
@@ -725,6 +738,7 @@ export const LeaveManagementPage: React.FC = () => {
             columns={columns}
             data={myRequests}
             keyExtractor={(r) => r.id}
+            onRowClick={(r) => navigate(`/${slug}/leave/detail/${r.id}`)}
             emptyTitle="No personal leave applications yet"
             emptyDescription="Click 'Apply for Leave' at the top to submit a time-off request."
           />
@@ -934,9 +948,58 @@ export const LeaveManagementPage: React.FC = () => {
             <Input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Family vacation / Medical consultation"
+              placeholder="e.g. Sick leave / Medical appointment / Personal emergency"
               required
             />
+          </FormField>
+
+          <FormField
+            label="Attach Medical Certificate / Document"
+            helperText={
+              selectedTypeObj?.requiresDoc
+                ? "⚠️ Policy Requirement: Please attach a medical certificate or doctor's note for this category"
+                : "Optional: Upload medical certificate, prescription, or travel booking (PDF, PNG, JPG, Max 8MB)"
+            }
+          >
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="leave-attachment-file"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 cursor-pointer shadow-2xs transition-all"
+                >
+                  <Paperclip className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>{attachmentName ? 'Change Attached Document' : 'Upload Medical Document / Certificate'}</span>
+                </label>
+                <input
+                  id="leave-attachment-file"
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx"
+                  onChange={handleLeaveAttachmentUpload}
+                  className="hidden"
+                />
+
+                {attachmentName && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAttachmentUrl('');
+                      setAttachmentName('');
+                    }}
+                    className="px-2.5 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-lg font-semibold transition-colors cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              {attachmentName && (
+                <div className="flex items-center gap-2 p-2 bg-indigo-50/60 border border-indigo-100 rounded-lg text-xs text-indigo-900 font-medium">
+                  <FileText className="w-4 h-4 text-indigo-600 shrink-0" />
+                  <span className="truncate flex-1 font-semibold">{attachmentName}</span>
+                  <span className="text-[10px] text-indigo-600 font-bold uppercase bg-indigo-100 px-1.5 py-0.5 rounded">Attached</span>
+                </div>
+              )}
+            </div>
           </FormField>
         </form>
       </Modal>

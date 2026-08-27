@@ -1,0 +1,33 @@
+[
+  {
+    "id": "shift-gen",
+    "tenantId": "t-001",
+    "name": "General Shift",
+    "code": "GEN",
+    "startTime": "09:00 AM",
+    "endTime": "06:00 PM",
+    "breakDurationMins": 60,
+    "color": "blue",
+    "isDefault": true
+  },
+  {
+    "id": "shift-night",
+    "tenantId": "t-001",
+    "name": "Night Shift",
+    "code": "NIGHT",
+    "startTime": "10:00 PM",
+    "endTime": "06:00 AM",
+    "breakDurationMins": 60,
+    "color": "slate"
+  },
+  {
+    "id": "shift-day",
+    "tenantId": "t-001",
+    "name": "Day Shift",
+    "code": "DAY",
+    "startTime": "08:00 AM",
+    "endTime": "05:00 PM",
+    "breakDurationMins": 60,
+    "color": "rose"
+  }
+]

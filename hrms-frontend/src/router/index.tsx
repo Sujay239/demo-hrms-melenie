@@ -16,6 +16,7 @@ import { TenantCreatePage } from "@/pages/platform/TenantCreatePage";
 import { TenantDetailPage } from "@/pages/platform/TenantDetailPage";
 import { ConsultantListPage } from "@/pages/platform/ConsultantListPage";
 import { PlatformSettingsPage } from "@/pages/platform/PlatformSettingsPage";
+import { PlatformAuditLogsPage } from "@/pages/platform/PlatformAuditLogsPage";
 
 import { TenantDashboardPage } from "@/pages/tenant/TenantDashboardPage";
 import { EmployeeListPage } from "@/pages/tenant/EmployeeListPage";
@@ -24,8 +25,10 @@ import { DepartmentListPage } from "@/pages/tenant/DepartmentListPage";
 import { DesignationListPage } from "@/pages/tenant/DesignationListPage";
 import { DocumentListPage } from "@/pages/tenant/DocumentListPage";
 import { LeaveManagementPage } from "@/pages/tenant/LeaveManagementPage";
+import { LeaveDetailPage } from "@/pages/tenant/LeaveDetailPage";
 import { HolidayListPage } from "@/pages/tenant/HolidayListPage";
 import { AttendancePage } from "@/pages/tenant/AttendancePage";
+import { ShiftRosterPage } from "@/pages/tenant/ShiftRosterPage";
 import { KBPage } from "@/pages/tenant/KBPage";
 import { AnnouncementsPage } from "@/pages/tenant/AnnouncementsPage";
 import { TicketListPage } from "@/pages/tenant/TicketListPage";
@@ -33,6 +36,8 @@ import { RoomReservationPage } from "@/pages/tenant/RoomReservationPage";
 import { AuditLogPage } from "@/pages/tenant/AuditLogPage";
 import { OnboardingCasesPage } from "@/pages/tenant/OnboardingCasesPage";
 import { ProfileSettingsPage } from "@/pages/tenant/ProfileSettingsPage";
+import { ProjectsPage } from "@/pages/tenant/ProjectsPage";
+import { TasksPage } from "@/pages/tenant/TasksPage";
 
 import { OnboardingDashboardPage } from "@/pages/onboarding/OnboardingDashboardPage";
 import { MyDetailsPage } from "@/pages/onboarding/MyDetailsPage";
@@ -62,10 +67,7 @@ export const AppRouter: React.FC = () => {
           <Route path="tenants/:tenantId" element={<TenantDetailPage />} />
           <Route path="consultants" element={<ConsultantListPage />} />
           <Route path="settings" element={<PlatformSettingsPage />} />
-          <Route
-            path="audit-logs"
-            element={<div className="p-6">Platform Audit Logs</div>}
-          />
+          <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
         </Route>
 
         {/* Company Portal Routes (Peopleworkplaces.hr/{company-slug}/*) */}
@@ -80,9 +82,16 @@ export const AppRouter: React.FC = () => {
           <Route path="departments" element={<DepartmentListPage />} />
           <Route path="designations" element={<DesignationListPage />} />
           <Route path="documents" element={<DocumentListPage />} />
+          <Route path="leave" element={<LeaveManagementPage />} />
           <Route path="leave/*" element={<LeaveManagementPage />} />
+          <Route path="leave/detail/:leaveId" element={<LeaveDetailPage />} />
           <Route path="holidays" element={<HolidayListPage />} />
+          <Route path="attendance" element={<AttendancePage />} />
           <Route path="attendance/*" element={<AttendancePage />} />
+          <Route path="shifts" element={<ShiftRosterPage />} />
+          <Route path="attendance/shifts" element={<ShiftRosterPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="tasks" element={<TasksPage />} />
           <Route path="knowledge-base" element={<KBPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="tickets" element={<TicketListPage />} />

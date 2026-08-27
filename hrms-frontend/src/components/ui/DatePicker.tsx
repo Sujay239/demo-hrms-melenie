@@ -35,23 +35,25 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   required,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [openAbove, setOpenAbove] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number; openAbove: boolean }>({
+    top: 0,
+    left: 0,
+    openAbove: false,
+  });
 
   // Auto-detect whether to open above or below based on viewport & container space
   const handleToggle = () => {
     if (disabled) return;
     if (!isOpen && containerRef.current) {
-      if (placement === 'top') {
-        setOpenAbove(true);
-      } else if (placement === 'bottom') {
-        setOpenAbove(false);
-      } else {
-        const rect = containerRef.current.getBoundingClientRect();
-        const spaceBelow = window.innerHeight - rect.bottom;
-        // If less than 350px below trigger, or closer to bottom of window/modal, flip above
-        setOpenAbove(spaceBelow < 350 || rect.top > spaceBelow);
-      }
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openAbove = placement === 'top' || (placement !== 'bottom' && spaceBelow < 340 && rect.top > 340);
+      setPopoverPos({
+        top: openAbove ? rect.top : rect.bottom,
+        left: Math.max(12, Math.min(rect.left, window.innerWidth - 300)),
+        openAbove,
+      });
     }
     setIsOpen(!isOpen);
   };
@@ -63,11 +65,15 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         setIsOpen(false);
       }
     };
+    const handleResize = () => setIsOpen(false);
+
     if (isOpen) {
       document.addEventListener('mousedown', handleOutsideClick);
+      window.addEventListener('resize', handleResize);
     }
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('resize', handleResize);
     };
   }, [isOpen]);
 
@@ -120,13 +126,19 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         required={required}
       />
 
-      {/* Trigger Button */}
-      <button
-        type="button"
-        disabled={disabled}
+      {/* Trigger Control */}
+      <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
         onClick={handleToggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleToggle();
+          }
+        }}
         className={cn(
-          'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs text-left shadow-xs transition-all cursor-pointer',
+          'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs text-left shadow-xs transition-all cursor-pointer select-none',
           'hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#FF6900]/20 focus:border-[#FF6900]',
           isOpen && 'ring-2 ring-[#FF6900]/20 border-[#FF6900]',
           disabled && 'opacity-60 bg-slate-50 cursor-not-allowed'
@@ -143,22 +155,26 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           <button
             type="button"
             onClick={handleClear}
-            className="p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors cursor-pointer"
             title="Clear date"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         )}
-      </button>
+      </div>
 
       {/* Popover Card containing Shadcn Calendar */}
       {isOpen && (
         <div
-          className={cn(
-            'absolute z-[9999] w-[290px] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150',
-            openAbove ? 'bottom-full mb-2' : 'top-full mt-1.5',
-            'left-0 sm:left-auto sm:right-0 md:left-0'
-          )}
+          style={{
+            position: 'fixed',
+            left: `${popoverPos.left}px`,
+            ...(popoverPos.openAbove
+              ? { bottom: `${window.innerHeight - popoverPos.top + 6}px` }
+              : { top: `${popoverPos.top + 6}px` }),
+            zIndex: 999999,
+          }}
+          className="w-[290px] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         >
           <Calendar
             selected={value}

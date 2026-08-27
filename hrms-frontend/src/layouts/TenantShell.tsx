@@ -29,6 +29,8 @@ import {
   Lock,
   User,
   Sparkles,
+  FolderKanban,
+  CheckSquare,
 } from "lucide-react";
 import { mockStorage, KEYS } from "@/services/mock-storage";
 import { Employee } from "@/demo-data/seedData";
@@ -279,8 +281,23 @@ export const TenantShell: React.FC = () => {
             path: `/${currentSlug}/attendance/records`,
             icon: Clock,
           },
+          {
+            label: "Shift Roster",
+            path: `/${currentSlug}/shifts`,
+            icon: CalendarDays,
+          },
         ]
       : []),
+    {
+      label: "Projects",
+      path: `/${currentSlug}/projects`,
+      icon: FolderKanban,
+    },
+    {
+      label: "Tasks",
+      path: `/${currentSlug}/tasks`,
+      icon: CheckSquare,
+    },
     ...(feats.knowledgeBase !== false
       ? [
           {
@@ -345,6 +362,16 @@ export const TenantShell: React.FC = () => {
           },
         ]
       : []),
+    {
+      label: "Projects",
+      path: `/${currentSlug}/projects`,
+      icon: FolderKanban,
+    },
+    {
+      label: "Tasks",
+      path: `/${currentSlug}/tasks`,
+      icon: CheckSquare,
+    },
     ...(feats.leaveManagement !== false
       ? [
           {

@@ -105,6 +105,7 @@ export interface Employee {
   gender?: "Male" | "Female" | "Other" | "Prefer not to say";
   maritalStatus?: "Single" | "Married" | "Divorced" | "Widowed";
   nationality?: string;
+  languagesKnown?: string[];
   bloodGroup?: "O+" | "A+" | "B+" | "AB+" | "O-" | "A-" | "B-" | "AB-";
   emergencyContactName?: string;
   emergencyContactRelation?: string;
@@ -191,6 +192,8 @@ export interface LeaveRequest {
   reason: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   appliedDate: string;
+  attachmentUrl?: string;
+  attachmentName?: string;
 }
 
 export interface Holiday {
@@ -223,6 +226,31 @@ export interface AttendanceRecord {
   status: "PRESENT" | "ABSENT" | "LATE" | "ON_LEAVE" | "HALF_DAY";
   correctionRequested?: boolean;
   correctionReason?: string;
+  notes?: string;
+}
+
+export interface ShiftDefinition {
+  id: string;
+  tenantId: string;
+  name: string;
+  code: string;
+  startTime: string;
+  endTime: string;
+  breakDurationMins: number;
+  color: string;
+  isDefault?: boolean;
+}
+
+export interface ShiftAssignment {
+  id: string;
+  tenantId: string;
+  employeeId: string;
+  employeeName: string;
+  shiftId: string;
+  shiftName: string;
+  startDate: string;
+  endDate: string;
+  notes?: string;
 }
 
 export interface OvertimeRequest {
@@ -438,6 +466,50 @@ export interface OnboardingCase {
   notes?: string;
 }
 
+export interface Project {
+  id: string;
+  tenantId: string;
+  name: string;
+  code: string;
+  description?: string;
+  client?: string;
+  startDate: string;
+  dueDate: string;
+  status: 'PLANNING' | 'IN_PROGRESS' | 'COMPLETED' | 'ON_HOLD';
+  assignedEmployeeIds: string[];
+  createdAt: string;
+}
+
+export interface TaskItem {
+  id: string;
+  tenantId: string;
+  title: string;
+  description?: string;
+  projectId?: string;
+  projectName?: string;
+  assignedEmployeeId?: string;
+  assignedEmployeeName?: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  dueDate: string;
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'BLOCKED';
+  createdAt: string;
+}
+
+export interface PlatformAuditLog {
+  id: string;
+  category: 'AUTH_LOGIN' | 'TENANT_MGMT' | 'CONSULTANT_MGMT' | 'STRUCTURE_EVENT' | 'SECURITY';
+  actorId: string;
+  actorName: string;
+  actorRole: 'SUPER_ADMIN' | 'CONSULTANT' | 'TENANT_ADMIN';
+  actorEmail: string;
+  action: string;
+  tenantId?: string;
+  tenantName?: string;
+  details: string;
+  ipAddress?: string;
+  timestamp: string;
+}
+
 // =========================================================
 // CLEAN INITIAL MASTER DATASETS (NO FAKE DEMO RECORDS)
 // =========================================================
@@ -473,3 +545,6 @@ export const INITIAL_ROOMS: Room[] = [];
 export const INITIAL_RESERVATIONS: RoomReservation[] = [];
 export const INITIAL_AUDIT_LOGS: AuditLog[] = [];
 export const INITIAL_ONBOARDING_CASES: OnboardingCase[] = [];
+export const INITIAL_PROJECTS: Project[] = [];
+export const INITIAL_TASKS: TaskItem[] = [];
+export const INITIAL_PLATFORM_AUDIT_LOGS: PlatformAuditLog[] = [];

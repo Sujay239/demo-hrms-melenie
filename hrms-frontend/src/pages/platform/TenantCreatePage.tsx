@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Card,
@@ -14,6 +14,7 @@ import { Select } from "@/components/ui/Select";
 import { Modal } from "@/components/ui/Modal";
 import { toast } from "@/components/ui/Toast";
 import { mockStorage } from "@/services/mock-storage";
+import { useFormDraft } from "@/hooks/useFormDraft";
 import {
   ArrowLeft,
   Upload,
@@ -78,6 +79,36 @@ export const TenantCreatePage: React.FC = () => {
   const [noticePeriodDays, setNoticePeriodDays] = useState<number>(30);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
+
+  useEffect(() => {
+    const saved = mockStorage.getFormDraft<any>('create_tenant');
+    if (saved?.data && (saved.data.name || saved.data.adminEmail || saved.data.websiteUrl)) {
+      const d = saved.data;
+      if (d.name) setName(d.name);
+      if (d.slug) setSlug(d.slug);
+      if (d.status) setStatus(d.status);
+      if (d.logoUrl) setLogoUrl(d.logoUrl);
+      if (d.websiteUrl) setWebsiteUrl(d.websiteUrl);
+      if (d.adminEmail) setAdminEmail(d.adminEmail);
+      if (d.adminPassword) setAdminPassword(d.adminPassword);
+      if (d.industry) setIndustry(d.industry);
+      if (d.isCustomIndustry !== undefined) setIsCustomIndustry(d.isCustomIndustry);
+      if (d.customIndustryText) setCustomIndustryText(d.customIndustryText);
+      if (d.offerLetterExpiryDays) setOfferLetterExpiryDays(d.offerLetterExpiryDays);
+      if (d.annualLeaveAllowance) setAnnualLeaveAllowance(d.annualLeaveAllowance);
+      if (d.currency) setCurrency(d.currency);
+      if (d.countryCode) setCountryCode(d.countryCode);
+      if (d.timezone) setTimezone(d.timezone);
+      if (d.workWeekDays) setWorkWeekDays(d.workWeekDays);
+      if (d.dailyWorkingHours) setDailyWorkingHours(d.dailyWorkingHours);
+      if (d.probationPeriodDays) setProbationPeriodDays(d.probationPeriodDays);
+      if (d.noticePeriodDays) setNoticePeriodDays(d.noticePeriodDays);
+
+      setHasRestoredDraft(true);
+      toast.info('⚡ Restored unsaved company creation draft!');
+    }
+  }, []);
 
   // Success Modal State for Displaying Generated Credentials
   const [createdTenantData, setCreatedTenantData] = useState<{
@@ -88,6 +119,59 @@ export const TenantCreatePage: React.FC = () => {
     portalUrl: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const tenantDraftData = {
+    name,
+    slug,
+    status,
+    logoUrl,
+    websiteUrl,
+    adminEmail,
+    adminPassword,
+    industry,
+    isCustomIndustry,
+    customIndustryText,
+    offerLetterExpiryDays,
+    annualLeaveAllowance,
+    currency,
+    countryCode,
+    timezone,
+    workWeekDays,
+    dailyWorkingHours,
+    probationPeriodDays,
+    noticePeriodDays,
+  };
+
+  const { clearDraft: clearTenantDraft } = useFormDraft({
+    draftKey: 'create_tenant',
+    data: tenantDraftData,
+    enabled: !createdTenantData,
+  });
+
+  const handleClearTenantDraft = () => {
+    clearTenantDraft();
+    setName('');
+    setSlug('');
+    setStatus('ACTIVE');
+    setLogoUrl('');
+    setWebsiteUrl('');
+    setAdminEmail('');
+    setAdminPassword('');
+    setIndustry('Software & Cloud Technology');
+    setIsCustomIndustry(false);
+    setCustomIndustryText('');
+    setOfferLetterExpiryDays(14);
+    setAnnualLeaveAllowance(24);
+    setCurrency('USD ($)');
+    setCountryCode('US');
+    setTimezone('America/New_York (EST)');
+    setWorkWeekDays(5);
+    setDailyWorkingHours(8);
+    setProbationPeriodDays(90);
+    setNoticePeriodDays(30);
+    setHasRestoredDraft(false);
+    toast.success('Company draft cleared.');
+  };
 
   const generateSecurePassword = (companySlug: string) => {
     const prefix = companySlug
@@ -177,6 +261,9 @@ export const TenantCreatePage: React.FC = () => {
         finalAdminPassword,
       );
 
+      clearTenantDraft();
+      setHasRestoredDraft(false);
+
       // Show credentials modal
       setCreatedTenantData({
         tenantName: tenant.name,
@@ -225,6 +312,24 @@ export const TenantCreatePage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {hasRestoredDraft && !createdTenantData && (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-2 text-amber-900 text-xs shadow-2xs animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>
+                <strong>Draft Restored:</strong> Unsaved changes from your previous session were automatically loaded.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleClearTenantDraft}
+              className="px-2.5 py-1 text-xs font-bold text-amber-800 hover:text-amber-950 bg-amber-100/80 hover:bg-amber-200 rounded-lg border border-amber-300 transition-colors shrink-0 cursor-pointer"
+            >
+              Clear Draft
+            </button>
+          </div>
+        )}
+
         {/* SECTION 1: IDENTITY & DOMAIN */}
         <Card className="shadow-xs border border-slate-200">
           <CardHeader className="border-b border-slate-100 pb-3">

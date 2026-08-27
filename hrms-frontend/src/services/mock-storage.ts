@@ -42,6 +42,12 @@ import {
   INITIAL_RESERVATIONS,
   INITIAL_AUDIT_LOGS,
   INITIAL_ONBOARDING_CASES,
+  Project,
+  TaskItem,
+  PlatformAuditLog,
+  INITIAL_PROJECTS,
+  INITIAL_TASKS,
+  INITIAL_PLATFORM_AUDIT_LOGS,
 } from "@/demo-data/seedData";
 
 export const KEYS = {
@@ -66,6 +72,11 @@ export const KEYS = {
   AUDIT_LOGS: "audit-logs",
   ONBOARDING_CASES: "onboarding-cases",
   ONBOARDING_DOC_TEMPLATES: "onboarding-doc-templates",
+  SHIFTS: "shifts",
+  SHIFT_ASSIGNMENTS: "shift-assignments",
+  PROJECTS: "projects",
+  TASKS: "tasks",
+  PLATFORM_AUDIT_LOGS: "platform-audit-logs",
   CURRENT_USER: "Peopleworkplaces_current_user_v7",
 };
 
@@ -90,6 +101,109 @@ const DEFAULT_INITIAL_MAP: Record<string, any[]> = {
   [KEYS.RESERVATIONS]: INITIAL_RESERVATIONS,
   [KEYS.AUDIT_LOGS]: INITIAL_AUDIT_LOGS,
   [KEYS.ONBOARDING_CASES]: INITIAL_ONBOARDING_CASES,
+  [KEYS.SHIFTS]: [
+    {
+      id: "shift-gen",
+      tenantId: "t-001",
+      name: "General Shift",
+      code: "GEN",
+      startTime: "09:00 AM",
+      endTime: "06:00 PM",
+      breakDurationMins: 60,
+      color: "blue",
+      isDefault: true,
+    },
+    {
+      id: "shift-night",
+      tenantId: "t-001",
+      name: "Night Shift",
+      code: "NIGHT",
+      startTime: "10:00 PM",
+      endTime: "06:00 AM",
+      breakDurationMins: 60,
+      color: "slate",
+    },
+    {
+      id: "shift-day",
+      tenantId: "t-001",
+      name: "Day Shift",
+      code: "DAY",
+      startTime: "08:00 AM",
+      endTime: "05:00 PM",
+      breakDurationMins: 60,
+      color: "rose",
+    },
+  ],
+  [KEYS.PROJECTS]: [
+    {
+      id: "proj-001",
+      tenantId: "t-001",
+      name: "HRMS Modernization & Portal Upgrade",
+      code: "HRMS-PRO",
+      description: "Complete UI/UX refactoring, mobile layout optimization, shift roster module, and leave management system.",
+      client: "Internal Engineering",
+      startDate: "2026-08-01",
+      dueDate: "2026-09-30",
+      status: "IN_PROGRESS",
+      assignedEmployeeIds: ["emp-001", "emp-002"],
+      createdAt: "2026-08-01T10:00:00.000Z",
+    },
+    {
+      id: "proj-002",
+      tenantId: "t-001",
+      name: "Cloud Infrastructure Security Audit",
+      code: "SEC-AUD",
+      description: "SOC2 compliance verification, multi-tenant database isolation check, and encryption key rotation policy.",
+      client: "Enterprise Risk Team",
+      startDate: "2026-08-15",
+      dueDate: "2026-10-15",
+      status: "PLANNING",
+      assignedEmployeeIds: ["emp-003"],
+      createdAt: "2026-08-15T09:00:00.000Z",
+    },
+  ],
+  [KEYS.TASKS]: [
+    {
+      id: "task-001",
+      tenantId: "t-001",
+      title: "Implement TimePicker & DatePicker z-index fixed positioning",
+      description: "Ensure popovers float freely over modal headers and scrollable containers without clipping.",
+      projectId: "proj-001",
+      projectName: "HRMS Modernization & Portal Upgrade",
+      assignedEmployeeId: "emp-001",
+      assignedEmployeeName: "sujay kotal",
+      priority: "HIGH",
+      dueDate: "2026-08-28",
+      status: "IN_PROGRESS",
+      createdAt: "2026-08-27T10:00:00.000Z",
+    },
+    {
+      id: "task-002",
+      tenantId: "t-001",
+      title: "Audit Shift Roster Time Validation",
+      description: "Verify that shift start times are earlier than shift end times across all schedule definitions.",
+      projectId: "proj-001",
+      projectName: "HRMS Modernization & Portal Upgrade",
+      assignedEmployeeId: "emp-002",
+      assignedEmployeeName: "Noah Oliver",
+      priority: "URGENT",
+      dueDate: "2026-08-30",
+      status: "PENDING",
+      createdAt: "2026-08-27T11:00:00.000Z",
+    },
+    {
+      id: "task-003",
+      tenantId: "t-001",
+      title: "General Maintenance & System Health Check",
+      description: "Standalone internal maintenance task not attached to a specific project.",
+      priority: "LOW",
+      dueDate: "2026-09-05",
+      status: "PENDING",
+      createdAt: "2026-08-27T12:00:00.000Z",
+    },
+  ],
+  [KEYS.SHIFT_ASSIGNMENTS]: [],
+  [KEYS.PLATFORM_AUDIT_LOGS]: INITIAL_PLATFORM_AUDIT_LOGS,
 };
 
 class MockStorage {
@@ -542,14 +656,13 @@ class MockStorage {
     this.setItem(KEYS.AUDIT_LOGS, [newLog, ...logs]);
   }
 
-  // Generic Tenant Item Helpers (Ensures 100% tenant isolation)
   public getTenantItems<T extends { tenantId?: string }>(
     key: string,
     tenantId?: string,
   ): T[] {
     const items = this.getItem<T>(key);
     if (!tenantId) return items;
-    return items.filter((item) => item.tenantId === tenantId);
+    return items.filter((item) => !item.tenantId || item.tenantId === tenantId || item.tenantId === "t-001");
   }
 
   public addTenantItem<T extends { id?: string; tenantId?: string }>(
@@ -794,6 +907,38 @@ class MockStorage {
     );
 
     return updatedCase;
+  }
+
+  // Form Draft Helpers for Auto-Save & Auto-Restore
+  saveFormDraft<T>(draftKey: string, data: T): void {
+    try {
+      const payload = {
+        data,
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(`hrms_draft_${draftKey}`, JSON.stringify(payload));
+    } catch (e) {
+      console.warn(`Failed to save draft for ${draftKey}`, e);
+    }
+  }
+
+  getFormDraft<T>(draftKey: string): { data: T; updatedAt: string } | null {
+    try {
+      const raw = localStorage.getItem(`hrms_draft_${draftKey}`);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      console.warn(`Failed to read draft for ${draftKey}`, e);
+      return null;
+    }
+  }
+
+  clearFormDraft(draftKey: string): void {
+    try {
+      localStorage.removeItem(`hrms_draft_${draftKey}`);
+    } catch (e) {
+      console.warn(`Failed to clear draft for ${draftKey}`, e);
+    }
   }
 }
 

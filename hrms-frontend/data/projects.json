@@ -1,0 +1,54 @@
+[
+  {
+    "id": "proj-001",
+    "tenantId": "t-001",
+    "name": "HRMS Modernization & Portal Upgrade",
+    "code": "HRMS-PRO",
+    "description": "Complete UI/UX refactoring, mobile layout optimization, shift roster module, and leave management system.",
+    "client": "Internal Engineering",
+    "startDate": "2026-08-01",
+    "dueDate": "2026-09-30",
+    "status": "IN_PROGRESS",
+    "assignedEmployeeIds": ["emp-001", "emp-002"],
+    "createdAt": "2026-08-01T10:00:00.000Z"
+  },
+  {
+    "id": "proj-002",
+    "tenantId": "t-001",
+    "name": "Cloud Infrastructure Security Audit",
+    "code": "SEC-AUD",
+    "description": "SOC2 compliance verification, multi-tenant database isolation check, and encryption key rotation policy.",
+    "client": "Enterprise Risk Team",
+    "startDate": "2026-08-15",
+    "dueDate": "2026-10-15",
+    "status": "PLANNING",
+    "assignedEmployeeIds": ["emp-003"],
+    "createdAt": "2026-08-15T09:00:00.000Z"
+  },
+  {
+    "id": "proj-tn-001",
+    "tenantId": "tenant-1787291784650",
+    "name": "Enterprise Core System Transformation",
+    "code": "CORE-SYS",
+    "description": "Full-stack HR transformation project covering attendance, shift rosters, employee onboarding, and document management.",
+    "client": "Auto Computation Global",
+    "startDate": "2026-08-01",
+    "dueDate": "2026-10-31",
+    "status": "IN_PROGRESS",
+    "assignedEmployeeIds": ["emp-1787752820312", "emp-1787312095175"],
+    "createdAt": "2026-08-01T08:00:00.000Z"
+  },
+  {
+    "id": "proj-tn-002",
+    "tenantId": "tenant-1787291784650",
+    "name": "Automated Shift Scheduling & Roster Engine",
+    "code": "ROSTER-AI",
+    "description": "Real-time weekly matrix shift planner, auto-populating time slots, time pickers, and attendance sync.",
+    "client": "Operations Department",
+    "startDate": "2026-08-10",
+    "dueDate": "2026-09-15",
+    "status": "IN_PROGRESS",
+    "assignedEmployeeIds": ["emp-1787752820312"],
+    "createdAt": "2026-08-10T10:00:00.000Z"
+  }
+]
