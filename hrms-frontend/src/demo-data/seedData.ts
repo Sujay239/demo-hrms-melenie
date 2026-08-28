@@ -312,14 +312,16 @@ export interface TicketComment {
 export interface Ticket {
   id: string;
   tenantId: string;
+  tenantName?: string;
   ticketNumber: string;
   subject: string;
   description: string;
   category: string;
   departmentId: string;
   departmentName: string;
-  priority: "HIGH" | "MEDIUM" | "LOW";
+  priority: "HIGH" | "MEDIUM" | "LOW" | "URGENT";
   status: "OPEN" | "IN_PROGRESS" | "WAITING" | "RESOLVED" | "CLOSED";
+  targetScope?: "PLATFORM_SUPER_ADMIN" | "INTERNAL_COMPANY";
   createdById: string;
   createdByName: string;
   assigneeName?: string;

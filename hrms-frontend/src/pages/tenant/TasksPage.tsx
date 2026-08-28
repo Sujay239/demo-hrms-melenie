@@ -6,6 +6,7 @@ import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { TaskForm } from '@/components/forms/TaskForm';
 import { Card } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
@@ -439,107 +440,29 @@ export const TasksPage: React.FC = () => {
         description="Configure task assignment, optional project link, priority, and due dates."
         maxWidth="2xl"
       >
-        <form onSubmit={handleSaveTask} className="space-y-4 text-xs pt-1 min-h-[380px] flex flex-col justify-between">
-          <div className="space-y-4">
-            <FormField label="Task Name / Title" required>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Implement TimePicker popover fixed positioning"
-                required
-              />
-            </FormField>
-
-            <div className="grid grid-cols-2 gap-3">
-              {/* Optional Project Select */}
-              <FormField
-                label="Select Project (Optional)"
-                helperText="Selecting a project filters the assignee list to team members assigned to that project"
-              >
-                <Select
-                  value={projectId}
-                  onChange={(e) => handleProjectChangeInForm(e.target.value)}
-                  options={[
-                    { value: '', label: '🌐 None (Standalone Task)' },
-                    ...projects.map((p) => ({ value: p.id, label: `📁 ${p.name} (${p.code})` })),
-                  ]}
-                />
-              </FormField>
-
-              {/* Conditional Assignee Employee Select */}
-              <FormField
-                label="Assignee Employee"
-                helperText={
-                  projectId
-                    ? 'Showing ONLY employees assigned to the selected project'
-                    : 'Showing ALL active company employees'
-                }
-              >
-                <Select
-                  value={assignedEmployeeId}
-                  onChange={(e) => setAssignedEmployeeId(e.target.value)}
-                  options={[
-                    { value: '', label: 'Select Assignee...' },
-                    ...availableAssignees.map((e) => ({
-                      value: e.id,
-                      label: `${e.name} (${e.employeeId || 'EMP'})`,
-                    })),
-                  ]}
-                />
-              </FormField>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <FormField label="Priority" required>
-                <Select
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value as any)}
-                  options={[
-                    { value: 'LOW', label: 'Low' },
-                    { value: 'MEDIUM', label: 'Medium' },
-                    { value: 'HIGH', label: 'High' },
-                    { value: 'URGENT', label: 'Urgent' },
-                  ]}
-                />
-              </FormField>
-
-              <FormField label="Status" required helperText="Defaults to PENDING">
-                <Select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
-                  options={[
-                    { value: 'PENDING', label: 'PENDING' },
-                    { value: 'IN_PROGRESS', label: 'IN_PROGRESS' },
-                    { value: 'COMPLETED', label: 'COMPLETED' },
-                    { value: 'BLOCKED', label: 'BLOCKED' },
-                  ]}
-                />
-              </FormField>
-
-              <FormField label="Due Date">
-                <DatePicker value={dueDate} onChange={setDueDate} />
-              </FormField>
-            </div>
-
-            <FormField label="Description">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Detailed instructions, requirements, or acceptance criteria..."
-                className="w-full min-h-20 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
-            </FormField>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 mt-4">
-            <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" className="bg-indigo-600 font-bold">
-              {editingTask ? 'Save Task Changes' : 'Create Task'}
-            </Button>
-          </div>
-        </form>
+        <TaskForm
+          initialValues={editingTask || undefined}
+          tenantId={currentTenant.id}
+          onSubmit={(formData) => {
+            if (editingTask) {
+              mockStorage.updateTenantItem<TaskItem>(KEYS.TASKS, editingTask.id, formData);
+              toast.success(`Task "${formData.title}" updated successfully!`);
+            } else {
+              const newTask: TaskItem = {
+                id: `task-${Date.now()}`,
+                tenantId: currentTenant.id,
+                ...formData,
+                createdAt: new Date().toISOString(),
+              };
+              mockStorage.addTenantItem<TaskItem>(KEYS.TASKS, newTask);
+              toast.success(`🎉 Task "${formData.title}" created successfully!`);
+            }
+            setIsModalOpen(false);
+            reloadData();
+          }}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={editingTask ? 'Save Task Changes' : 'Create Task'}
+        />
       </Modal>
 
       {/* MODAL: VIEW TASK DETAILS */}

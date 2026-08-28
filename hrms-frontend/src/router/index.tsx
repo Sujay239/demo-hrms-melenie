@@ -17,6 +17,7 @@ import { TenantDetailPage } from "@/pages/platform/TenantDetailPage";
 import { ConsultantListPage } from "@/pages/platform/ConsultantListPage";
 import { PlatformSettingsPage } from "@/pages/platform/PlatformSettingsPage";
 import { PlatformAuditLogsPage } from "@/pages/platform/PlatformAuditLogsPage";
+import { PlatformTicketsPage } from "@/pages/platform/PlatformTicketsPage";
 
 import { TenantDashboardPage } from "@/pages/tenant/TenantDashboardPage";
 import { EmployeeListPage } from "@/pages/tenant/EmployeeListPage";
@@ -66,6 +67,7 @@ export const AppRouter: React.FC = () => {
           <Route path="tenants/new" element={<TenantCreatePage />} />
           <Route path="tenants/:tenantId" element={<TenantDetailPage />} />
           <Route path="consultants" element={<ConsultantListPage />} />
+          <Route path="tickets" element={<PlatformTicketsPage />} />
           <Route path="settings" element={<PlatformSettingsPage />} />
           <Route path="audit-logs" element={<PlatformAuditLogsPage />} />
         </Route>

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { MultiSelect } from '@/components/ui/MultiSelect';
+import { ProjectForm } from '@/components/forms/ProjectForm';
 import { Card } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
@@ -410,96 +411,29 @@ export const ProjectsPage: React.FC = () => {
         description="Configure project details and assign team members."
         maxWidth="2xl"
       >
-        <form onSubmit={handleSaveProject} className="space-y-4 text-xs pt-1 min-h-[380px] flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2">
-                <FormField label="Project Name" required>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Mobile App Redesign"
-                    required
-                  />
-                </FormField>
-              </div>
-
-              <FormField label="Project Code" required>
-                <Input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. MOB-APP"
-                  maxLength={10}
-                  required
-                />
-              </FormField>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <FormField label="Client / Department">
-                <Input
-                  value={client}
-                  onChange={(e) => setClient(e.target.value)}
-                  placeholder="e.g. Marketing Team"
-                />
-              </FormField>
-
-              <FormField label="Status" required>
-                <Select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
-                  options={[
-                    { value: 'PLANNING', label: 'Planning' },
-                    { value: 'IN_PROGRESS', label: 'In Progress' },
-                    { value: 'COMPLETED', label: 'Completed' },
-                    { value: 'ON_HOLD', label: 'On Hold' },
-                  ]}
-                />
-              </FormField>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <FormField label="Start Date" required>
-                <DatePicker value={startDate} onChange={setStartDate} required />
-              </FormField>
-
-              <FormField label="Due Date" required>
-                <DatePicker value={dueDate} onChange={setDueDate} minDate={startDate} required />
-              </FormField>
-            </div>
-
-            {/* Assigned Employees (MultiSelect) */}
-            <FormField label="Assigned Team Members" helperText="Select one or more employees assigned to this project">
-              <MultiSelect
-                value={assignedEmployeeIds}
-                onChange={setAssignedEmployeeIds}
-                options={employees.map((e) => ({
-                  value: e.id,
-                  label: `${e.name} (${e.employeeId || 'EMP'})`,
-                }))}
-                placeholder="Select employees to assign to project..."
-              />
-            </FormField>
-
-            <FormField label="Description">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Detailed scope, objectives, or deliverable notes..."
-                className="w-full min-h-20 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
-            </FormField>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 mt-4">
-            <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" className="bg-indigo-600 font-bold">
-              {editingProject ? 'Save Changes' : 'Create Project'}
-            </Button>
-          </div>
-        </form>
+        <ProjectForm
+          initialValues={editingProject || undefined}
+          tenantId={currentTenant.id}
+          onSubmit={(formData) => {
+            if (editingProject) {
+              mockStorage.updateTenantItem<Project>(KEYS.PROJECTS, editingProject.id, formData);
+              toast.success(`Project "${formData.name}" updated successfully!`);
+            } else {
+              const newProj: Project = {
+                id: `proj-${Date.now()}`,
+                tenantId: currentTenant.id,
+                ...formData,
+                createdAt: new Date().toISOString(),
+              };
+              mockStorage.addTenantItem<Project>(KEYS.PROJECTS, newProj);
+              toast.success(`🎉 Project "${formData.name}" created successfully!`);
+            }
+            setIsModalOpen(false);
+            reloadData();
+          }}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={editingProject ? 'Save Changes' : 'Create Project'}
+        />
       </Modal>
 
       {/* MODAL: VIEW PROJECT DETAILS */}

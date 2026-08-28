@@ -31,6 +31,9 @@ import {
   Sparkles,
   FolderKanban,
   CheckSquare,
+  Plus,
+  Bell,
+  Search,
 } from "lucide-react";
 import { mockStorage, KEYS } from "@/services/mock-storage";
 import { Employee } from "@/demo-data/seedData";
@@ -39,6 +42,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ToastContainer } from "@/components/ui/Toast";
+import { QuickAddModal, QuickAddType } from "@/components/ui/QuickAddModal";
 
 export const TenantShell: React.FC = () => {
   const location = useLocation();
@@ -46,6 +50,8 @@ export const TenantShell: React.FC = () => {
   const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isQuickAddMenuOpen, setIsQuickAddMenuOpen] = useState(false);
+  const [quickAddType, setQuickAddType] = useState<QuickAddType>(null);
 
   const currentUser = mockStorage.getCurrentUser();
   const allTenants = mockStorage.getTenants();
@@ -553,56 +559,218 @@ export const TenantShell: React.FC = () => {
             </div>
           </div>
 
-          {/* User Account Menu */}
-          <div className="relative">
+          {/* Universal Header Action Bar & Quick-Add Menu */}
+          <div className="flex items-center gap-2.5">
+            {/* Upgrade Plan Badge */}
+
+            {/* Quick Action Icons Bar */}
+            <div className="hidden sm:flex items-center gap-1 border-r border-slate-200 pr-2.5 mr-1">
+
+              <button
+                type="button"
+                onClick={() => navigate(`/${currentSlug}/knowledge-base`)}
+                className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                title="Knowledge Base & Notes"
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate(`/${currentSlug}/attendance`)}
+                className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                title="Attendance & Clock In/Out"
+              >
+                <Clock className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* UNIVERSAL QUICK-ADD + FLOATING MENU */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsQuickAddMenuOpen(!isQuickAddMenuOpen)}
+                className={cn(
+                  "p-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer flex items-center justify-center border border-slate-200 bg-white shadow-2xs",
+                  isQuickAddMenuOpen && "bg-indigo-50 border-indigo-300 text-indigo-700 ring-2 ring-indigo-500/20"
+                )}
+                title="Universal Quick Add Menu"
+              >
+                <Plus className="w-4.5 h-4.5 stroke-[2.5]" />
+              </button>
+
+              {isQuickAddMenuOpen && (
+                <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95 select-none">
+                  <div className="px-3.5 py-1 border-b border-slate-100 mb-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                      Quick Actions
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("PROJECT");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Project</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("TASK");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Task</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("EMPLOYEE");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Employee</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("REGION");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Region / Office</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("DEPARTMENT");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Department</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("DESIGNATION");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Designation</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("MEETING_ROOM");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add Meeting Room</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("KB_ARTICLE");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Add KB Article</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsQuickAddMenuOpen(false);
+                      setQuickAddType("TICKET");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left border-t border-slate-100 mt-1 pt-2"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Create Ticket</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Notification Bell Icon */}
             <button
-              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+              type="button"
+              onClick={() => navigate(`/${currentSlug}/announcements`)}
+              className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer relative"
+              title="Notifications & Announcements"
             >
-              <Avatar
-                src={currentUser.avatarUrl}
-                name={currentUser.name}
-                size="sm"
-              />
-              <div className="hidden md:flex flex-col text-left">
-                <span className="text-sm font-semibold text-slate-800 leading-tight">
-                  {currentUser.name}
-                </span>
-                <span className="text-xs text-slate-500">
-                  {mockStorage.getRoleLabel(currentUser.role)}
-                </span>
-              </div>
-              <ChevronDown className="w-4 h-4 text-slate-400" />
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />
             </button>
 
-            {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-40 animate-in fade-in zoom-in-95">
-                <div className="px-4 py-2.5 border-b border-slate-100">
-                  <p className="text-sm font-semibold text-slate-900">
+            {/* User Profile Account Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <Avatar
+                  src={currentUser.avatarUrl}
+                  name={currentUser.name}
+                  size="sm"
+                />
+                <div className="hidden md:flex flex-col text-left">
+                  <span className="text-sm font-semibold text-slate-800 leading-tight">
                     {currentUser.name}
-                  </p>
-                  <p className="text-xs text-slate-500">{currentUser.email}</p>
-                  <span className="inline-block mt-1 text-[10px] font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100">
+                  </span>
+                  <span className="text-xs text-slate-500">
                     {mockStorage.getRoleLabel(currentUser.role)}
                   </span>
                 </div>
-                <Link
-                  to={`/${currentSlug}/profile`}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                >
-                  <User className="w-4 h-4 text-indigo-600" />
-                  My Profile & Settings
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </div>
-            )}
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              </button>
+
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-1 z-50 animate-in fade-in zoom-in-95">
+                  <div className="px-4 py-2.5 border-b border-slate-100">
+                    <p className="text-sm font-semibold text-slate-900">
+                      {currentUser.name}
+                    </p>
+                    <p className="text-xs text-slate-500">{currentUser.email}</p>
+                    <span className="inline-block mt-1 text-[10px] font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100">
+                      {mockStorage.getRoleLabel(currentUser.role)}
+                    </span>
+                  </div>
+                  <Link
+                    to={`/${currentSlug}/profile`}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 border-b border-slate-100"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                  >
+                    <User className="w-4 h-4 text-indigo-600" />
+                    My Profile & Settings
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -657,9 +825,21 @@ export const TenantShell: React.FC = () => {
             <Outlet />
           )}
         </main>
-      </div>
 
-      <ToastContainer />
+        {/* Toast Notifications */}
+        <ToastContainer />
+
+        {/* Global Quick Add Modal */}
+        <QuickAddModal
+          type={quickAddType}
+          tenantId={activeTenant.id}
+          isOpen={!!quickAddType}
+          onClose={() => setQuickAddType(null)}
+          onSuccess={() => {
+            window.dispatchEvent(new Event("storage"));
+          }}
+        />
+      </div>
     </div>
   );
 };

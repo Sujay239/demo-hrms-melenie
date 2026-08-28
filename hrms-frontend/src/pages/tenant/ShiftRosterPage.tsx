@@ -592,7 +592,9 @@ export const ShiftRosterPage: React.FC = () => {
               onChange={(e) => setAssignEmpId(e.target.value)}
               options={[
                 { value: 'ALL', label: '👥 ALL EMPLOYEES (Organization Wide)' },
-                ...employees.map((e) => ({ value: e.id, label: `${e.name} (${e.employeeId || 'EMP'})` })),
+                ...employees
+                  .filter((e) => e.isPermanent !== false && e.employmentStatus !== 'INACTIVE')
+                  .map((e) => ({ value: e.id, label: `${e.name} (${e.employeeId || 'EMP'})` })),
               ]}
             />
           </FormField>

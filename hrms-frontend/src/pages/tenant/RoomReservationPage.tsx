@@ -11,6 +11,7 @@ import { FormField } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
 import { mockStorage, KEYS } from '@/services/mock-storage';
 import { Room, RoomReservation, Building } from '@/demo-data/seedData';
+import { MeetingRoomForm } from '@/components/forms/MeetingRoomForm';
 import {
   DoorOpen,
   Plus,
@@ -97,17 +98,6 @@ export const RoomReservationPage: React.FC = () => {
   const [reserveStartTime, setReserveStartTime] = useState('10:00');
   const [reserveEndTime, setReserveEndTime] = useState('11:00');
 
-  // Add / Edit Room Form State
-  const [roomName, setRoomName] = useState('');
-  const [buildingName, setBuildingName] = useState('');
-  const [floor, setFloor] = useState<number>(1);
-  const [capacity, setCapacity] = useState<number>(8);
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([
-    '4K Video Conf Display',
-    'Digital Smart Whiteboard',
-    'High-Speed Wi-Fi & LAN',
-  ]);
-  const [roomStatus, setRoomStatus] = useState<'ACTIVE' | 'INACTIVE'>('ACTIVE');
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -231,77 +221,15 @@ export const RoomReservationPage: React.FC = () => {
     reloadData();
   };
 
-  // Open Add Room Modal
   const handleOpenAddRoom = () => {
     setEditingRoom(null);
-    setRoomName('');
-    setBuildingName(buildings[0]?.name || 'Main Office Tower');
-    setFloor(1);
-    setCapacity(8);
-    setSelectedFacilities([
-      '4K Video Conf Display',
-      'Digital Smart Whiteboard',
-      'High-Speed Wi-Fi & LAN',
-    ]);
-    setRoomStatus('ACTIVE');
     setIsAddRoomModalOpen(true);
   };
 
   // Open Edit Room Modal
   const handleOpenEditRoom = (room: Room) => {
     setEditingRoom(room);
-    setRoomName(room.name);
-    setBuildingName(room.buildingName);
-    setFloor(room.floor);
-    setCapacity(room.capacity);
-    setSelectedFacilities(room.facilities || []);
-    setRoomStatus(room.status);
     setIsAddRoomModalOpen(true);
-  };
-
-  // Save Add / Edit Room
-  const handleSaveRoom = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!roomName.trim()) {
-      toast.error('Please enter a room name');
-      return;
-    }
-
-    const bld = buildings.find((b) => b.name === buildingName) || buildings[0];
-    const bldId = bld?.id || `bld-${Date.now()}`;
-    const bldName = buildingName.trim() || 'Headquarters Alpha';
-
-    if (editingRoom) {
-      mockStorage.updateTenantItem<Room>(KEYS.ROOMS, editingRoom.id, {
-        name: roomName.trim(),
-        buildingId: bldId,
-        buildingName: bldName,
-        floor: Number(floor) || 1,
-        capacity: Number(capacity) || 4,
-        facilities: selectedFacilities,
-        status: roomStatus,
-      });
-      mockStorage.addAuditLog('ROOM_UPDATED', 'ROOM', editingRoom.id);
-      toast.success(`Meeting Room "${roomName}" updated successfully!`);
-    } else {
-      const newRoom: Room = {
-        id: `room-${Date.now()}`,
-        tenantId: currentTenant.id,
-        buildingId: bldId,
-        buildingName: bldName,
-        floor: Number(floor) || 1,
-        name: roomName.trim(),
-        capacity: Number(capacity) || 4,
-        facilities: selectedFacilities,
-        status: roomStatus,
-      };
-      mockStorage.addTenantItem<Room>(KEYS.ROOMS, newRoom);
-      mockStorage.addAuditLog('ROOM_CREATED', 'ROOM', newRoom.id);
-      toast.success(`🎉 New Meeting Room "${roomName}" created successfully!`);
-    }
-
-    setIsAddRoomModalOpen(false);
-    reloadData();
   };
 
   const handleDeleteRoom = (id: string, name: string) => {
@@ -309,14 +237,6 @@ export const RoomReservationPage: React.FC = () => {
       mockStorage.deleteTenantItem(KEYS.ROOMS, id);
       toast.success(`Meeting Room "${name}" removed`);
       reloadData();
-    }
-  };
-
-  const toggleFacility = (facility: string) => {
-    if (selectedFacilities.includes(facility)) {
-      setSelectedFacilities(selectedFacilities.filter((f) => f !== facility));
-    } else {
-      setSelectedFacilities([...selectedFacilities, facility]);
     }
   };
 
@@ -639,124 +559,49 @@ export const RoomReservationPage: React.FC = () => {
         maxWidth="2xl"
         title={editingRoom ? 'Edit Meeting Room' : 'Add New Meeting Room'}
         description="Configure room details, seating capacity, facilities, and location for your office."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setIsAddRoomModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveRoom} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
-              {editingRoom ? 'Save Changes' : 'Create Meeting Room'}
-            </Button>
-          </>
-        }
       >
-        <form onSubmit={handleSaveRoom} className="space-y-4 text-xs">
-          <FormField label="Meeting Room Name" required helperText="e.g. Apollo Boardroom, Orion Focus Pod">
-            <Input
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              placeholder="e.g. Apollo Boardroom"
-              required
-            />
-          </FormField>
+        <MeetingRoomForm
+          initialValues={editingRoom || undefined}
+          tenantId={currentTenant.id}
+          onSubmit={(formData) => {
+            const bld = buildings.find((b) => b.name === formData.buildingName) || buildings[0];
+            const bldId = bld?.id || `bld-${Date.now()}`;
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField label="Building / Office Location" required>
-              <Input
-                value={buildingName}
-                onChange={(e) => setBuildingName(e.target.value)}
-                placeholder="e.g. HQ Tower Alpha, Tech Annex B"
-                required
-              />
-            </FormField>
+            if (editingRoom) {
+              mockStorage.updateTenantItem<Room>(KEYS.ROOMS, editingRoom.id, {
+                name: formData.name,
+                buildingId: bldId,
+                buildingName: formData.buildingName,
+                floor: formData.floor,
+                capacity: formData.capacity,
+                facilities: formData.facilities,
+                status: formData.status,
+              });
+              mockStorage.addAuditLog('ROOM_UPDATED', 'ROOM', editingRoom.id);
+              toast.success(`Meeting Room "${formData.name}" updated successfully!`);
+            } else {
+              const newRoom: Room = {
+                id: `room-${Date.now()}`,
+                tenantId: currentTenant.id,
+                buildingId: bldId,
+                buildingName: formData.buildingName,
+                floor: formData.floor,
+                name: formData.name,
+                capacity: formData.capacity,
+                facilities: formData.facilities,
+                status: formData.status,
+              };
+              mockStorage.addTenantItem<Room>(KEYS.ROOMS, newRoom);
+              mockStorage.addAuditLog('ROOM_CREATED', 'ROOM', newRoom.id);
+              toast.success(`🎉 New Meeting Room "${formData.name}" created successfully!`);
+            }
 
-            <FormField label="Floor Number" required>
-              <Input
-                type="number"
-                min="0"
-                max="100"
-                value={floor}
-                onChange={(e) => setFloor(Number(e.target.value))}
-                placeholder="1"
-                required
-              />
-            </FormField>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-            <FormField label="Seating Capacity (Persons)" required>
-              <Input
-                type="number"
-                min="1"
-                max="200"
-                value={capacity}
-                onChange={(e) => setCapacity(Number(e.target.value))}
-                placeholder="8"
-                required
-              />
-            </FormField>
-
-            <FormField label="Operational Room Status" required>
-              <Select
-                value={roomStatus}
-                onChange={(e) => setRoomStatus(e.target.value as 'ACTIVE' | 'INACTIVE')}
-                options={[
-                  { value: 'ACTIVE', label: 'ACTIVE — Available for booking' },
-                  { value: 'INACTIVE', label: 'INACTIVE — Under Maintenance' },
-                ]}
-              />
-            </FormField>
-          </div>
-
-          {/* Facilities Multi-Tag Checklist */}
-          <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-700 block">
-                Available Facilities & Equipment:
-              </label>
-              <span className="text-[11px] text-slate-400 font-medium">
-                {selectedFacilities.length} of {COMMON_FACILITIES.length} selected
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-              {COMMON_FACILITIES.map((f) => {
-                const isSelected = selectedFacilities.includes(f.label);
-                const FacilityIcon = f.icon;
-                return (
-                  <button
-                    key={f.label}
-                    type="button"
-                    onClick={() => toggleFacility(f.label)}
-                    className={`flex items-center justify-between p-2.5 rounded-lg border text-[11px] font-medium transition-all cursor-pointer text-left w-full ${
-                      isSelected
-                        ? 'bg-indigo-50/90 text-indigo-900 border-indigo-300 font-semibold shadow-2xs'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                      <FacilityIcon
-                        className={`w-3.5 h-3.5 shrink-0 ${
-                          isSelected ? 'text-indigo-600' : 'text-slate-400'
-                        }`}
-                      />
-                      <span className="truncate">{f.label}</span>
-                    </div>
-
-                    <div
-                      className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors ${
-                        isSelected
-                          ? 'bg-indigo-600 text-white'
-                          : 'border border-slate-300 bg-white'
-                      }`}
-                    >
-                      {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </form>
+            setIsAddRoomModalOpen(false);
+            reloadData();
+          }}
+          onCancel={() => setIsAddRoomModalOpen(false)}
+          submitLabel={editingRoom ? 'Save Changes' : 'Create Meeting Room'}
+        />
       </Modal>
 
       {/* ============================================================ */}

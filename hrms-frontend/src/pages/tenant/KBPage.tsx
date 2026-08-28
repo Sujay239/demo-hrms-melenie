@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -10,6 +10,7 @@ import { FormField } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
 import { mockStorage, KEYS } from '@/services/mock-storage';
 import { KBArticle, KBAttachment, Department, Employee } from '@/demo-data/seedData';
+import { KBArticleForm } from '@/components/forms/KBArticleForm';
 import {
   Search,
   Plus,
@@ -41,15 +42,7 @@ export const KBPage: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<KBAttachment | null>(null);
 
-  // Create form state
-  const [title, setTitle] = useState('');
-  const [categoryName, setCategoryName] = useState('Company Policies');
-  const [content, setContent] = useState('');
-  const [tagsInput, setTagsInput] = useState('guide, policy, step-by-step');
-  const [audienceScope, setAudienceScope] = useState<'COMPANY_WIDE' | 'DEPARTMENT_SPECIFIC'>('COMPANY_WIDE');
-  const [targetDepartmentId, setTargetDepartmentId] = useState('');
-  const [attachments, setAttachments] = useState<KBAttachment[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const tenants = mockStorage.getTenants();
   const currentTenant = tenants.find((t) => t.slug === slug) || tenants[0];
@@ -127,114 +120,7 @@ export const KBPage: React.FC = () => {
     return matchesSearch && matchesScope && matchesDept;
   });
 
-  // Handle multiple file attachment uploads (Images, PDF, DOCX)
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      if (file.size > 15 * 1024 * 1024) {
-        toast.error(`File "${file.name}" exceeds 15MB size limit`);
-        return;
-      }
-
-      const isImage = file.type.startsWith('image/');
-      const isPdf = file.type === 'application/pdf' || file.name.endsWith('.pdf');
-      const isDocx =
-        file.type.includes('word') ||
-        file.name.endsWith('.docx') ||
-        file.name.endsWith('.doc');
-
-      const fileType = isImage ? 'image' : isPdf ? 'pdf' : isDocx ? 'docx' : 'file';
-
-      const formatSize = (bytes: number) => {
-        if (bytes < 1024) return `${bytes} B`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-      };
-
-      const reader = new FileReader();
-      reader.onload = async (loadEvent) => {
-        const rawDataUrl = loadEvent.target?.result as string;
-        let finalUrl = rawDataUrl;
-
-        try {
-          const uploadRes = await mockStorage.uploadFile(file.name, rawDataUrl);
-          if (uploadRes && uploadRes.url) {
-            finalUrl = uploadRes.url;
-          }
-        } catch {
-          // Fallback to rawDataUrl
-        }
-
-        const newAttachment: KBAttachment = {
-          id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
-          name: file.name,
-          size: formatSize(file.size),
-          type: fileType,
-          dataUrl: finalUrl,
-          uploadedAt: new Date().toISOString(),
-        };
-
-        setAttachments((prev) => [...prev, newAttachment]);
-        toast.success(`Attached ${file.name}`);
-      };
-
-      reader.readAsDataURL(file);
-    });
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleRemoveAttachment = (attId: string) => {
-    setAttachments((prev) => prev.filter((a) => a.id !== attId));
-  };
-
-  const handleCreateArticle = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) {
-      toast.error('Title and content are required');
-      return;
-    }
-
-    const selectedDept =
-      audienceScope === 'DEPARTMENT_SPECIFIC'
-        ? departments.find((d) => d.id === targetDepartmentId) || departments[0]
-        : null;
-
-    const newArticle: KBArticle = {
-      id: `kb-${Date.now()}`,
-      tenantId: currentTenant.id,
-      title: title.trim(),
-      categoryId: `cat-${Date.now()}`,
-      categoryName: categoryName.trim() || 'Company Policies',
-      content: content.trim(),
-      tags: tagsInput.split(',').map((t) => t.trim()).filter(Boolean),
-      status: 'PUBLISHED',
-      updatedAt: new Date().toISOString(),
-      targetDepartmentId: selectedDept ? selectedDept.id : null,
-      targetDepartmentName: selectedDept ? selectedDept.name : null,
-      attachments: attachments,
-    };
-
-    mockStorage.addTenantItem<KBArticle>(KEYS.KB_ARTICLES, newArticle);
-    mockStorage.addAuditLog('KB_ARTICLE_CREATED', 'KB_ARTICLE', newArticle.id);
-
-    const scopeMsg = selectedDept
-      ? `restricted to "${selectedDept.name}" department`
-      : 'published company-wide';
-
-    toast.success(`Knowledge Base article "${title}" ${scopeMsg}!`);
-    setIsCreateModalOpen(false);
-    setTitle('');
-    setContent('');
-    setAudienceScope('COMPANY_WIDE');
-    setTargetDepartmentId('');
-    setAttachments([]);
-    reloadArticles();
-  };
 
   const downloadAttachment = (att: KBAttachment) => {
     if (att.dataUrl) {
@@ -271,12 +157,7 @@ export const KBPage: React.FC = () => {
         </div>
         {isTenantAdmin && (
           <Button
-            onClick={() => {
-              setAttachments([]);
-              setAudienceScope('COMPANY_WIDE');
-              setTargetDepartmentId(departments[0]?.id || '');
-              setIsCreateModalOpen(true);
-            }}
+            onClick={() => setIsCreateModalOpen(true)}
             leftIcon={<Plus className="w-4 h-4" />}
             className="bg-[#FF6900] hover:bg-[#E05D00] font-bold cursor-pointer"
           >
@@ -595,209 +476,41 @@ export const KBPage: React.FC = () => {
         title="Create Knowledge Base Article & Step Guide"
         description="Publish company-wide universal guidelines or department-restricted step guides."
         maxWidth="2xl"
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)} className="cursor-pointer">
-              Cancel
-            </Button>
-            <Button onClick={handleCreateArticle} className="bg-[#FF6900] hover:bg-[#E05D00] font-bold cursor-pointer">
-              Publish Article
-            </Button>
-          </>
-        }
       >
-        <form onSubmit={handleCreateArticle} className="space-y-4">
-          {/* Audience / Scope Dependency Selector */}
-          <div className="space-y-2 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-            <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[#FF6900]" /> Audience Scope & Access Permission:
-            </label>
+        <KBArticleForm
+          tenantId={currentTenant.id}
+          onSubmit={(formData) => {
+            const newArticle: KBArticle = {
+              id: `kb-${Date.now()}`,
+              tenantId: currentTenant.id,
+              title: formData.title,
+              categoryId: formData.categoryId,
+              categoryName: formData.categoryName,
+              content: formData.content,
+              tags: formData.tags,
+              status: formData.status,
+              updatedAt: new Date().toISOString(),
+              targetDepartmentId: formData.targetDepartmentId,
+              targetDepartmentName: formData.targetDepartmentName,
+              attachments: formData.attachments,
+            };
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div
-                onClick={() => setAudienceScope('COMPANY_WIDE')}
-                className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                  audienceScope === 'COMPANY_WIDE'
-                    ? 'border-[#FF6900] bg-orange-50/40 text-slate-900 shadow-xs'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-bold text-xs">
-                  <Globe className="w-4 h-4 text-emerald-600" />
-                  <span>Company-Wide (Universal)</span>
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Visible to all employees across every department in {currentTenant.name}.
-                </p>
-              </div>
+            mockStorage.addTenantItem<KBArticle>(KEYS.KB_ARTICLES, newArticle);
+            mockStorage.addAuditLog('KB_ARTICLE_CREATED', 'KB_ARTICLE', newArticle.id);
 
-              <div
-                onClick={() => {
-                  setAudienceScope('DEPARTMENT_SPECIFIC');
-                  if (!targetDepartmentId) {
-                    setTargetDepartmentId(departments[0]?.id || '');
-                  }
-                }}
-                className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                  audienceScope === 'DEPARTMENT_SPECIFIC'
-                    ? 'border-purple-600 bg-purple-50/40 text-slate-900 shadow-xs'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-bold text-xs">
-                  <Lock className="w-4 h-4 text-purple-600" />
-                  <span>Department Specific</span>
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Strictly restricted to members of the selected department.
-                </p>
-              </div>
-            </div>
+            const scopeMsg = formData.targetDepartmentName
+              ? `restricted to "${formData.targetDepartmentName}" department`
+              : 'published company-wide';
 
-            {/* Department Selection (if Department Specific) */}
-            {audienceScope === 'DEPARTMENT_SPECIFIC' && (
-              <div className="pt-2">
-                <FormField label="Select Target Department" required>
-                  <Select
-                    value={targetDepartmentId}
-                    onChange={(e) => setTargetDepartmentId(e.target.value)}
-                    options={departments.map((dept) => ({
-                      value: dept.id,
-                      label: `${dept.name} Department`,
-                    }))}
-                  />
-                </FormField>
-              </div>
-            )}
-          </div>
-
-          <FormField label="Article Title" required>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Engineering On-Call Escalation Protocols"
-              required
-            />
-          </FormField>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField label="Category Name" required>
-              <Input
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="e.g. IT & Security, Engineering, Benefits"
-                required
-              />
-            </FormField>
-
-            <FormField label="Tags (Comma separated)" required>
-              <Input
-                value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="sop, guidelines, escalation, handbook"
-                required
-              />
-            </FormField>
-          </div>
-
-          <FormField label="Detailed Article Content & Instructions" required>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={5}
-              className="w-full rounded-xl border border-slate-300 p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6900]"
-              placeholder="Write the full documentation, step-by-step instructions, or departmental policy summary..."
-              required
-            />
-          </FormField>
-
-          {/* Attach Documents & Images Upload Section */}
-          <div className="space-y-2.5 pt-2 border-t border-slate-200">
-            <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Paperclip className="w-4 h-4 text-[#FF6900]" />
-                <span>Attach Step Guide Images, PDF & DOCX Files</span>
-              </span>
-              <span className="text-[11px] font-normal text-slate-400">Max 15MB each</span>
-            </label>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*,.pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 hover:border-[#FF6900] bg-slate-50 hover:bg-orange-50/20 p-5 rounded-2xl text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2"
-            >
-              <div className="w-10 h-10 rounded-xl bg-orange-100/60 text-[#FF6900] flex items-center justify-center">
-                <UploadCloud className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-800">
-                  Click to browse or drop step guide images (PNG/JPG), PDF or Word (DOCX) files
-                </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Screenshots of steps, policy PDFs, onboarding handbooks, or compliance documents
-                </p>
-              </div>
-            </div>
-
-            {attachments.length > 0 && (
-              <div className="space-y-2 pt-1">
-                <p className="text-xs font-semibold text-slate-600">
-                  Attached Files ({attachments.length}):
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {attachments.map((att) => (
-                    <div
-                      key={att.id}
-                      className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl shadow-2xs text-xs"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {att.type === 'image' ? (
-                          <ImageIcon className="w-4 h-4 text-purple-600 shrink-0" />
-                        ) : att.type === 'pdf' ? (
-                          <FileText className="w-4 h-4 text-rose-600 shrink-0" />
-                        ) : (
-                          <FileSpreadsheet className="w-4 h-4 text-blue-600 shrink-0" />
-                        )}
-                        <span className="font-medium text-slate-800 truncate" title={att.name}>
-                          {att.name}
-                        </span>
-                        <span className="text-[10px] text-slate-400 shrink-0">({att.size})</span>
-                      </div>
-
-                      <div className="flex items-center gap-1 shrink-0 ml-2">
-                        <button
-                          type="button"
-                          onClick={() => setPreviewDoc(att)}
-                          className="p-1 text-slate-400 hover:text-[#FF6900] rounded-md transition-colors cursor-pointer"
-                          title="Preview Uploaded File"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveAttachment(att.id)}
-                          className="p-1 text-slate-400 hover:text-rose-600 rounded-md transition-colors cursor-pointer"
-                          title="Remove Attachment"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </form>
+            toast.success(`Knowledge Base article "${formData.title}" ${scopeMsg}!`);
+            setIsCreateModalOpen(false);
+            reloadArticles();
+          }}
+          onCancel={() => setIsCreateModalOpen(false)}
+          submitLabel="Publish Article"
+        />
       </Modal>
+
 
       {/* Document & Step Guide Preview Modal (Topmost elevation z-[9999]) */}
       {previewDoc && (

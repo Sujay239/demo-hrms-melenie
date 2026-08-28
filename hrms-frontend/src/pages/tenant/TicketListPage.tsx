@@ -10,6 +10,7 @@ import { DataTable, Column } from '@/components/ui/DataTable';
 import { toast } from '@/components/ui/Toast';
 import { mockStorage, KEYS } from '@/services/mock-storage';
 import { Ticket, Department, Employee } from '@/demo-data/seedData';
+import { TicketForm } from '@/components/forms/TicketForm';
 import { Plus, Search, Ticket as TicketIcon, Send, MessageSquare, ShieldCheck, User } from 'lucide-react';
 
 export const TicketListPage: React.FC = () => {
@@ -364,62 +365,52 @@ export const TicketListPage: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         title="Create Help Desk Ticket"
-        description="Submit a request to IT, HR, or Operations department."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreateTicket} className="bg-[#FF6900] hover:bg-[#E05D00]">
-              Submit Ticket
-            </Button>
-          </>
-        }
+        description="Submit a request to Platform Super Admin or internal company support."
       >
-        <form onSubmit={handleCreateTicket} className="space-y-4">
-          <FormField label="Subject / Brief Summary" required>
-            <Input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="e.g. Laptop VPN Connection Timeout"
-              required
-            />
-          </FormField>
+        <TicketForm
+          tenantId={currentTenant.id}
+          onSubmit={(formData) => {
+            const newTicket: Ticket = {
+              id: `tkt-${Date.now()}`,
+              tenantId: currentTenant.id,
+              ticketNumber: `TKT-${Math.floor(100000 + Math.random() * 900000)}`,
+              subject: formData.subject.trim(),
+              description: formData.description.trim() || formData.subject.trim(),
+              category: formData.category,
+              departmentId: 'dept-1',
+              departmentName:
+                formData.targetScope === 'PLATFORM_SUPER_ADMIN'
+                  ? 'Platform Core Support'
+                  : 'Operations',
+              priority: (formData.priority === 'URGENT' ? 'HIGH' : formData.priority) as any,
+              status: 'OPEN',
+              targetScope: formData.targetScope,
+              createdById: myEmployee?.id || currentUser.id,
+              createdByName: myEmployee?.name || currentUser.name,
+              createdAt: new Date().toISOString(),
+              comments: [
+                {
+                  id: `c-${Date.now()}`,
+                  authorName: myEmployee?.name || currentUser.name,
+                  authorRole: 'TENANT_ADMIN',
+                  content:
+                    formData.targetScope === 'PLATFORM_SUPER_ADMIN'
+                      ? 'Reported directly to Platform Super Admin Dashboard.'
+                      : 'Ticket created and assigned to support desk.',
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            };
 
-          <FormField label="Target Department" required>
-            <Select
-              value={departmentId}
-              onChange={(e) => setDepartmentId(e.target.value)}
-              options={departments.map((dept) => ({
-                value: dept.id,
-                label: dept.name,
-              }))}
-            />
-          </FormField>
+            mockStorage.addTenantItem<Ticket>(KEYS.TICKETS, newTicket);
+            mockStorage.addAuditLog('TICKET_CREATED', 'TICKET', newTicket.id);
 
-          <FormField label="Priority" required>
-            <Select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as any)}
-              options={[
-                { value: 'HIGH', label: 'High Priority' },
-                { value: 'MEDIUM', label: 'Medium Priority' },
-                { value: 'LOW', label: 'Low Priority' },
-              ]}
-            />
-          </FormField>
-
-          <FormField label="Detailed Description" required>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full rounded-xl border border-slate-300 p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6900]"
-              placeholder="Explain the issue or request in detail..."
-              required
-            />
-          </FormField>
-        </form>
+            toast.success(`Ticket ${newTicket.ticketNumber} created successfully!`);
+            setIsCreateModalOpen(false);
+          }}
+          onCancel={() => setIsCreateModalOpen(false)}
+          submitLabel="Submit Ticket"
+        />
       </Modal>
     </div>
   );

@@ -901,7 +901,9 @@ export const AttendancePage: React.FC = () => {
               value={manualEmployeeId}
               onChange={(e) => setManualEmployeeId(e.target.value)}
               placeholder="Select Employee"
-              options={employees.map((e: any) => ({ value: e.id, label: `${e.name} (${e.employeeId || 'EMP'})` }))}
+              options={employees
+                .filter((e: any) => e.isPermanent !== false && e.employmentStatus !== 'INACTIVE')
+                .map((e: any) => ({ value: e.id, label: `${e.name} (${e.employeeId || 'EMP'})` }))}
             />
           </FormField>
 

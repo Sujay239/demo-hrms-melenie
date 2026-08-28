@@ -7,12 +7,14 @@ import {
   Users2,
   Settings,
   ShieldAlert,
+  LifeBuoy,
   LogOut,
   Menu,
   ChevronDown,
   Lock,
 } from "lucide-react";
-import { mockStorage } from "@/services/mock-storage";
+import { mockStorage, KEYS } from "@/services/mock-storage";
+import { Ticket } from "@/demo-data/seedData";
 import { Drawer } from "@/components/ui/Drawer";
 import { Avatar } from "@/components/ui/Avatar";
 import { ToastContainer } from "@/components/ui/Toast";
@@ -54,10 +56,23 @@ export const PlatformShell: React.FC = () => {
     );
   }
 
+  const allTickets = mockStorage.getTenantItems<Ticket>(KEYS.TICKETS);
+  const openTicketCount = allTickets.filter(
+    (t) =>
+      (t.targetScope === "PLATFORM_SUPER_ADMIN" || !t.targetScope) &&
+      (t.status === "OPEN" || t.status === "IN_PROGRESS"),
+  ).length;
+
   const navItems = [
     { label: "Platform Dashboard", path: "/admin", icon: LayoutDashboard },
     { label: "Tenants & Companies", path: "/admin/tenants", icon: Building2 },
     { label: "Consultants", path: "/admin/consultants", icon: Users2 },
+    {
+      label: "Support Tickets & Bugs",
+      path: "/admin/tickets",
+      icon: LifeBuoy,
+      badge: openTicketCount > 0 ? openTicketCount : undefined,
+    },
     { label: "Platform Settings", path: "/admin/settings", icon: Settings },
     {
       label: "Platform Audit Logs",
@@ -92,14 +107,28 @@ export const PlatformShell: React.FC = () => {
               to={item.path}
               onClick={() => setIsMobileOpen(false)}
               className={cn(
-                "flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all",
+                "flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all",
                 isActive
                   ? "bg-indigo-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
               )}
             >
-              <Icon className="w-5 h-5 shrink-0" />
-              <span>{item.label}</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <Icon className="w-5 h-5 shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </div>
+              {item.badge !== undefined && (
+                <span
+                  className={cn(
+                    "px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0",
+                    isActive
+                      ? "bg-rose-500 text-white"
+                      : "bg-rose-100 text-rose-700",
+                  )}
+                >
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}
